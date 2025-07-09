@@ -52,7 +52,7 @@ export default function KataDisplay() {
           return res.json();
         })
         .then((data) => {
-          setGradeId(data.grade_id);
+          setGradeId(String(data.grade));
         })
         .catch((error) => {
           console.error("Error fetching grade ID:", error);
