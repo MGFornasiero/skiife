@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { type Passaggi, type Sequenze } from "@/lib/data";
+import { type Passaggi, type Sequenze, type Passaggio } from "@/lib/data";
 import {
   Select,
   SelectContent,
@@ -164,10 +164,10 @@ export default function KataDisplay() {
                   {Object.entries(selectedPassaggi).map(([passaggioKey, passaggio]) => (
                     <TableRow key={passaggioKey}>
                       <TableCell className="font-medium">{passaggioKey}</TableCell>
-                      <TableCell>{passaggio.movement}</TableCell>
-                      <TableCell>{passaggio.tecnica}</TableCell>
-                      <TableCell>{passaggio.Stand}</TableCell>
-                      <TableCell>{passaggio.Target}</TableCell>
+                      <TableCell>{(passaggio as Passaggio).movement}</TableCell>
+                      <TableCell>{(passaggio as Passaggio).tecnica}</TableCell>
+                      <TableCell>{(passaggio as Passaggio).Stand}</TableCell>
+                      <TableCell>{(passaggio as Passaggio).Target}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
