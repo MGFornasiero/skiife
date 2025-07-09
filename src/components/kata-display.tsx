@@ -43,7 +43,7 @@ export default function KataDisplay() {
       setLoadingGradeId(true);
       setGradeId(null);
       fetch(
-        `https://skiiapi-638356355820.europe-west12.run.app/grade_id/${gradeType}/${grade}`
+        `/api/grade_id/${gradeType}/${grade}`
       )
         .then((res) => {
           if (!res.ok) {
