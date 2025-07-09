@@ -161,15 +161,18 @@ export default function KataDisplay() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {Object.entries(selectedPassaggi).map(([passaggioKey, passaggio]) => (
-                    <TableRow key={passaggioKey}>
-                      <TableCell className="font-medium">{passaggioKey}</TableCell>
-                      <TableCell>{(passaggio as Passaggio).movement}</TableCell>
-                      <TableCell>{(passaggio as Passaggio).tecnica}</TableCell>
-                      <TableCell>{(passaggio as Passaggio).Stand}</TableCell>
-                      <TableCell>{(passaggio as Passaggio).Target}</TableCell>
-                    </TableRow>
-                  ))}
+                  {Object.keys(selectedPassaggi).map((passaggioKey) => {
+                    const passaggio = selectedPassaggi[Number(passaggioKey)];
+                    return (
+                      <TableRow key={passaggioKey}>
+                        <TableCell className="font-medium">{passaggioKey}</TableCell>
+                        <TableCell>{passaggio.movement}</TableCell>
+                        <TableCell>{passaggio.tecnica}</TableCell>
+                        <TableCell>{passaggio.Stand}</TableCell>
+                        <TableCell>{passaggio.Target}</TableCell>
+                      </TableRow>
+                    );
+                  })}
                 </TableBody>
               </Table>
             </div>
