@@ -27,9 +27,9 @@ const facingArrowMap: { [key: string]: string } = {
   'E': '\u2192',  // Rightwards Arrow
   'SE': '\u2198', // South East Arrow
   'S': '\u2193',  // Downwards Arrow
-  'SW': '\u2199', // South West Arrow
-  'W': '\u2190',  // Leftwards Arrow
-  'NW': '\u2196'  // North West Arrow
+  'SO': '\u2199', // South West Arrow
+  'O': '\u2190',  // Leftwards Arrow
+  'NO': '\u2196'  // North West Arrow
 };
 
 const getFacingArrow = (facing: string) => {
@@ -147,7 +147,7 @@ export default function KataSelection() {
                    <CardContent className="p-4 flex flex-col gap-2">
                         <div className="flex justify-between items-start">
                            <div className="flex-grow">
-                            <p className="text-base font-medium">{step.posizione}</p>
+                            <p className="font-medium">{step.posizione}</p>
                             <p className="text-sm text-muted-foreground">{step.guardia}</p>
                            </div>
                            <span className="text-2xl font-bold text-muted-foreground" title={step.facing}>{getFacingArrow(step.facing)}</span>
@@ -157,9 +157,9 @@ export default function KataSelection() {
                         <TooltipTrigger asChild>
                             <div className="p-2 -mx-2 rounded-md hover:bg-accent/50 cursor-pointer">
                                 <p className="text-sm text-muted-foreground">Techniques:</p>
-                                <ul className="list-disc pl-5 text-sm font-medium">
+                                <ul className="list-disc pl-5 font-medium">
                                     {step.tecniche.map((tech) => (
-                                        <li key={tech.technic_id} className="truncate">{tech.Tecnica}</li>
+                                        <li key={tech.technic_id} className="truncate text-sm">{tech.Tecnica}</li>
                                     ))}
                                 </ul>
                             </div>
