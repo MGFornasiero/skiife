@@ -148,9 +148,11 @@ export default function KataSelection() {
                         <div className="flex justify-between items-start">
                            <div className="flex-grow">
                             <p className="font-medium">{step.posizione}</p>
-                            <p className="text-sm text-muted-foreground">{step.guardia}</p>
                            </div>
-                           <span className="text-2xl font-bold text-muted-foreground" title={step.facing}>{getFacingArrow(step.facing)}</span>
+                           <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                             <span>{step.guardia}</span>
+                             <span className="text-2xl font-bold" title={step.facing}>{getFacingArrow(step.facing)}</span>
+                           </div>
                         </div>
                     
                         <Tooltip>
