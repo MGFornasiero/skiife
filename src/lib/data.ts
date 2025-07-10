@@ -52,3 +52,7 @@ export type Transaction = {
 export type Transactions = {
   [key: number]: Transaction;
 };
+
+export type TransactionsMapping = {
+    [key: number]: number;
+};
