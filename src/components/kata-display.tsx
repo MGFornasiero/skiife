@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { type Sequenze, type KataInventory } from "@/lib/data";
+import { type Sequenze } from "@/lib/data";
 import {
   Select,
   SelectContent,
@@ -31,23 +31,6 @@ export default function KataDisplay() {
   const [sequenzeData, setSequenzeData] = useState<Sequenze | null>(null);
   const [loading, setLoading] = useState(false);
   const [showGradeSelection, setShowGradeSelection] = useState(true);
-
-  const [kataInventory, setKataInventory] = useState<KataInventory | null>(null);
-  const [kataId, setKataId] = useState<number | null>(null);
-
-
-  useEffect(() => {
-    // Fetch kata inventory on component mount
-    fetch('/api/kata_inventory')
-      .then(res => res.json())
-      .then(data => {
-        if (data && data.kata) {
-            setKataInventory(data.kata);
-        }
-      })
-      .catch(console.error);
-  }, []);
-
 
   useEffect(() => {
     // Reset state when grade or type changes
@@ -115,13 +98,6 @@ export default function KataDisplay() {
     setSelectedSequenzaKey(null);
   }
 
-  const handleKataChange = (value: string) => {
-      if (kataInventory) {
-          const selectedKataId = kataInventory[value];
-          setKataId(selectedKataId);
-      }
-  };
-
   return (
     <div className="space-y-6">
       <Card>
@@ -176,29 +152,6 @@ export default function KataDisplay() {
         )}
       </Card>
       
-      {kataInventory && (
-        <Card>
-          <CardContent className="pt-6">
-            <div className="space-y-2">
-              <Label htmlFor="kata-select">Kata</Label>
-              <Select onValueChange={handleKataChange}>
-                <SelectTrigger id="kata-select" className="w-full sm:w-[280px]">
-                  <SelectValue placeholder="Select a kata..." />
-                </SelectTrigger>
-                <SelectContent>
-                  {Object.keys(kataInventory).map((kataName) => (
-                    <SelectItem key={kataName} value={kataName}>
-                      {kataName}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              {kataId !== null && <p className="text-sm text-muted-foreground">Selected Kata ID: {kataId}</p>}
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
       {loading ? (
         <div className="flex flex-col items-center justify-center text-center p-10 border-2 border-dashed rounded-lg">
           <p className="text-muted-foreground">Loading data...</p>

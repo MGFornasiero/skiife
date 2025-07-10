@@ -1,6 +1,7 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import KataDisplay from "@/components/kata-display";
+import KataSelection from "@/components/kata-selection";
 
 export default function Home() {
   return (
@@ -28,15 +29,7 @@ export default function Home() {
             </Card>
           </TabsContent>
           <TabsContent value="segnaposto">
-            <Card>
-              <CardHeader>
-                <CardTitle>Placeholder</CardTitle>
-                <CardDescription>This is a placeholder tab.</CardDescription>
-              </CardHeader>
-              <CardContent className="flex items-center justify-center h-48">
-                <p className="text-muted-foreground">Content for this tab is coming soon.</p>
-              </CardContent>
-            </Card>
+            <KataSelection />
           </TabsContent>
         </Tabs>
       </div>
