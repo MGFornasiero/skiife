@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { type KataInventory, type KataSteps, type Transactions, type TransactionsMapping, type KataStep } from "@/lib/data";
+import { type KataInventory, type KataSteps, type Transactions, type TransactionsMapping } from "@/lib/data";
 import {
   Select,
   SelectContent,
@@ -20,6 +20,21 @@ interface KataData {
   transactions_mapping_from: TransactionsMapping;
   transactions_mapping_to: TransactionsMapping;
 }
+
+const facingArrowMap: { [key: string]: string } = {
+  'N': '\u2191',  // Upwards Arrow
+  'NE': '\u2197', // North East Arrow
+  'E': '\u2192',  // Rightwards Arrow
+  'SE': '\u2198', // South East Arrow
+  'S': '\u2193',  // Downwards Arrow
+  'SW': '\u2199', // South West Arrow
+  'W': '\u2190',  // Leftwards Arrow
+  'NW': '\u2196'  // North West Arrow
+};
+
+const getFacingArrow = (facing: string) => {
+  return facingArrowMap[facing] || facing;
+};
 
 export default function KataSelection() {
   const [kataInventory, setKataInventory] = useState<KataInventory | null>(null);
@@ -129,34 +144,36 @@ export default function KataSelection() {
             <div className="mt-6 flex flex-col gap-4">
               {sortedKataSteps.map((step) => (
                 <Card key={step.id_sequence} className={cn("flex flex-col", step.kiai && "bg-accent/20 border-accent")}>
-                   <CardHeader className="flex-grow p-4">
-                      <CardTitle className="text-lg">{step.posizione}</CardTitle>
-                      <CardDescription>
-                          {step.guardia} | {step.facing}
-                      </CardDescription>
-                  </CardHeader>
-                  <CardContent className="p-4 pt-0">
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <div className="p-2 -mx-2 rounded-md hover:bg-accent/50 cursor-pointer">
-                            <p className="font-semibold text-sm">Techniques:</p>
-                            <ul className="list-disc pl-5 text-sm">
-                                {step.tecniche.map((tech) => (
-                                    <li key={tech.technic_id} className="truncate">{tech.Tecnica}</li>
-                                ))}
-                            </ul>
+                   <CardContent className="p-4 flex flex-col gap-2">
+                        <div className="flex justify-between items-start">
+                           <div className="flex-grow">
+                            <p className="text-base font-medium">{step.posizione}</p>
+                            <p className="text-sm text-muted-foreground">{step.guardia}</p>
+                           </div>
+                           <span className="text-2xl font-bold text-muted-foreground" title={step.facing}>{getFacingArrow(step.facing)}</span>
                         </div>
-                      </TooltipTrigger>
-                      <TooltipContent side="top" align="start">
-                        {step.tecniche.map((tech) => (
-                            <div key={tech.technic_id} className="mb-2 last:mb-0">
-                                <p><strong>Arto:</strong> {tech.arto}</p>
-                                <p><strong>Tecnica:</strong> {tech.Tecnica}</p>
-                                <p><strong>Obiettivo:</strong> {tech.Obiettivo || 'N/A'}</p>
+                    
+                        <Tooltip>
+                        <TooltipTrigger asChild>
+                            <div className="p-2 -mx-2 rounded-md hover:bg-accent/50 cursor-pointer">
+                                <p className="text-sm text-muted-foreground">Techniques:</p>
+                                <ul className="list-disc pl-5 text-sm font-medium">
+                                    {step.tecniche.map((tech) => (
+                                        <li key={tech.technic_id} className="truncate">{tech.Tecnica}</li>
+                                    ))}
+                                </ul>
                             </div>
-                        ))}
-                      </TooltipContent>
-                    </Tooltip>
+                        </TooltipTrigger>
+                        <TooltipContent side="top" align="start">
+                            {step.tecniche.map((tech) => (
+                                <div key={tech.technic_id} className="mb-2 last:mb-0">
+                                    <p><strong>Arto:</strong> {tech.arto}</p>
+                                    <p><strong>Tecnica:</strong> {tech.Tecnica}</p>
+                                    <p><strong>Obiettivo:</strong> {tech.Obiettivo || 'N/A'}</p>
+                                </div>
+                            ))}
+                        </TooltipContent>
+                        </Tooltip>
                   </CardContent>
                 </Card>
               ))}
