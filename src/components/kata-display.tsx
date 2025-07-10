@@ -19,6 +19,9 @@ import {
 } from "@/components/ui/table";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { ChevronDown, ChevronUp } from "lucide-react";
 
 export default function KataDisplay() {
   const [selectedSequenzaKey, setSelectedSequenzaKey] = useState<string | null>(null);
@@ -27,6 +30,7 @@ export default function KataDisplay() {
   const [gradeId, setGradeId] = useState<string | null>(null);
   const [sequenzeData, setSequenzeData] = useState<Sequenze | null>(null);
   const [loading, setLoading] = useState(false);
+  const [showGradeSelection, setShowGradeSelection] = useState(true);
 
   useEffect(() => {
     // Reset state when grade or type changes
@@ -49,6 +53,7 @@ export default function KataDisplay() {
       .then((gradeData) => {
         const newGradeId = String(gradeData.grade);
         setGradeId(newGradeId);
+        setShowGradeSelection(false); // Hide selection on success
         return fetch(`/api/kihons/${newGradeId}`);
       })
       .then((res) => {
@@ -68,6 +73,7 @@ export default function KataDisplay() {
         console.error("Error fetching data:", error);
         setGradeId(null);
         setSequenzeData(null);
+        setShowGradeSelection(true); // Show selection on error
       })
       .finally(() => {
         setLoading(false);
@@ -93,36 +99,56 @@ export default function KataDisplay() {
 
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-end mb-4">
-        <div className="space-y-2">
-          <Label>Tipo</Label>
-          <div className="flex items-center space-x-2">
-            <Label htmlFor="grade-type-switch" className={gradeType === 'kyu' ? '' : 'text-muted-foreground'}>Kyu</Label>
-            <Switch
-              id="grade-type-switch"
-              checked={gradeType === "dan"}
-              onCheckedChange={handleGradeTypeChange}
-            />
-            <Label htmlFor="grade-type-switch" className={gradeType === 'dan' ? '' : 'text-muted-foreground'}>Dan</Label>
-          </div>
+      <Card>
+        <div className="flex justify-between items-center p-4 cursor-pointer" onClick={() => setShowGradeSelection(!showGradeSelection)}>
+            <div className="flex flex-col">
+                 <h3 className="font-semibold">Grade Selection</h3>
+                 {!showGradeSelection && grade && (
+                    <p className="text-sm text-muted-foreground capitalize">
+                        {gradeType} {grade}
+                    </p>
+                )}
+            </div>
+            <Button variant="ghost" size="sm">
+                {showGradeSelection ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                <span className="sr-only">Toggle Grade Selection</span>
+            </Button>
         </div>
+        {showGradeSelection && (
+          <CardContent>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-end pt-4 border-t">
+              <div className="space-y-2">
+                <Label>Tipo</Label>
+                <div className="flex items-center space-x-2">
+                  <Label htmlFor="grade-type-switch" className={gradeType === 'kyu' ? '' : 'text-muted-foreground'}>Kyu</Label>
+                  <Switch
+                    id="grade-type-switch"
+                    checked={gradeType === "dan"}
+                    onCheckedChange={handleGradeTypeChange}
+                  />
+                  <Label htmlFor="grade-type-switch" className={gradeType === 'dan' ? '' : 'text-muted-foreground'}>Dan</Label>
+                </div>
+              </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="grade-select">Grado</Label>
-          <Select onValueChange={handleGradeChange} value={grade?.toString() || ""}>
-            <SelectTrigger id="grade-select" className="w-full sm:w-[180px]">
-              <SelectValue placeholder="Select a grado..." />
-            </SelectTrigger>
-            <SelectContent>
-              {gradeNumbers.map((num) => (
-                <SelectItem key={num} value={String(num)}>
-                  {num}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-      </div>
+              <div className="space-y-2">
+                <Label htmlFor="grade-select">Grado</Label>
+                <Select onValueChange={handleGradeChange} value={grade?.toString() || ""}>
+                  <SelectTrigger id="grade-select" className="w-full sm:w-[180px]">
+                    <SelectValue placeholder="Select a grado..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {gradeNumbers.map((num) => (
+                      <SelectItem key={num} value={String(num)}>
+                        {num}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          </CardContent>
+        )}
+      </Card>
       
       {loading ? (
         <div className="flex flex-col items-center justify-center text-center p-10 border-2 border-dashed rounded-lg">
@@ -130,22 +156,22 @@ export default function KataDisplay() {
         </div>
       ) : gradeId && sequenzeData ? (
         <>
-          <div className="h-6 mb-4">
-            <p className="font-medium">Grade ID: <span className="font-mono p-1 bg-muted rounded-md text-sm">{gradeId}</span></p>
-          </div>
-          <div className="w-full sm:w-64">
-            <Select onValueChange={setSelectedSequenzaKey} value={selectedSequenzaKey || ""}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select a sequenza..." />
-              </SelectTrigger>
-              <SelectContent>
-                {sequenzaKeys.map((key) => (
-                  <SelectItem key={key} value={key}>
-                    Sequenza {key}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+          <div className="flex items-center gap-4">
+             <div className="w-full sm:w-64">
+                <Select onValueChange={setSelectedSequenzaKey} value={selectedSequenzaKey || ""}>
+                <SelectTrigger>
+                    <SelectValue placeholder="Select a sequenza..." />
+                </SelectTrigger>
+                <SelectContent>
+                    {sequenzaKeys.map((key) => (
+                    <SelectItem key={key} value={key}>
+                        Sequenza {key}
+                    </SelectItem>
+                    ))}
+                </SelectContent>
+                </Select>
+            </div>
+            <p className="text-sm font-medium text-muted-foreground">Grade ID: <span className="font-mono p-1 bg-muted rounded-md text-sm text-foreground">{gradeId}</span></p>
           </div>
 
           {selectedPassaggi ? (
