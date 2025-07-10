@@ -12,16 +12,22 @@ import {
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 
+interface KataData {
+  steps: KataSteps;
+  transactions: Transactions;
+  transactions_mapping_from: TransactionsMapping;
+  transactions_mapping_to: TransactionsMapping;
+}
+
 export default function KataSelection() {
   const [kataInventory, setKataInventory] = useState<KataInventory | null>(null);
   const [kataId, setKataId] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
-  const [kataData, setKataData] = useState<{
-    kata_steps: KataSteps;
-    transactions: Transactions;
-    transactions_mapping_from: TransactionsMapping;
-    transactions_mapping_to: TransactionsMapping;
-  } | null>(null);
+  const [kataSteps, setKataSteps] = useState<KataSteps | null>(null);
+  const [tx, setTx] = useState<Transactions | null>(null);
+  const [transactionsMappingFrom, setTransactionsMappingFrom] = useState<TransactionsMapping | null>(null);
+  const [transactionsMappingTo, setTransactionsMappingTo] = useState<TransactionsMapping | null>(null);
+
 
   useEffect(() => {
     // Fetch kata inventory on component mount
@@ -37,12 +43,19 @@ export default function KataSelection() {
 
   useEffect(() => {
     if (kataId === null) {
-      setKataData(null);
+      setKataSteps(null);
+      setTx(null);
+      setTransactionsMappingFrom(null);
+      setTransactionsMappingTo(null);
       return;
     }
 
     setLoading(true);
-    setKataData(null);
+    setKataSteps(null);
+    setTx(null);
+    setTransactionsMappingFrom(null);
+    setTransactionsMappingTo(null);
+
     fetch(`/api/kata/${kataId}`)
       .then(res => {
         if (!res.ok) {
@@ -50,12 +63,14 @@ export default function KataSelection() {
         }
         return res.json();
       })
-      .then(data => {
-        setKataData(data);
+      .then((data: KataData) => {
+        setKataSteps(data.steps);
+        setTx(data.transactions);
+        setTransactionsMappingFrom(data.transactions_mapping_from);
+        setTransactionsMappingTo(data.transactions_mapping_to);
       })
       .catch(error => {
         console.error("Error fetching kata data:", error);
-        setKataData(null);
       })
       .finally(() => {
         setLoading(false);
@@ -68,6 +83,13 @@ export default function KataSelection() {
           const selectedKataId = kataInventory[value];
           setKataId(selectedKataId);
       }
+  };
+
+  const kataData = {
+    kata_steps: kataSteps,
+    tx: tx,
+    transactions_mapping_from: transactionsMappingFrom,
+    transactions_mapping_to: transactionsMappingTo
   };
 
   return (
@@ -103,7 +125,7 @@ export default function KataSelection() {
         
         {loading && <p className="text-muted-foreground pt-4">Loading kata details...</p>}
 
-        {kataData && (
+        {kataSteps && tx && (
           <div className="mt-6 p-4 bg-muted rounded-lg">
             <h4 className="font-semibold mb-2">Kata Data Loaded</h4>
             <pre className="text-xs overflow-auto bg-background p-2 rounded">
