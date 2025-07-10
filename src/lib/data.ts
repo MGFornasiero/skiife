@@ -43,3 +43,12 @@ export type Sequenze = {
 export type KataInventory = {
   [key: string]: number;
 };
+
+export type Transaction = {
+  tempo: string;
+  direction: string;
+};
+
+export type Transactions = {
+  [key: number]: Transaction;
+};
