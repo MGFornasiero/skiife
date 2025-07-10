@@ -85,13 +85,6 @@ export default function KataSelection() {
       }
   };
 
-  const kataData = {
-    kata_steps: kataSteps,
-    tx: tx,
-    transactions_mapping_from: transactionsMappingFrom,
-    transactions_mapping_to: transactionsMappingTo
-  };
-
   return (
     <Card>
       <CardHeader>
@@ -125,12 +118,32 @@ export default function KataSelection() {
         
         {loading && <p className="text-muted-foreground pt-4">Loading kata details...</p>}
 
-        {kataSteps && tx && (
-          <div className="mt-6 p-4 bg-muted rounded-lg">
-            <h4 className="font-semibold mb-2">Kata Data Loaded</h4>
-            <pre className="text-xs overflow-auto bg-background p-2 rounded">
-              {JSON.stringify(kataData, null, 2)}
-            </pre>
+        {kataSteps && tx && transactionsMappingFrom && transactionsMappingTo && (
+           <div className="mt-6 space-y-4">
+            <div>
+              <h4 className="font-semibold mb-2">Kata Steps</h4>
+              <pre className="text-xs overflow-auto bg-muted p-2 rounded max-h-60">
+                {JSON.stringify(kataSteps, null, 2)}
+              </pre>
+            </div>
+            <div>
+              <h4 className="font-semibold mb-2">Transactions (tx)</h4>
+              <pre className="text-xs overflow-auto bg-muted p-2 rounded max-h-60">
+                {JSON.stringify(tx, null, 2)}
+              </pre>
+            </div>
+            <div>
+              <h4 className="font-semibold mb-2">Transactions Mapping From</h4>
+              <pre className="text-xs overflow-auto bg-muted p-2 rounded max-h-60">
+                {JSON.stringify(transactionsMappingFrom, null, 2)}
+              </pre>
+            </div>
+            <div>
+              <h4 className="font-semibold mb-2">Transactions Mapping To</h4>
+              <pre className="text-xs overflow-auto bg-muted p-2 rounded max-h-60">
+                {JSON.stringify(transactionsMappingTo, null, 2)}
+              </pre>
+            </div>
           </div>
         )}
 
