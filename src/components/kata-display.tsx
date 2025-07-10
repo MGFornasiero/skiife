@@ -102,12 +102,13 @@ export default function KataDisplay() {
       <Card>
         <div className="flex justify-between items-center p-4 cursor-pointer" onClick={() => setShowGradeSelection(!showGradeSelection)}>
             <div className="flex flex-col">
-                 <h3 className="font-semibold">Grade Selection</h3>
-                 {!showGradeSelection && grade && (
-                    <p className="text-sm text-muted-foreground capitalize">
-                        {gradeType} {grade}
-                    </p>
-                )}
+                 <h3 className="font-semibold">
+                  {!showGradeSelection && grade ? (
+                    <span className="capitalize">Grado: {grade}° {gradeType}</span>
+                  ) : (
+                    "Grade Selection"
+                  )}
+                 </h3>
             </div>
             <Button variant="ghost" size="sm">
                 {showGradeSelection ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
@@ -171,7 +172,6 @@ export default function KataDisplay() {
                 </SelectContent>
                 </Select>
             </div>
-            <p className="text-sm font-medium text-muted-foreground">Grade ID: <span className="font-mono p-1 bg-muted rounded-md text-sm text-foreground">{gradeId}</span></p>
           </div>
 
           {selectedPassaggi ? (
