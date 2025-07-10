@@ -126,7 +126,7 @@ export default function KataSelection() {
 
         {kataSteps && (
           <TooltipProvider>
-            <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            <div className="mt-6 flex flex-col gap-4">
               {sortedKataSteps.map((step) => (
                 <Card key={step.id_sequence} className={cn("flex flex-col", step.kiai && "bg-accent/20 border-accent")}>
                    <CardHeader className="flex-grow p-4">
