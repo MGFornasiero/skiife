@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { type KataInventory, type KataSteps, type Transactions, type TransactionsMapping } from "@/lib/data";
+import { type KataInventory, type KataSteps, type Transactions, type TransactionsMapping, type KataStep } from "@/lib/data";
 import {
   Select,
   SelectContent,
@@ -11,6 +11,8 @@ import {
 } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { cn } from "@/lib/utils";
 
 interface KataData {
   steps: KataSteps;
@@ -84,6 +86,10 @@ export default function KataSelection() {
           setKataId(selectedKataId);
       }
   };
+  
+  const sortedKataSteps = kataSteps 
+    ? Object.values(kataSteps).sort((a, b) => a.seq_num - b.seq_num) 
+    : [];
 
   return (
     <Card>
@@ -118,35 +124,45 @@ export default function KataSelection() {
         
         {loading && <p className="text-muted-foreground pt-4">Loading kata details...</p>}
 
-        {kataSteps && tx && transactionsMappingFrom && transactionsMappingTo && (
-           <div className="mt-6 space-y-4">
-            <div>
-              <h4 className="font-semibold mb-2">Kata Steps</h4>
-              <pre className="text-xs overflow-auto bg-muted p-2 rounded max-h-60">
-                {JSON.stringify(kataSteps, null, 2)}
-              </pre>
+        {kataSteps && (
+          <TooltipProvider>
+            <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              {sortedKataSteps.map((step) => (
+                <Card key={step.id_sequence} className={cn("flex flex-col", step.kiai && "bg-accent/20 border-accent")}>
+                   <CardHeader className="flex-grow p-4">
+                      <CardTitle className="text-lg">{step.posizione}</CardTitle>
+                      <CardDescription>
+                          {step.guardia} | {step.facing}
+                      </CardDescription>
+                  </CardHeader>
+                  <CardContent className="p-4 pt-0">
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <div className="p-2 -mx-2 rounded-md hover:bg-accent/50 cursor-pointer">
+                            <p className="font-semibold text-sm">Techniques:</p>
+                            <ul className="list-disc pl-5 text-sm">
+                                {step.tecniche.map((tech) => (
+                                    <li key={tech.technic_id} className="truncate">{tech.Tecnica}</li>
+                                ))}
+                            </ul>
+                        </div>
+                      </TooltipTrigger>
+                      <TooltipContent side="top" align="start">
+                        {step.tecniche.map((tech) => (
+                            <div key={tech.technic_id} className="mb-2 last:mb-0">
+                                <p><strong>Arto:</strong> {tech.arto}</p>
+                                <p><strong>Tecnica:</strong> {tech.Tecnica}</p>
+                                <p><strong>Obiettivo:</strong> {tech.Obiettivo || 'N/A'}</p>
+                            </div>
+                        ))}
+                      </TooltipContent>
+                    </Tooltip>
+                  </CardContent>
+                </Card>
+              ))}
             </div>
-            <div>
-              <h4 className="font-semibold mb-2">Transactions (tx)</h4>
-              <pre className="text-xs overflow-auto bg-muted p-2 rounded max-h-60">
-                {JSON.stringify(tx, null, 2)}
-              </pre>
-            </div>
-            <div>
-              <h4 className="font-semibold mb-2">Transactions Mapping From</h4>
-              <pre className="text-xs overflow-auto bg-muted p-2 rounded max-h-60">
-                {JSON.stringify(transactionsMappingFrom, null, 2)}
-              </pre>
-            </div>
-            <div>
-              <h4 className="font-semibold mb-2">Transactions Mapping To</h4>
-              <pre className="text-xs overflow-auto bg-muted p-2 rounded max-h-60">
-                {JSON.stringify(transactionsMappingTo, null, 2)}
-              </pre>
-            </div>
-          </div>
+          </TooltipProvider>
         )}
-
       </CardContent>
     </Card>
   );
