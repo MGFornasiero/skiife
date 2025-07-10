@@ -39,3 +39,7 @@ export type Passaggi = {
 export type Sequenze = {
   [key: number]: Passaggi;
 };
+
+export type KataInventory = {
+  [key: string]: number;
+};
