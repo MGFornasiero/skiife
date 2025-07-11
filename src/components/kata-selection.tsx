@@ -10,7 +10,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import React from "react";
@@ -122,17 +121,15 @@ export default function KataSelection() {
 
   return (
     <Card>
-      <CardHeader>
-        <CardTitle>{selectedKataName ? `Kata: ${selectedKataName}` : "Kata Selection"}</CardTitle>
-        {!selectedKataName && <CardDescription>Select a kata to see its details.</CardDescription>}
-      </CardHeader>
-      <CardContent>
+      <CardHeader className="flex-row items-center justify-between">
+        <div>
+          <CardTitle>{selectedKataName ? `Kata: ${selectedKataName}` : "Kata Selection"}</CardTitle>
+          {!selectedKataName && <CardDescription>Select a kata to see its details.</CardDescription>}
+        </div>
         {kataInventory ? (
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="kata-select">Kata</Label>
+          <div className="w-full sm:w-[280px]">
               <Select onValueChange={handleKataChange}>
-                <SelectTrigger id="kata-select" className="w-full sm:w-[280px]">
+                <SelectTrigger id="kata-select">
                   <SelectValue placeholder="Select a kata..." />
                 </SelectTrigger>
                 <SelectContent>
@@ -143,14 +140,14 @@ export default function KataSelection() {
                   ))}
                 </SelectContent>
               </Select>
-            </div>
           </div>
         ) : (
-            <div className="flex items-center justify-center h-24">
-                <p className="text-muted-foreground">Loading kata inventory...</p>
+            <div className="flex items-center justify-center">
+                <p className="text-sm text-muted-foreground">Loading...</p>
             </div>
         )}
-        
+      </CardHeader>
+      <CardContent>
         {loading && <p className="text-muted-foreground pt-4">Loading kata details...</p>}
 
         {kataSteps && tx && transactionsMappingFrom && (
