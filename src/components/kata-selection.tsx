@@ -13,7 +13,6 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Label } from "@/components/ui/label";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
-import { ArrowDown } from "lucide-react";
 import React from "react";
 
 interface KataData {
@@ -34,9 +33,21 @@ const facingArrowMap: { [key: string]: string } = {
   'NO': '\u2196'  // North West Arrow
 };
 
+const directionSymbolMap: { [key: string]: string } = {
+  'sx': '\u21BA',      // Anticlockwise Open Circle Arrow
+  'dx': '\u21BB',      // Clockwise Open Circle Arrow
+  'frontal': '\u21D3', // Downwards Double Arrow
+};
+
 const getFacingArrow = (facing: string) => {
   return facingArrowMap[facing] || facing;
 };
+
+const getDirectionSymbol = (direction: string | null | undefined) => {
+  if (!direction) return '\u21D3'; // Default for None or ""
+  return directionSymbolMap[direction] || '\u21D3'; // Default for any other case
+}
+
 
 export default function KataSelection() {
   const [kataInventory, setKataInventory] = useState<KataInventory | null>(null);
@@ -189,12 +200,11 @@ export default function KataSelection() {
                     {index < sortedKataSteps.length - 1 && (
                       <div className="flex flex-col items-center my-2 text-muted-foreground">
                          {transaction && (
-                          <div className="text-xs text-center mb-1">
-                            <p>{transaction.tempo}</p>
-                            <p>{transaction.direction}</p>
+                          <div className="text-center mb-1">
+                            <p className="text-xs">{transaction.tempo}</p>
+                            <p className="text-2xl font-bold" title={transaction.direction}>{getDirectionSymbol(transaction.direction)}</p>
                           </div>
                         )}
-                        <ArrowDown className="h-6 w-6" />
                       </div>
                     )}
                   </React.Fragment>
