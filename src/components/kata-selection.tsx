@@ -14,6 +14,7 @@ import { Label } from "@/components/ui/label";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import { ArrowDown } from "lucide-react";
+import React from "react";
 
 interface KataData {
   steps: KataSteps;
@@ -145,8 +146,8 @@ export default function KataSelection() {
           <TooltipProvider>
             <div className="mt-6 flex flex-col items-center gap-2">
               {sortedKataSteps.map((step, index) => (
-                <>
-                  <Card key={step.id_sequence} className={cn("w-full max-w-md flex flex-col", step.kiai && "bg-accent/20 border-accent")}>
+                <React.Fragment key={step.id_sequence}>
+                  <Card className={cn("w-full max-w-md flex flex-col", step.kiai && "bg-accent/20 border-accent")}>
                     <CardContent className="p-4 flex flex-col gap-2">
                           <div className="flex justify-between items-start">
                             <div className="flex-grow">
@@ -185,7 +186,7 @@ export default function KataSelection() {
                   {index < sortedKataSteps.length - 1 && (
                     <ArrowDown className="text-muted-foreground h-6 w-6 my-2" />
                   )}
-                </>
+                </React.Fragment>
               ))}
             </div>
           </TooltipProvider>
