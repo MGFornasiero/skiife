@@ -198,9 +198,9 @@ export default function KataSelection() {
                       </CardContent>
                     </Card>
                     {index < sortedKataSteps.length - 1 && (
-                      <div className="flex flex-col items-center my-2 text-muted-foreground">
+                      <div className="flex items-center justify-center my-2 text-muted-foreground">
                          {transaction && (
-                          <div className="text-center mb-1">
+                          <div className="flex items-center gap-2">
                             <p className="text-xs">{transaction.tempo}</p>
                             <p className="text-2xl font-bold" title={transaction.direction}>{getDirectionSymbol(transaction.direction)}</p>
                           </div>
