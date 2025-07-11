@@ -13,6 +13,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Label } from "@/components/ui/label";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
+import { ArrowDown } from "lucide-react";
 
 interface KataData {
   steps: KataSteps;
@@ -38,6 +39,7 @@ const getFacingArrow = (facing: string) => {
 
 export default function KataSelection() {
   const [kataInventory, setKataInventory] = useState<KataInventory | null>(null);
+  const [selectedKataName, setSelectedKataName] = useState<string | null>(null);
   const [kataId, setKataId] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
   const [kataSteps, setKataSteps] = useState<KataSteps | null>(null);
@@ -47,7 +49,6 @@ export default function KataSelection() {
 
 
   useEffect(() => {
-    // Fetch kata inventory on component mount
     fetch('/api/kata_inventory')
       .then(res => res.json())
       .then(data => {
@@ -97,6 +98,7 @@ export default function KataSelection() {
 
   const handleKataChange = (value: string) => {
       if (kataInventory) {
+          setSelectedKataName(value);
           const selectedKataId = kataInventory[value];
           setKataId(selectedKataId);
       }
@@ -109,8 +111,8 @@ export default function KataSelection() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Kata Selection</CardTitle>
-        <CardDescription>Select a kata to see its details.</CardDescription>
+        <CardTitle>{selectedKataName ? `Kata: ${selectedKataName}` : "Kata Selection"}</CardTitle>
+        {!selectedKataName && <CardDescription>Select a kata to see its details.</CardDescription>}
       </CardHeader>
       <CardContent>
         {kataInventory ? (
@@ -141,43 +143,49 @@ export default function KataSelection() {
 
         {kataSteps && (
           <TooltipProvider>
-            <div className="mt-6 flex flex-col gap-4">
-              {sortedKataSteps.map((step) => (
-                <Card key={step.id_sequence} className={cn("flex flex-col", step.kiai && "bg-accent/20 border-accent")}>
-                   <CardContent className="p-4 flex flex-col gap-2">
-                        <div className="flex justify-between items-start">
-                           <div className="flex-grow">
-                            <p className="font-medium">{step.posizione}</p>
-                           </div>
-                           <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                             <span>{step.guardia}</span>
-                             <span className="text-2xl font-bold" title={step.facing}>{getFacingArrow(step.facing)}</span>
-                           </div>
-                        </div>
-                    
-                        <Tooltip>
-                        <TooltipTrigger asChild>
-                            <div className="p-2 -mx-2 rounded-md hover:bg-accent/50 cursor-pointer">
-                                <p className="text-sm text-muted-foreground">Techniques:</p>
-                                <ul className="list-disc pl-5 font-medium">
-                                    {step.tecniche.map((tech) => (
-                                        <li key={tech.technic_id} className="truncate text-sm">{tech.Tecnica}</li>
-                                    ))}
-                                </ul>
+            <div className="mt-6 flex flex-col items-center gap-2">
+              {sortedKataSteps.map((step, index) => (
+                <>
+                  <Card key={step.id_sequence} className={cn("w-full max-w-md flex flex-col", step.kiai && "bg-accent/20 border-accent")}>
+                    <CardContent className="p-4 flex flex-col gap-2">
+                          <div className="flex justify-between items-start">
+                            <div className="flex-grow">
+                              <p className="font-medium">{step.posizione}</p>
                             </div>
-                        </TooltipTrigger>
-                        <TooltipContent side="top" align="start">
-                            {step.tecniche.map((tech) => (
-                                <div key={tech.technic_id} className="mb-2 last:mb-0">
-                                    <p><strong>Arto:</strong> {tech.arto}</p>
-                                    <p><strong>Tecnica:</strong> {tech.Tecnica}</p>
-                                    <p><strong>Obiettivo:</strong> {tech.Obiettivo || 'N/A'}</p>
-                                </div>
-                            ))}
-                        </TooltipContent>
-                        </Tooltip>
-                  </CardContent>
-                </Card>
+                            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                              <span className="text-xl font-bold">{step.embusen}</span>
+                              <span>{step.guardia}</span>
+                              <span className="text-2xl font-bold" title={step.facing}>{getFacingArrow(step.facing)}</span>
+                            </div>
+                          </div>
+                      
+                          <Tooltip>
+                          <TooltipTrigger asChild>
+                              <div className="p-2 -mx-2 rounded-md hover:bg-accent/50 cursor-pointer">
+                                  <p className="text-sm text-muted-foreground">Techniques:</p>
+                                  <ul className="list-disc pl-5 font-medium">
+                                      {step.tecniche.map((tech) => (
+                                          <li key={tech.technic_id} className="truncate text-sm">{tech.Tecnica}</li>
+                                      ))}
+                                  </ul>
+                              </div>
+                          </TooltipTrigger>
+                          <TooltipContent side="top" align="start">
+                              {step.tecniche.map((tech) => (
+                                  <div key={tech.technic_id} className="mb-2 last:mb-0">
+                                      <p><strong>Arto:</strong> {tech.arto}</p>
+                                      <p><strong>Tecnica:</strong> {tech.Tecnica}</p>
+                                      <p><strong>Obiettivo:</strong> {tech.Obiettivo || 'N/A'}</p>
+                                  </div>
+                              ))}
+                          </TooltipContent>
+                          </Tooltip>
+                    </CardContent>
+                  </Card>
+                  {index < sortedKataSteps.length - 1 && (
+                    <ArrowDown className="text-muted-foreground h-6 w-6 my-2" />
+                  )}
+                </>
               ))}
             </div>
           </TooltipProvider>
