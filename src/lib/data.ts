@@ -30,6 +30,7 @@ export type Passaggio = {
   tecnica: string;
   Stand: string;
   Target: string;
+  notes?: string;
 };
 
 export type Passaggi = {

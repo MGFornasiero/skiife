@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { type Sequenze } from "@/lib/data";
+import { type Sequenze, type Passaggio } from "@/lib/data";
 import {
   Select,
   SelectContent,
@@ -22,6 +22,7 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { ChevronDown, ChevronUp } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 export default function KataDisplay() {
   const [selectedSequenzaKey, setSelectedSequenzaKey] = useState<string | null>(null);
@@ -31,6 +32,7 @@ export default function KataDisplay() {
   const [sequenzeData, setSequenzeData] = useState<Sequenze | null>(null);
   const [loading, setLoading] = useState(false);
   const [showGradeSelection, setShowGradeSelection] = useState(true);
+  const { toast } = useToast();
 
   useEffect(() => {
     // Reset state when grade or type changes
@@ -97,6 +99,16 @@ export default function KataDisplay() {
     setGrade(null); // Reset grade when type changes
     setSelectedSequenzaKey(null);
   }
+
+  const handleRowClick = (passaggio: Passaggio) => {
+    if (passaggio.notes) {
+      toast({
+        title: "Note",
+        description: passaggio.notes,
+      });
+    }
+  };
+
 
   return (
     <div className="space-y-6">
@@ -191,7 +203,7 @@ export default function KataDisplay() {
                   {Object.keys(selectedPassaggi).map((passaggioKey) => {
                     const passaggio = selectedPassaggi[Number(passaggioKey)];
                     return (
-                      <TableRow key={passaggioKey}>
+                      <TableRow key={passaggioKey} onClick={() => handleRowClick(passaggio)} className={passaggio.notes ? "cursor-pointer" : ""}>
                         <TableCell className="font-medium">{passaggioKey}</TableCell>
                         <TableCell>{passaggio.movement}</TableCell>
                         <TableCell>{passaggio.tecnica}</TableCell>
