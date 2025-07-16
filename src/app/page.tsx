@@ -4,6 +4,7 @@ import KataDisplay from "@/components/kata-display";
 import KataSelection from "@/components/kata-selection";
 import GlossaryDisplay from "@/components/glossary-display";
 import SearchDisplay from "@/components/search-display";
+import SegnapostoDisplay from "@/components/segnaposto-display";
 
 export default function Home() {
   return (
@@ -52,15 +53,7 @@ export default function Home() {
               <SearchDisplay />
           </TabsContent>
           <TabsContent value="segnaposto">
-            <Card>
-              <CardHeader>
-                <CardTitle>Segnaposto</CardTitle>
-                <CardDescription>This is a placeholder tab.</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <p>Content for this tab can be added here.</p>
-              </CardContent>
-            </Card>
+            <SegnapostoDisplay />
           </TabsContent>
         </Tabs>
       </div>

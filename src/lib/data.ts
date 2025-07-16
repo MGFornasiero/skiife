@@ -57,3 +57,16 @@ export type Transactions = {
 export type TransactionsMapping = {
     [key: number]: number;
 };
+
+export type Tecnica = {
+  id_technic: number;
+  waza: string;
+  name: string;
+  description: string;
+  notes: string | null;
+  resource_url: string | null;
+};
+
+export type Tecniche = {
+  [key: string]: Tecnica;
+};
