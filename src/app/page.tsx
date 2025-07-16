@@ -12,9 +12,11 @@ export default function Home() {
         </header>
 
         <Tabs defaultValue="kata" className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
+          <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="kata">Kata</TabsTrigger>
             <TabsTrigger value="kihon">Kihon</TabsTrigger>
+            <TabsTrigger value="glossario">Glossario</TabsTrigger>
+            <TabsTrigger value="ricerca">Ricerca</TabsTrigger>
           </TabsList>
           <TabsContent value="kata">
             <KataSelection />
@@ -27,6 +29,28 @@ export default function Home() {
               </CardHeader>
               <CardContent>
                 <KataDisplay />
+              </CardContent>
+            </Card>
+          </TabsContent>
+          <TabsContent value="glossario">
+            <Card>
+              <CardHeader>
+                <CardTitle>Glossario</CardTitle>
+                <CardDescription>Definitions for martial arts terms.</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <p>Coming soon...</p>
+              </CardContent>
+            </Card>
+          </TabsContent>
+           <TabsContent value="ricerca">
+            <Card>
+              <CardHeader>
+                <CardTitle>Ricerca</CardTitle>
+                <CardDescription>Search for specific techniques or movements.</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <p>Coming soon...</p>
               </CardContent>
             </Card>
           </TabsContent>
