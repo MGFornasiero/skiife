@@ -135,7 +135,6 @@ export default function KataDisplay() {
           <CardContent>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-end pt-4 border-t">
               <div className="space-y-2">
-                <Label>Tipo</Label>
                 <div className="flex items-center space-x-2">
                   <Label htmlFor="grade-type-switch" className={gradeType === 'kyu' ? '' : 'text-muted-foreground'}>Kyu</Label>
                   <Switch
