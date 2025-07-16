@@ -148,7 +148,6 @@ export default function KataDisplay() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="grade-select">Grado</Label>
                 <Select onValueChange={handleGradeChange} value={grade?.toString() || ""}>
                   <SelectTrigger id="grade-select" className="w-full sm:w-[180px]">
                     <SelectValue placeholder="Select a grado..." />
