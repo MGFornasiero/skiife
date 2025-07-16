@@ -70,3 +70,15 @@ export type Tecnica = {
 export type Tecniche = {
   [key: string]: Tecnica;
 };
+
+export type Posizione = {
+    id_stand: number;
+    name: string;
+    description: string;
+    illustration_url: string | null;
+    notes: string | null;
+};
+
+export type Posizioni = {
+    [key: string]: Posizione;
+};
