@@ -10,12 +10,13 @@ export default function Home() {
     <main className="flex min-h-screen flex-col items-center justify-center p-4 sm:p-8 md:p-24 bg-background">
       <div className="w-full max-w-4xl">
         <Tabs defaultValue="home" className="w-full">
-          <TabsList className="grid w-full grid-cols-5 mb-8">
+          <TabsList className="grid w-full grid-cols-6 mb-8">
             <TabsTrigger value="home">Home</TabsTrigger>
             <TabsTrigger value="kata">Kata</TabsTrigger>
             <TabsTrigger value="kihon">Kihon</TabsTrigger>
             <TabsTrigger value="glossario">Glossario</TabsTrigger>
             <TabsTrigger value="ricerca">Ricerca</TabsTrigger>
+            <TabsTrigger value="segnaposto">Segnaposto</TabsTrigger>
           </TabsList>
           <TabsContent value="home">
             <Card>
@@ -48,7 +49,18 @@ export default function Home() {
             <GlossaryDisplay />
           </TabsContent>
            <TabsContent value="ricerca">
-            <SearchDisplay />
+              <SearchDisplay />
+          </TabsContent>
+          <TabsContent value="segnaposto">
+            <Card>
+              <CardHeader>
+                <CardTitle>Segnaposto</CardTitle>
+                <CardDescription>This is a placeholder tab.</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <p>Content for this tab can be added here.</p>
+              </CardContent>
+            </Card>
           </TabsContent>
         </Tabs>
       </div>
