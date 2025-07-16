@@ -21,7 +21,7 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { ChevronDown, ChevronUp } from "lucide-react";
+import { ChevronDown, ChevronUp, Minus, Plus } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 export default function KataDisplay() {
@@ -85,7 +85,7 @@ export default function KataDisplay() {
       });
   }, [gradeType, grade]);
 
-  const sequenzaKeys = sequenzeData ? Object.keys(sequenzeData) : [];
+  const sequenzaKeys = sequenzeData ? Object.keys(sequenzeData).sort((a, b) => parseInt(a) - parseInt(b)) : [];
   const gradeNumbers = Array.from({ length: 9 }, (_, i) => i + 1);
   const selectedPassaggi =
     selectedSequenzaKey && sequenzeData
@@ -112,6 +112,20 @@ export default function KataDisplay() {
     }
   };
 
+  const handleSequenzaChange = (direction: 'next' | 'prev') => {
+    if (!sequenzaKeys.length) return;
+
+    const currentIndex = selectedSequenzaKey ? sequenzaKeys.indexOf(selectedSequenzaKey) : -1;
+    let nextIndex;
+
+    if (direction === 'next') {
+        nextIndex = currentIndex >= 0 ? (currentIndex + 1) % sequenzaKeys.length : 0;
+    } else { // prev
+        nextIndex = currentIndex > 0 ? currentIndex - 1 : sequenzaKeys.length - 1;
+    }
+    
+    setSelectedSequenzaKey(sequenzaKeys[nextIndex]);
+  };
 
   return (
     <div className="space-y-6">
@@ -172,19 +186,16 @@ export default function KataDisplay() {
       ) : gradeId && sequenzeData ? (
         <>
           <div className="flex items-center gap-4">
-             <div className="w-full sm:w-64">
-                <Select onValueChange={setSelectedSequenzaKey} value={selectedSequenzaKey || ""}>
-                <SelectTrigger>
-                    <SelectValue placeholder="Select a sequenza..." />
-                </SelectTrigger>
-                <SelectContent>
-                    {sequenzaKeys.map((key) => (
-                    <SelectItem key={key} value={key}>
-                        Sequenza {key}
-                    </SelectItem>
-                    ))}
-                </SelectContent>
-                </Select>
+             <div className="flex items-center gap-2">
+                <Button variant="outline" size="icon" onClick={() => handleSequenzaChange('prev')} disabled={sequenzaKeys.length < 2}>
+                    <Minus className="h-4 w-4" />
+                </Button>
+                <div className="w-48 h-10 flex items-center justify-center rounded-md border border-input bg-background px-3 py-2 text-sm">
+                    {selectedSequenzaKey ? `Sequenza ${selectedSequenzaKey}` : "Select a sequenza"}
+                </div>
+                 <Button variant="outline" size="icon" onClick={() => handleSequenzaChange('next')} disabled={sequenzaKeys.length < 2}>
+                    <Plus className="h-4 w-4" />
+                </Button>
             </div>
           </div>
 
@@ -219,7 +230,7 @@ export default function KataDisplay() {
           ) : (
             <div className="flex flex-col items-center justify-center text-center p-10 border-2 border-dashed rounded-lg">
               <p className="text-muted-foreground">
-                Please select a sequenza from the dropdown menu to view its details.
+                Please select a sequenza to view its details.
               </p>
             </div>
           )}
