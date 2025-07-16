@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Tecniche, Tecnica, Posizioni, Posizione } from "@/lib/data";
+import { Tecniche, Tecnica, Posizioni, Posizione, Parti, Parte } from "@/lib/data";
 import {
   Table,
   TableBody,
@@ -19,34 +19,38 @@ const ITEMS_PER_PAGE = 10;
 export default function SegnapostoDisplay() {
   const [inventoryTechnics, setInventoryTechnics] = useState<Tecniche | null>(null);
   const [inventoryStands, setInventoryStands] = useState<Posizioni | null>(null);
+  const [inventoryStrikingParts, setInventoryStrikingParts] = useState<Parti | null>(null);
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const [currentTechnicsPage, setCurrentTechnicsPage] = useState(1);
   const [currentStandsPage, setCurrentStandsPage] = useState(1);
+  const [currentStrikingPartsPage, setCurrentStrikingPartsPage] = useState(1);
+
 
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
       setError(null);
       try {
-        const [technicsRes, standsRes] = await Promise.all([
+        const [technicsRes, standsRes, strikingPartsRes] = await Promise.all([
             fetch("/api/technic_inventory"),
             fetch("/api/stand_inventory"),
+            fetch("/api/strikingparts_inventory"),
         ]);
         
-        if (!technicsRes.ok) {
-          throw new Error("Failed to fetch technic inventory");
-        }
+        if (!technicsRes.ok) throw new Error("Failed to fetch technic inventory");
         const technicsData = await technicsRes.json();
         setInventoryTechnics(technicsData.technics_inventory);
 
-        if (!standsRes.ok) {
-            throw new Error("Failed to fetch stand inventory");
-        }
+        if (!standsRes.ok) throw new Error("Failed to fetch stand inventory");
         const standsData = await standsRes.json();
         setInventoryStands(standsData.stands_inventory);
+
+        if (!strikingPartsRes.ok) throw new Error("Failed to fetch striking parts inventory");
+        const strikingPartsData = await strikingPartsRes.json();
+        setInventoryStrikingParts(strikingPartsData.strikingparts_inventory);
 
       } catch (err: any) {
         setError(err.message || "An unexpected error occurred.");
@@ -72,6 +76,14 @@ export default function SegnapostoDisplay() {
     (currentStandsPage - 1) * ITEMS_PER_PAGE,
     currentStandsPage * ITEMS_PER_PAGE
   );
+
+  const strikingPartsArray = inventoryStrikingParts ? Object.values(inventoryStrikingParts) : [];
+  const totalStrikingPartsPages = Math.ceil(strikingPartsArray.length / ITEMS_PER_PAGE);
+  const paginatedStrikingParts = strikingPartsArray.slice(
+    (currentStrikingPartsPage - 1) * ITEMS_PER_PAGE,
+    currentStrikingPartsPage * ITEMS_PER_PAGE
+  );
+
 
   return (
     <Card>
@@ -172,6 +184,54 @@ export default function SegnapostoDisplay() {
                                     size="sm"
                                     onClick={() => setCurrentStandsPage(p => Math.min(totalStandsPages, p + 1))}
                                     disabled={currentStandsPage === totalStandsPages}
+                                >
+                                    Next
+                                </Button>
+                            </div>
+                        </>
+                    )}
+                </AccordionContent>
+            </AccordionItem>
+            <AccordionItem value="item-3">
+                <AccordionTrigger>Striking Parts Inventory</AccordionTrigger>
+                <AccordionContent>
+                    {inventoryStrikingParts && (
+                        <>
+                            <div className="overflow-hidden rounded-lg border">
+                                <Table>
+                                    <TableHeader>
+                                        <TableRow>
+                                            <TableHead>Name</TableHead>
+                                            <TableHead>Description</TableHead>
+                                        </TableRow>
+                                    </TableHeader>
+                                    <TableBody>
+                                        {paginatedStrikingParts.map((part) => (
+                                            <TableRow key={part.id_part}>
+                                                <TableCell>{part.name}</TableCell>
+                                                <TableCell>{part.description}</TableCell>
+                                            </TableRow>
+                                        ))}
+                                    </TableBody>
+                                </Table>
+                            </div>
+                            <div className="flex items-center justify-end space-x-2 py-4">
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => setCurrentStrikingPartsPage(p => Math.max(1, p - 1))}
+                                    disabled={currentStrikingPartsPage === 1}
+                                >
+                                    Previous
+                                </Button>
+                                <span className="text-sm text-muted-foreground">
+                                    Page {currentStrikingPartsPage} of {totalStrikingPartsPages}
+                                </span>
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => setCurrentStrikingPartsPage(p => Math.min(totalStrikingPartsPages, p + 1))}
+                                    disabled={currentStrikingPartsPage === totalStrikingPartsPages}
                                 >
                                     Next
                                 </Button>

@@ -82,3 +82,16 @@ export type Posizione = {
 export type Posizioni = {
     [key: string]: Posizione;
 };
+
+export type Parte = {
+  id_part: number;
+  name: string;
+  translation: string | null;
+  description: string;
+  notes: string | null;
+  resource_url: string | null;
+};
+
+export type Parti = {
+  [key: string]: Parte;
+};
