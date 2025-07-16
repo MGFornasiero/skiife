@@ -2,30 +2,42 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import KataDisplay from "@/components/kata-display";
 import KataSelection from "@/components/kata-selection";
+import GlossaryDisplay from "@/components/glossary-display";
+import SearchDisplay from "@/components/search-display";
 
 export default function Home() {
   return (
     <main className="flex min-h-screen flex-col items-center justify-center p-4 sm:p-8 md:p-24 bg-background">
       <div className="w-full max-w-4xl">
-        <header className="text-center mb-8">
-          <h1 className="font-headline text-4xl sm:text-5xl font-bold text-primary">SKI Compendium</h1>
-        </header>
-
-        <Tabs defaultValue="kata" className="w-full">
-          <TabsList className="grid w-full grid-cols-4">
+        <Tabs defaultValue="home" className="w-full">
+          <TabsList className="grid w-full grid-cols-5 mb-8">
+            <TabsTrigger value="home">Home</TabsTrigger>
             <TabsTrigger value="kata">Kata</TabsTrigger>
             <TabsTrigger value="kihon">Kihon</TabsTrigger>
             <TabsTrigger value="glossario">Glossario</TabsTrigger>
             <TabsTrigger value="ricerca">Ricerca</TabsTrigger>
           </TabsList>
+          <TabsContent value="home">
+            <Card>
+              <CardHeader>
+                  <CardTitle>
+                    <h1 className="font-headline text-4xl sm:text-5xl font-bold text-primary">SKI Compendium</h1>
+                  </CardTitle>
+                  <CardDescription>Welcome to the SKI Compendium. Your digital resource for Shotokan Karate.</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <p>Use the tabs to navigate through Kata, Kihon, and the Glossary.</p>
+              </CardContent>
+            </Card>
+          </TabsContent>
           <TabsContent value="kata">
             <KataSelection />
           </TabsContent>
           <TabsContent value="kihon">
             <Card>
               <CardHeader>
-                <CardTitle>Sequenza Display</CardTitle>
-                <CardDescription>Select a sequenza number to see its detailed passaggi.</CardDescription>
+                <CardTitle>Kihon</CardTitle>
+                <CardDescription>Select a grade to see its detailed kihon sequenze.</CardDescription>
               </CardHeader>
               <CardContent>
                 <KataDisplay />
@@ -33,26 +45,10 @@ export default function Home() {
             </Card>
           </TabsContent>
           <TabsContent value="glossario">
-            <Card>
-              <CardHeader>
-                <CardTitle>Glossario</CardTitle>
-                <CardDescription>Definitions for martial arts terms.</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <p>Coming soon...</p>
-              </CardContent>
-            </Card>
+            <GlossaryDisplay />
           </TabsContent>
            <TabsContent value="ricerca">
-            <Card>
-              <CardHeader>
-                <CardTitle>Ricerca</CardTitle>
-                <CardDescription>Search for specific techniques or movements.</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <p>Coming soon...</p>
-              </CardContent>
-            </Card>
+            <SearchDisplay />
           </TabsContent>
         </Tabs>
       </div>
