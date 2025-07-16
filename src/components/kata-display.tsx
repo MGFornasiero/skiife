@@ -45,6 +45,7 @@ export default function KataDisplay() {
     }
 
     setLoading(true);
+    let gradeRes: Response;
     fetch(`/api/grade_id/${gradeType}/${grade}`)
       .then((res) => {
         if (!res.ok) {
@@ -58,9 +59,11 @@ export default function KataDisplay() {
         // setShowGradeSelection(false); // Hide selection on success
         return fetch(`/api/kihons/${newGradeId}`);
       })
-      .then((res) => {
+      .then(async (res) => {
+        gradeRes = res;
         if (!res.ok) {
-          throw new Error("Network response was not ok for kihons");
+            const errorBody = await res.text();
+            throw new Error(`Network response was not ok for kihons. Status: ${res.status}. Body: ${errorBody}`);
         }
         return res.json();
       })
