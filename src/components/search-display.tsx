@@ -20,13 +20,7 @@ export default function SearchDisplay() {
     setSearched(null);
 
     try {
-      const response = await fetch('/api/finder', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ search: searchText }),
-      });
+      const response = await fetch(`/api/finder?search=${encodeURIComponent(searchText)}`);
 
       if (!response.ok) {
         const errorText = await response.text();
