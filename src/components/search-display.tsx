@@ -66,7 +66,6 @@ export default function SearchDisplay() {
               <TableRow>
                 <TableHead>Name</TableHead>
                 <TableHead>Description</TableHead>
-                <TableHead>Relevance</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -74,7 +73,6 @@ export default function SearchDisplay() {
                 <TableRow key={stand[2]}>
                   <TableCell>{stand[3]}</TableCell>
                   <TableCell>{stand[4]}</TableCell>
-                  <TableCell>{stand[1].toFixed(2)}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
@@ -95,7 +93,6 @@ export default function SearchDisplay() {
               <TableRow>
                 <TableHead>Name</TableHead>
                 <TableHead>Description</TableHead>
-                <TableHead>Relevance</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -103,7 +100,6 @@ export default function SearchDisplay() {
                 <TableRow key={tech[2]}>
                   <TableCell>{tech[4]}</TableCell>
                   <TableCell>{tech[5]}</TableCell>
-                  <TableCell>{tech[1].toFixed(2)}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
@@ -124,7 +120,6 @@ export default function SearchDisplay() {
               <TableRow>
                 <TableHead>Name</TableHead>
                 <TableHead>Description</TableHead>
-                <TableHead>Relevance</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -132,7 +127,6 @@ export default function SearchDisplay() {
                 <TableRow key={target[2]}>
                   <TableCell>{target[3]}</TableCell>
                   <TableCell>{target[4]}</TableCell>
-                  <TableCell>{target[1].toFixed(2)}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
@@ -153,7 +147,6 @@ export default function SearchDisplay() {
               <TableRow>
                 <TableHead>Name</TableHead>
                 <TableHead>Description</TableHead>
-                <TableHead>Relevance</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -161,7 +154,6 @@ export default function SearchDisplay() {
                 <TableRow key={part[2]}>
                   <TableCell>{part[3]}</TableCell>
                   <TableCell>{part[5]}</TableCell>
-                   <TableCell>{part[1].toFixed(2)}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
