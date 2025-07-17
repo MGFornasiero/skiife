@@ -70,17 +70,14 @@ const parseEmbusen = (embusen: string): { x: number; y: number } | null => {
 const EmbusenGrid = ({ embusen }: { embusen: string }) => {
     const coords = parseEmbusen(embusen);
 
-    // Define grid dimensions
-    const gridSize = 11; // e.g., -5 to +5
-    const cellSize = 32; // in pixels
+    const gridSize = 11;
+    const cellSize = 32;
     const centerOffset = Math.floor(gridSize / 2);
 
     if (!coords) {
         return <div className="text-muted-foreground">Invalid embusen format.</div>;
     }
 
-    // Convert embusen coords to grid position.
-    // Y is inverted for typical screen coordinates (top-left is 0,0)
     const gridX = coords.x + centerOffset;
     const gridY = -coords.y + centerOffset;
 
@@ -88,14 +85,22 @@ const EmbusenGrid = ({ embusen }: { embusen: string }) => {
         <div className="flex flex-col items-center">
             <h4 className="font-semibold mb-2">Embusen</h4>
             <div
-                className="relative bg-secondary/30 border border-border"
-                style={{ width: gridSize * cellSize, height: gridSize * cellSize }}
+                className="relative border border-border"
+                style={{
+                    width: gridSize * cellSize,
+                    height: gridSize * cellSize,
+                    backgroundImage: `
+                        linear-gradient(to right, hsl(var(--border)) 1px, transparent 1px),
+                        linear-gradient(to bottom, hsl(var(--border)) 1px, transparent 1px)
+                    `,
+                    backgroundSize: `${cellSize}px ${cellSize}px`,
+                    backgroundColor: 'hsl(var(--secondary) / 0.3)',
+                }}
             >
-                {/* Dot */}
                 <div
                     className="absolute w-4 h-4 rounded-full bg-primary border-2 border-primary-foreground shadow-lg"
                     style={{
-                        left: gridX * cellSize + (cellSize / 2) - 8, // Center the dot
+                        left: gridX * cellSize + (cellSize / 2) - 8,
                         top: gridY * cellSize + (cellSize / 2) - 8,
                         transition: 'top 0.3s ease, left 0.3s ease',
                     }}
