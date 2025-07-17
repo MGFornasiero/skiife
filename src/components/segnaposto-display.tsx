@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Tecniche, Tecnica, Posizioni, Posizione, Parti, Parte } from "@/lib/data";
+import { Tecniche, Tecnica, Posizioni, Posizione, Parti, Parte , Obbiettivi, Obiettivo} from "@/lib/data";
 import {
   Table,
   TableBody,
@@ -20,6 +20,7 @@ export default function SegnapostoDisplay() {
   const [inventoryTechnics, setInventoryTechnics] = useState<Tecniche | null>(null);
   const [inventoryStands, setInventoryStands] = useState<Posizioni | null>(null);
   const [inventoryStrikingParts, setInventoryStrikingParts] = useState<Parti | null>(null);
+  const [inventoryTargets, setInventoryTargets] = useState<Obiettivi | null>(null);
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -27,6 +28,7 @@ export default function SegnapostoDisplay() {
   const [currentTechnicsPage, setCurrentTechnicsPage] = useState(1);
   const [currentStandsPage, setCurrentStandsPage] = useState(1);
   const [currentStrikingPartsPage, setCurrentStrikingPartsPage] = useState(1);
+  const [currentTargetsPage, setCurrentTargetsPage] = useState(1);
 
 
   useEffect(() => {
@@ -34,10 +36,11 @@ export default function SegnapostoDisplay() {
       setLoading(true);
       setError(null);
       try {
-        const [technicsRes, standsRes, strikingPartsRes] = await Promise.all([
+        const [technicsRes, standsRes, strikingPartsRes,targetsRes] = await Promise.all([
             fetch("/api/technic_inventory"),
             fetch("/api/stand_inventory"),
             fetch("/api/strikingparts_inventory"),
+            fetch("/api/target_inventory"),
         ]);
         
         if (!technicsRes.ok) throw new Error("Failed to fetch technic inventory");
@@ -51,6 +54,10 @@ export default function SegnapostoDisplay() {
         if (!strikingPartsRes.ok) throw new Error("Failed to fetch striking parts inventory");
         const strikingPartsData = await strikingPartsRes.json();
         setInventoryStrikingParts(strikingPartsData.strikingparts_inventory);
+        
+        if (!targetsRes.ok) throw new Error("Failed to fetch targets inventory");
+        const targetsData = await targetsRes.json();
+        setInventoryTargets(targetsData.targets_inventory);
 
       } catch (err: any) {
         setError(err.message || "An unexpected error occurred.");
@@ -84,6 +91,12 @@ export default function SegnapostoDisplay() {
     currentStrikingPartsPage * ITEMS_PER_PAGE
   );
 
+  const targetsArray = inventoryTargets ? Object.values(inventoryTargets) : [];
+  const totalTargetsPages = Math.ceil(targetsArray.length / ITEMS_PER_PAGE);
+  const paginatedTargets = targetsArray.slice(
+    (currentTargetsPage - 1) * ITEMS_PER_PAGE,
+    currentTargetsPage * ITEMS_PER_PAGE
+  );
 
   return (
     <Card>
@@ -240,6 +253,56 @@ export default function SegnapostoDisplay() {
                     )}
                 </AccordionContent>
             </AccordionItem>
+
+            <AccordionItem value="item-4">
+                <AccordionTrigger>Targets Parts Inventory</AccordionTrigger>
+                <AccordionContent>
+                    {inventoryStrikingParts && (
+                        <>
+                            <div className="overflow-hidden rounded-lg border">
+                                <Table>
+                                    <TableHeader>
+                                        <TableRow>
+                                            <TableHead>Name</TableHead>
+                                            <TableHead>Description</TableHead>
+                                        </TableRow>
+                                    </TableHeader>
+                                    <TableBody>
+                                        {paginatedStrikingParts.map((target) => (
+                                            <TableRow key={target.id_part}>
+                                                <TableCell>{target.name}</TableCell>
+                                                <TableCell>{target.description}</TableCell>
+                                            </TableRow>
+                                        ))}
+                                    </TableBody>
+                                </Table>
+                            </div>
+                            <div className="flex items-center justify-end space-x-2 py-4">
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => setCurrentTargetsPage(p => Math.max(1, p - 1))}
+                                    disabled={currentTargetsPage === 1}
+                                >
+                                    Previous
+                                </Button>
+                                <span className="text-sm text-muted-foreground">
+                                    Page {currentTargetsPage} of {totalTargetsPages}
+                                </span>
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => setCurrentTargetsPage(p => Math.min(totalTargetsPages, p + 1))}
+                                    disabled={currentTargetsPage === totalTargetsPages}
+                                >
+                                    Next
+                                </Button>
+                            </div>
+                        </>
+                    )}
+                </AccordionContent>
+            </AccordionItem>
+
         </Accordion>
       </CardContent>
     </Card>
