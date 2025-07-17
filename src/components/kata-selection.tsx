@@ -2,7 +2,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { type KataInventory, type KataSteps, type Transactions, type TransactionsMapping } from "@/lib/data";
+import { type KataInventory, type KataSteps, type Transactions, type TransactionsMapping, type KataStep } from "@/lib/data";
 import {
   Select,
   SelectContent,
@@ -13,6 +13,8 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Button } from "@/components/ui/button";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import React from "react";
 
@@ -59,6 +61,7 @@ export default function KataSelection() {
   const [tx, setTx] = useState<Transactions | null>(null);
   const [transactionsMappingFrom, setTransactionsMappingFrom] = useState<TransactionsMapping | null>(null);
   const [transactionsMappingTo, setTransactionsMappingTo] = useState<TransactionsMapping | null>(null);
+  const [selectedStepIndex, setSelectedStepIndex] = useState(0);
 
 
   useEffect(() => {
@@ -78,6 +81,7 @@ export default function KataSelection() {
       setTx(null);
       setTransactionsMappingFrom(null);
       setTransactionsMappingTo(null);
+      setSelectedStepIndex(0);
       return;
     }
 
@@ -86,6 +90,7 @@ export default function KataSelection() {
     setTx(null);
     setTransactionsMappingFrom(null);
     setTransactionsMappingTo(null);
+    setSelectedStepIndex(0);
 
     fetch(`/api/kata/${kataId}`)
       .then(res => {
@@ -120,6 +125,19 @@ export default function KataSelection() {
   const sortedKataSteps = kataSteps 
     ? Object.values(kataSteps).sort((a, b) => a.seq_num - b.seq_num) 
     : [];
+    
+  const currentStep: KataStep | undefined = sortedKataSteps[selectedStepIndex];
+
+  const handleStepChange = (direction: 'next' | 'prev') => {
+    if (!sortedKataSteps.length) return;
+
+    if (direction === 'next') {
+        setSelectedStepIndex((prevIndex) => (prevIndex + 1) % sortedKataSteps.length);
+    } else {
+        setSelectedStepIndex((prevIndex) => (prevIndex - 1 + sortedKataSteps.length) % sortedKataSteps.length);
+    }
+  };
+
 
   return (
     <Card>
@@ -219,11 +237,57 @@ export default function KataSelection() {
               </TooltipProvider>
             </TabsContent>
             <TabsContent value="dettagli">
-              <div className="flex flex-col items-center justify-center text-center p-10 border-2 border-dashed rounded-lg mt-4">
-                <p className="text-muted-foreground">
-                  Kata details will be displayed here.
-                </p>
-              </div>
+              {sortedKataSteps.length > 0 && currentStep ? (
+                  <div className="space-y-4 pt-4">
+                    <div className="flex items-center justify-center gap-4">
+                        <Button variant="outline" size="icon" onClick={() => handleStepChange('prev')}>
+                            <ChevronLeft className="h-4 w-4" />
+                        </Button>
+                        <div className="w-48 text-center font-medium">
+                            Step {currentStep.seq_num} of {sortedKataSteps.length}
+                        </div>
+                        <Button variant="outline" size="icon" onClick={() => handleStepChange('next')}>
+                            <ChevronRight className="h-4 w-4" />
+                        </Button>
+                    </div>
+
+                    <Card className="w-full max-w-lg mx-auto">
+                        <CardHeader>
+                            <CardTitle className="flex justify-between items-center">
+                               <span>{currentStep.posizione}</span>
+                               <span className="text-4xl font-bold" title={currentStep.facing}>
+                                   {getFacingArrow(currentStep.facing)}
+                               </span>
+                            </CardTitle>
+                            <CardDescription>
+                                Guardia: {currentStep.guardia}
+                                {currentStep.kiai && <span className="ml-2 font-bold text-destructive">KIAI!</span>}
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                           <h4 className="font-semibold mb-2">Techniques:</h4>
+                           <ul className="space-y-2">
+                               {currentStep.tecniche.map(tech => (
+                                   <li key={tech.technic_id} className="border-l-4 pl-4 py-1 border-primary/50 bg-secondary/50 rounded-r-md">
+                                       <p><strong>Technique:</strong> {tech.Tecnica}</p>
+                                       <p><strong>Limb:</strong> {tech.arto}</p>
+                                       <p><strong>Target:</strong> {tech.Obiettivo || 'N/A'}</p>
+                                   </li>
+                               ))}
+                           </ul>
+                           <div className="mt-4">
+                                <p><span className="font-semibold">Embusen:</span> {currentStep.embusen}</p>
+                           </div>
+                        </CardContent>
+                    </Card>
+                  </div>
+              ) : (
+                <div className="flex flex-col items-center justify-center text-center p-10 border-2 border-dashed rounded-lg mt-4">
+                  <p className="text-muted-foreground">
+                    Select a kata to see step-by-step details.
+                  </p>
+                </div>
+              )}
             </TabsContent>
           </Tabs>
         )}
