@@ -67,7 +67,7 @@ const parseEmbusen = (embusen: string): { x: number; y: number } | null => {
     return null;
 };
 
-const EmbusenGrid = ({ embusen }: { embusen: string }) => {
+const EmbusenGrid = ({ embusen, facing }: { embusen: string; facing: string }) => {
     const coords = parseEmbusen(embusen);
 
     const gridSize = 11;
@@ -80,6 +80,7 @@ const EmbusenGrid = ({ embusen }: { embusen: string }) => {
 
     const gridX = coords.x + centerOffset;
     const gridY = -coords.y + centerOffset;
+    const arrow = getFacingArrow(facing);
 
     return (
         <div className="flex flex-col items-center">
@@ -98,14 +99,18 @@ const EmbusenGrid = ({ embusen }: { embusen: string }) => {
                 }}
             >
                 <div
-                    className="absolute w-4 h-4 rounded-full bg-primary border-2 border-primary-foreground shadow-lg"
+                    className="absolute flex items-center justify-center text-primary-foreground text-2xl font-bold bg-primary rounded-full"
                     style={{
-                        left: gridX * cellSize + (cellSize / 2) - 8,
-                        top: gridY * cellSize + (cellSize / 2) - 8,
+                        width: cellSize,
+                        height: cellSize,
+                        left: gridX * cellSize,
+                        top: gridY * cellSize,
                         transition: 'top 0.3s ease, left 0.3s ease',
                     }}
-                    title={`Position: (${coords.x}, ${coords.y})`}
-                />
+                    title={`Position: (${coords.x}, ${coords.y}), Facing: ${facing}`}
+                >
+                    {arrow}
+                </div>
             </div>
             <p className="mt-2 text-sm text-muted-foreground">Coordinates: ({coords.x}, {coords.y})</p>
         </div>
@@ -214,7 +219,7 @@ export default function KataSelection() {
                   <SelectValue placeholder="Select a kata..." />
                 </SelectTrigger>
                 <SelectContent>
-                  {Object.keys(kataInventory).map((kataName) => (
+                  {Object.keys(kataInventory).sort().map((kataName) => (
                     <SelectItem key={kataName} value={kataName}>
                       {kataName}
                     </SelectItem>
@@ -340,7 +345,7 @@ export default function KataSelection() {
                                     </ul>
                                 </div>
                                 <div className="mt-4 md:mt-0 flex justify-center">
-                                    <EmbusenGrid embusen={currentStep.embusen} />
+                                    <EmbusenGrid embusen={currentStep.embusen} facing={currentStep.facing} />
                                 </div>
                            </div>
                         </CardContent>
@@ -360,3 +365,5 @@ export default function KataSelection() {
     </Card>
   );
 }
+
+    
