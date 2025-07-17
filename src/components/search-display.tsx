@@ -201,9 +201,6 @@ export default function SearchDisplay() {
           {loading && <p>Loading search results...</p>}
           {searched && (
             <div className="space-y-4">
-              <p className="text-sm text-muted-foreground">
-                Showing results for <span className="font-bold text-primary">"{searched.ts}"</span>. Maximum relevance: {searched.max_relevance.toFixed(4)}
-              </p>
                <Accordion type="multiple" className="w-full">
                   {renderStands()}
                   {renderTechnics()}
