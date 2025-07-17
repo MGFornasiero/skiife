@@ -51,6 +51,75 @@ const getDirectionSymbol = (direction: string | null | undefined) => {
   return directionSymbolMap[direction] || '⇓'; // Default for any other case
 }
 
+const parseEmbusen = (embusen: string): { x: number; y: number } | null => {
+    try {
+        const match = embusen.match(/\(([^,]+),([^)]+)\)/);
+        if (match) {
+            const x = parseFloat(match[1]);
+            const y = parseFloat(match[2]);
+            if (!isNaN(x) && !isNaN(y)) {
+                return { x, y };
+            }
+        }
+    } catch (e) {
+        console.error("Error parsing embusen:", e);
+    }
+    return null;
+};
+
+const EmbusenGrid = ({ embusen }: { embusen: string }) => {
+    const coords = parseEmbusen(embusen);
+
+    // Define grid dimensions
+    const gridSize = 11; // e.g., -5 to +5
+    const cellSize = 32; // in pixels
+    const centerOffset = Math.floor(gridSize / 2);
+
+    if (!coords) {
+        return <div className="text-muted-foreground">Invalid embusen format.</div>;
+    }
+
+    // Convert embusen coords to grid position.
+    // Y is inverted for typical screen coordinates (top-left is 0,0)
+    const gridX = coords.x + centerOffset;
+    const gridY = -coords.y + centerOffset;
+
+    return (
+        <div className="flex flex-col items-center">
+            <h4 className="font-semibold mb-2">Embusen</h4>
+            <div
+                className="relative bg-secondary/30 border border-border"
+                style={{ width: gridSize * cellSize, height: gridSize * cellSize }}
+            >
+                {/* Grid lines */}
+                {Array.from({ length: gridSize + 1 }).map((_, i) => (
+                    <React.Fragment key={`grid-${i}`}>
+                        {/* Vertical line */}
+                        <div className="absolute bg-border/50" style={{ left: i * cellSize, top: 0, width: 1, height: '100%' }} />
+                        {/* Horizontal line */}
+                        <div className="absolute bg-border/50" style={{ top: i * cellSize, left: 0, height: 1, width: '100%' }} />
+                    </React.Fragment>
+                ))}
+                {/* Center lines */}
+                <div className="absolute bg-foreground/30" style={{ left: '50%', top: 0, width: 2, height: '100%', transform: 'translateX(-50%)' }} />
+                <div className="absolute bg-foreground/30" style={{ top: '50%', left: 0, height: 2, width: '100%', transform: 'translateY(-50%)' }} />
+
+                {/* Dot */}
+                <div
+                    className="absolute w-4 h-4 rounded-full bg-primary border-2 border-primary-foreground shadow-lg"
+                    style={{
+                        left: gridX * cellSize + (cellSize / 2) - 8, // Center the dot
+                        top: gridY * cellSize + (cellSize / 2) - 8,
+                        transition: 'top 0.3s ease, left 0.3s ease',
+                    }}
+                    title={`Position: (${coords.x}, ${coords.y})`}
+                />
+            </div>
+            <p className="mt-2 text-sm text-muted-foreground">Coordinates: ({coords.x}, {coords.y})</p>
+        </div>
+    );
+};
+
 
 export default function KataSelection() {
   const [kataInventory, setKataInventory] = useState<KataInventory | null>(null);
@@ -265,18 +334,22 @@ export default function KataSelection() {
                             </CardDescription>
                         </CardHeader>
                         <CardContent>
-                           <h4 className="font-semibold mb-2">Techniques:</h4>
-                           <ul className="space-y-2">
-                               {currentStep.tecniche.map(tech => (
-                                   <li key={tech.technic_id} className="border-l-4 pl-4 py-1 border-primary/50 bg-secondary/50 rounded-r-md">
-                                       <p><strong>Technique:</strong> {tech.Tecnica}</p>
-                                       <p><strong>Limb:</strong> {tech.arto}</p>
-                                       <p><strong>Target:</strong> {tech.Obiettivo || 'N/A'}</p>
-                                   </li>
-                               ))}
-                           </ul>
-                           <div className="mt-4">
-                                <p><span className="font-semibold">Embusen:</span> {currentStep.embusen}</p>
+                           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <h4 className="font-semibold mb-2">Techniques:</h4>
+                                    <ul className="space-y-2">
+                                        {currentStep.tecniche.map(tech => (
+                                            <li key={tech.technic_id} className="border-l-4 pl-4 py-1 border-primary/50 bg-secondary/50 rounded-r-md">
+                                                <p><strong>Technique:</strong> {tech.Tecnica}</p>
+                                                <p><strong>Limb:</strong> {tech.arto}</p>
+                                                <p><strong>Target:</strong> {tech.Obiettivo || 'N/A'}</p>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
+                                <div className="mt-4 md:mt-0 flex justify-center">
+                                    <EmbusenGrid embusen={currentStep.embusen} />
+                                </div>
                            </div>
                         </CardContent>
                     </Card>
