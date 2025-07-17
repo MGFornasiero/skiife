@@ -24,20 +24,20 @@ interface KataData {
 }
 
 const facingArrowMap: { [key: string]: string } = {
-  'N': '\u2191',  // Upwards Arrow
-  'NE': '\u2197', // North East Arrow
-  'E': '\u2192',  // Rightwards Arrow
-  'SE': '\u2198', // South East Arrow
-  'S': '\u2193',  // Downwards Arrow
-  'SO': '\u2199', // South West Arrow
-  'O': '\u2190',  // Leftwards Arrow
-  'NO': '\u2196'  // North West Arrow
+  'N': '↑',  // Upwards Arrow
+  'NE': '↗', // North East Arrow
+  'E': '→',  // Rightwards Arrow
+  'SE': '↘', // South East Arrow
+  'S': '↓',  // Downwards Arrow
+  'SO': '↙', // South West Arrow
+  'O': '←',  // Leftwards Arrow
+  'NO': '↖'  // North West Arrow
 };
 
 const directionSymbolMap: { [key: string]: string } = {
-  'sx': '\u21BA',      // Anticlockwise Open Circle Arrow
-  'dx': '\u21BB',      // Clockwise Open Circle Arrow
-  'frontal': '\u21D3', // Downwards Double Arrow
+  'sx': '↺',      // Anticlockwise Open Circle Arrow
+  'dx': '↻',      // Clockwise Open Circle Arrow
+  'frontal': '⇓', // Downwards Double Arrow
 };
 
 const getFacingArrow = (facing: string) => {
@@ -45,8 +45,8 @@ const getFacingArrow = (facing: string) => {
 };
 
 const getDirectionSymbol = (direction: string | null | undefined) => {
-  if (!direction) return '\u21D3'; // Default for None or ""
-  return directionSymbolMap[direction] || '\u21D3'; // Default for any other case
+  if (!direction) return '⇓'; // Default for None or ""
+  return directionSymbolMap[direction] || '⇓'; // Default for any other case
 }
 
 
@@ -156,6 +156,7 @@ export default function KataSelection() {
            <Tabs defaultValue="generale" className="w-full">
             <TabsList>
               <TabsTrigger value="generale">Generale</TabsTrigger>
+              <TabsTrigger value="dettagli">Dettagli</TabsTrigger>
             </TabsList>
             <TabsContent value="generale">
               <TooltipProvider>
@@ -216,6 +217,13 @@ export default function KataSelection() {
                   })}
                 </div>
               </TooltipProvider>
+            </TabsContent>
+            <TabsContent value="dettagli">
+              <div className="flex flex-col items-center justify-center text-center p-10 border-2 border-dashed rounded-lg mt-4">
+                <p className="text-muted-foreground">
+                  Kata details will be displayed here.
+                </p>
+              </div>
             </TabsContent>
           </Tabs>
         )}
