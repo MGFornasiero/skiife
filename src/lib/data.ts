@@ -108,3 +108,12 @@ export type Obiettivo = {
 export type Obiettivi = {
   [key: number]: Obiettivo;
 };
+
+export type Rilevanza = {
+  abs_relecance: number;
+  relative_relevance: number;
+};
+
+export type Rilevanze = {
+  [key: number]: Rilevanza;
+};
