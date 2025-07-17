@@ -95,3 +95,16 @@ export type Parte = {
 export type Parti = {
   [key: string]: Parte;
 };
+
+export type Obiettivo = {
+  id_target: number;
+  name: string;
+  original_name: string;
+  description: string;
+  notes: string | null;
+  resource_url: string | null;
+};
+
+export type Obiettivi = {
+  [key: number]: Obiettivo;
+};
