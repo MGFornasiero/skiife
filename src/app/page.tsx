@@ -2,7 +2,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import KataDisplay from "@/components/kata-display";
 import KataSelection from "@/components/kata-selection";
-import GlossaryDisplay from "@/components/glossary-display";
 import SearchDisplay from "@/components/search-display";
 import SegnapostoDisplay from "@/components/segnaposto-display";
 
@@ -11,11 +10,10 @@ export default function Home() {
     <main className="flex min-h-screen flex-col items-center justify-center p-4 sm:p-8 md:p-24 bg-background">
       <div className="w-full max-w-4xl">
         <Tabs defaultValue="home" className="w-full">
-          <TabsList className="grid w-full grid-cols-6 mb-8">
+          <TabsList className="grid w-full grid-cols-5 mb-8">
             <TabsTrigger value="home">Home</TabsTrigger>
             <TabsTrigger value="kata">Kata</TabsTrigger>
             <TabsTrigger value="kihon">Kihon</TabsTrigger>
-            <TabsTrigger value="glossario">Glossario</TabsTrigger>
             <TabsTrigger value="ricerca">Ricerca</TabsTrigger>
             <TabsTrigger value="segnaposto">Segnaposto</TabsTrigger>
           </TabsList>
@@ -45,9 +43,6 @@ export default function Home() {
                 <KataDisplay />
               </CardContent>
             </Card>
-          </TabsContent>
-          <TabsContent value="glossario">
-            <GlossaryDisplay />
           </TabsContent>
            <TabsContent value="ricerca">
               <SearchDisplay />
