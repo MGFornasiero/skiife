@@ -93,7 +93,7 @@ export type Parte = {
 };
 
 export type Parti = {
-  [key: string]: Parte;
+  [key:string]: Parte;
 };
 
 export type Obiettivo = {
