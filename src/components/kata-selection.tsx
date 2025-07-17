@@ -10,9 +10,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
+import React from "react";
 
 interface KataData {
   steps: KataSteps;
@@ -32,12 +32,25 @@ const facingArrowMap: { [key: string]: string } = {
   'NO': '\u2196'  // North West Arrow
 };
 
+const directionSymbolMap: { [key: string]: string } = {
+  'sx': '\u21BA',      // Anticlockwise Open Circle Arrow
+  'dx': '\u21BB',      // Clockwise Open Circle Arrow
+  'frontal': '\u21D3', // Downwards Double Arrow
+};
+
 const getFacingArrow = (facing: string) => {
   return facingArrowMap[facing] || facing;
 };
 
+const getDirectionSymbol = (direction: string | null | undefined) => {
+  if (!direction) return '\u21D3'; // Default for None or ""
+  return directionSymbolMap[direction] || '\u21D3'; // Default for any other case
+}
+
+
 export default function KataSelection() {
   const [kataInventory, setKataInventory] = useState<KataInventory | null>(null);
+  const [selectedKataName, setSelectedKataName] = useState<string | null>(null);
   const [kataId, setKataId] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
   const [kataSteps, setKataSteps] = useState<KataSteps | null>(null);
@@ -47,7 +60,6 @@ export default function KataSelection() {
 
 
   useEffect(() => {
-    // Fetch kata inventory on component mount
     fetch('/api/kata_inventory')
       .then(res => res.json())
       .then(data => {
@@ -97,6 +109,7 @@ export default function KataSelection() {
 
   const handleKataChange = (value: string) => {
       if (kataInventory) {
+          setSelectedKataName(value);
           const selectedKataId = kataInventory[value];
           setKataId(selectedKataId);
       }
@@ -108,17 +121,15 @@ export default function KataSelection() {
 
   return (
     <Card>
-      <CardHeader>
-        <CardTitle>Kata Selection</CardTitle>
-        <CardDescription>Select a kata to see its details.</CardDescription>
-      </CardHeader>
-      <CardContent>
+      <CardHeader className="flex-row items-center justify-between">
+        <div>
+          <CardTitle>{selectedKataName ? `Kata: ${selectedKataName}` : "Kata Selection"}</CardTitle>
+          {!selectedKataName && <CardDescription>Select a kata to see its details.</CardDescription>}
+        </div>
         {kataInventory ? (
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="kata-select">Kata</Label>
+          <div className="w-full sm:w-[280px]">
               <Select onValueChange={handleKataChange}>
-                <SelectTrigger id="kata-select" className="w-full sm:w-[280px]">
+                <SelectTrigger id="kata-select">
                   <SelectValue placeholder="Select a kata..." />
                 </SelectTrigger>
                 <SelectContent>
@@ -129,56 +140,73 @@ export default function KataSelection() {
                   ))}
                 </SelectContent>
               </Select>
-            </div>
           </div>
         ) : (
-            <div className="flex items-center justify-center h-24">
-                <p className="text-muted-foreground">Loading kata inventory...</p>
+            <div className="flex items-center justify-center">
+                <p className="text-sm text-muted-foreground">Loading...</p>
             </div>
         )}
-        
+      </CardHeader>
+      <CardContent>
         {loading && <p className="text-muted-foreground pt-4">Loading kata details...</p>}
 
-        {kataSteps && (
+        {kataSteps && tx && transactionsMappingFrom && (
           <TooltipProvider>
-            <div className="mt-6 flex flex-col gap-4">
-              {sortedKataSteps.map((step) => (
-                <Card key={step.id_sequence} className={cn("flex flex-col", step.kiai && "bg-accent/20 border-accent")}>
-                   <CardContent className="p-4 flex flex-col gap-2">
-                        <div className="flex justify-between items-start">
-                           <div className="flex-grow">
-                            <p className="font-medium">{step.posizione}</p>
-                           </div>
-                           <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                             <span>{step.guardia}</span>
-                             <span className="text-2xl font-bold" title={step.facing}>{getFacingArrow(step.facing)}</span>
-                           </div>
-                        </div>
-                    
-                        <Tooltip>
-                        <TooltipTrigger asChild>
-                            <div className="p-2 -mx-2 rounded-md hover:bg-accent/50 cursor-pointer">
-                                <p className="text-sm text-muted-foreground">Techniques:</p>
-                                <ul className="list-disc pl-5 font-medium">
-                                    {step.tecniche.map((tech) => (
-                                        <li key={tech.technic_id} className="truncate text-sm">{tech.Tecnica}</li>
-                                    ))}
-                                </ul>
+            <div className="mt-6 flex flex-col items-center gap-2">
+              {sortedKataSteps.map((step, index) => {
+                const transactionId = transactionsMappingFrom[step.id_sequence];
+                const transaction = transactionId ? tx[transactionId] : null;
+
+                return (
+                  <React.Fragment key={step.id_sequence}>
+                    <Card className={cn("w-full max-w-md flex flex-col", step.kiai && "bg-accent/20 border-accent")}>
+                      <CardContent className="p-4 flex flex-col gap-2">
+                            <div className="flex justify-between items-start">
+                              <div className="flex-grow">
+                                <p className="font-medium">{step.posizione}</p>
+                              </div>
+                              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                                <span>{step.guardia}</span>
+                                <span className="text-2xl font-bold" title={step.facing}>{getFacingArrow(step.facing)}</span>
+                              </div>
                             </div>
-                        </TooltipTrigger>
-                        <TooltipContent side="top" align="start">
-                            {step.tecniche.map((tech) => (
-                                <div key={tech.technic_id} className="mb-2 last:mb-0">
-                                    <p><strong>Arto:</strong> {tech.arto}</p>
-                                    <p><strong>Tecnica:</strong> {tech.Tecnica}</p>
-                                    <p><strong>Obiettivo:</strong> {tech.Obiettivo || 'N/A'}</p>
+                        
+                            <Tooltip>
+                            <TooltipTrigger asChild>
+                                <div className="p-2 -mx-2 rounded-md hover:bg-accent/50 cursor-pointer">
+                                    <p className="text-sm text-muted-foreground">Techniques:</p>
+                                    <ul className="list-disc pl-5 font-medium">
+                                        {step.tecniche.map((tech) => (
+                                            <li key={tech.technic_id} className="truncate text-sm">{tech.Tecnica}</li>
+                                        ))}
+                                    </ul>
                                 </div>
-                            ))}
-                        </TooltipContent>
-                        </Tooltip>
-                  </CardContent>
-                </Card>
-              ))}
+                            </TooltipTrigger>
+                            <TooltipContent side="top" align="start">
+                                {step.tecniche.map((tech) => (
+                                    <div key={tech.technic_id} className="mb-2 last:mb-0">
+                                        <p><strong>Arto:</strong> {tech.arto}</p>
+                                        <p><strong>Tecnica:</strong> {tech.Tecnica}</p>
+                                        <p><strong>Obiettivo:</strong> {tech.Obiettivo || 'N/A'}</p>
+                                    </div>
+                                ))}
+                            </TooltipContent>
+                            </Tooltip>
+                      </CardContent>
+                    </Card>
+                    {index < sortedKataSteps.length - 1 && (
+                      <div className="flex items-center justify-center my-2 text-muted-foreground">
+                         {transaction && (
+                          <div className="flex items-center gap-2">
+                            <p className="text-xs">{transaction.tempo}</p>
+                            <p className="text-2xl font-bold" title={transaction.direction}>{getDirectionSymbol(transaction.direction)}</p>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </React.Fragment>
+                )
+              })}
             </div>
           </TooltipProvider>
         )}

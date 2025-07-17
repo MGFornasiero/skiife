@@ -1,6 +1,7 @@
-import type {Metadata} from 'next';
+import type { Metadata } from 'next';
 import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
+import Header from '@/components/header';
 
 export const metadata: Metadata = {
   title: 'KataFlow',
@@ -20,7 +21,12 @@ export default function RootLayout({
         <link href="https://fonts.googleapis.com/css2?family=PT+Sans:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet" />
       </head>
       <body className="font-body antialiased">
-        {children}
+        <Header />
+        <main className="flex min-h-screen flex-col items-center justify-start p-4 sm:p-8 md:p-12 bg-background">
+          <div className="w-full max-w-4xl mt-16">
+            {children}
+          </div>
+        </main>
         <Toaster />
       </body>
     </html>

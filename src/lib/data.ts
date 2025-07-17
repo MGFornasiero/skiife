@@ -30,6 +30,7 @@ export type Passaggio = {
   tecnica: string;
   Stand: string;
   Target: string;
+  notes?: string;
 };
 
 export type Passaggi = {
@@ -55,4 +56,64 @@ export type Transactions = {
 
 export type TransactionsMapping = {
     [key: number]: number;
+};
+
+export type Tecnica = {
+  id_technic: number;
+  waza: string;
+  name: string;
+  description: string;
+  notes: string | null;
+  resource_url: string | null;
+};
+
+export type Tecniche = {
+  [key: string]: Tecnica;
+};
+
+export type Posizione = {
+    id_stand: number;
+    name: string;
+    description: string;
+    illustration_url: string | null;
+    notes: string | null;
+};
+
+export type Posizioni = {
+    [key: string]: Posizione;
+};
+
+export type Parte = {
+  id_part: number;
+  name: string;
+  translation: string | null;
+  description: string;
+  notes: string | null;
+  resource_url: string | null;
+};
+
+export type Parti = {
+  [key: string]: Parte;
+};
+
+export type Obiettivo = {
+  id_target: number;
+  name: string;
+  original_name: string;
+  description: string;
+  notes: string | null;
+  resource_url: string | null;
+};
+
+export type Obiettivi = {
+  [key: number]: Obiettivo;
+};
+
+export type Rilevanza = {
+  abs_relecance: number;
+  relative_relevance: number;
+};
+
+export type Rilevanze = {
+  [key: number]: Rilevanza;
 };

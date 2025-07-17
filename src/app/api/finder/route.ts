@@ -2,18 +2,21 @@ import { NextResponse } from 'next/server';
 
 const API_URL = "https://skiiapi-638356355820.europe-west12.run.app";
 
-export async function GET(
-  request: Request,
-  { params }: { params: { kata_id: string } }
-) {
-  const { kata_id } = params;
-
-  if (!kata_id) {
-    return NextResponse.json({ error: 'Missing kata_id' }, { status: 400 });
-  }
-
+export async function GET(request: Request) {
   try {
-    const res = await fetch(`${API_URL}/kata/${kata_id}`);
+    const { searchParams } = new URL(request.url);
+    const search = searchParams.get('search');
+
+    if (!search) {
+      return NextResponse.json({ error: 'Search text is required' }, { status: 400 });
+    }
+
+    const res = await fetch(`${API_URL}/finder?search=${encodeURIComponent(search)}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
     
     if (!res.ok) {
       const errorText = await res.text();

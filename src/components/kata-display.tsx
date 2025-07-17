@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { type Sequenze } from "@/lib/data";
+import { type Sequenze, type Passaggio } from "@/lib/data";
 import {
   Select,
   SelectContent,
@@ -21,7 +21,8 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { ChevronDown, ChevronUp } from "lucide-react";
+import { ChevronDown, ChevronUp, Minus, Plus } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 export default function KataDisplay() {
   const [selectedSequenzaKey, setSelectedSequenzaKey] = useState<string | null>(null);
@@ -31,6 +32,7 @@ export default function KataDisplay() {
   const [sequenzeData, setSequenzeData] = useState<Sequenze | null>(null);
   const [loading, setLoading] = useState(false);
   const [showGradeSelection, setShowGradeSelection] = useState(true);
+  const { toast } = useToast();
 
   useEffect(() => {
     // Reset state when grade or type changes
@@ -43,6 +45,7 @@ export default function KataDisplay() {
     }
 
     setLoading(true);
+    let gradeRes: Response;
     fetch(`/api/grade_id/${gradeType}/${grade}`)
       .then((res) => {
         if (!res.ok) {
@@ -56,9 +59,11 @@ export default function KataDisplay() {
         // setShowGradeSelection(false); // Hide selection on success
         return fetch(`/api/kihons/${newGradeId}`);
       })
-      .then((res) => {
+      .then(async (res) => {
+        gradeRes = res;
         if (!res.ok) {
-          throw new Error("Network response was not ok for kihons");
+            const errorBody = await res.text();
+            throw new Error(`Network response was not ok for kihons. Status: ${res.status}. Body: ${errorBody}`);
         }
         return res.json();
       })
@@ -80,7 +85,7 @@ export default function KataDisplay() {
       });
   }, [gradeType, grade]);
 
-  const sequenzaKeys = sequenzeData ? Object.keys(sequenzeData) : [];
+  const sequenzaKeys = sequenzeData ? Object.keys(sequenzeData).sort((a, b) => parseInt(a) - parseInt(b)) : [];
   const gradeNumbers = Array.from({ length: 9 }, (_, i) => i + 1);
   const selectedPassaggi =
     selectedSequenzaKey && sequenzeData
@@ -97,6 +102,30 @@ export default function KataDisplay() {
     setGrade(null); // Reset grade when type changes
     setSelectedSequenzaKey(null);
   }
+
+  const handleRowClick = (passaggio: Passaggio) => {
+    if (passaggio.notes) {
+      toast({
+        title: "Note",
+        description: passaggio.notes,
+      });
+    }
+  };
+
+  const handleSequenzaChange = (direction: 'next' | 'prev') => {
+    if (!sequenzaKeys.length) return;
+
+    const currentIndex = selectedSequenzaKey ? sequenzaKeys.indexOf(selectedSequenzaKey) : -1;
+    let nextIndex;
+
+    if (direction === 'next') {
+        nextIndex = currentIndex >= 0 ? (currentIndex + 1) % sequenzaKeys.length : 0;
+    } else { // prev
+        nextIndex = currentIndex > 0 ? currentIndex - 1 : sequenzaKeys.length - 1;
+    }
+    
+    setSelectedSequenzaKey(sequenzaKeys[nextIndex]);
+  };
 
   return (
     <div className="space-y-6">
@@ -120,7 +149,6 @@ export default function KataDisplay() {
           <CardContent>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-end pt-4 border-t">
               <div className="space-y-2">
-                <Label>Tipo</Label>
                 <div className="flex items-center space-x-2">
                   <Label htmlFor="grade-type-switch" className={gradeType === 'kyu' ? '' : 'text-muted-foreground'}>Kyu</Label>
                   <Switch
@@ -133,7 +161,6 @@ export default function KataDisplay() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="grade-select">Grado</Label>
                 <Select onValueChange={handleGradeChange} value={grade?.toString() || ""}>
                   <SelectTrigger id="grade-select" className="w-full sm:w-[180px]">
                     <SelectValue placeholder="Select a grado..." />
@@ -159,19 +186,16 @@ export default function KataDisplay() {
       ) : gradeId && sequenzeData ? (
         <>
           <div className="flex items-center gap-4">
-             <div className="w-full sm:w-64">
-                <Select onValueChange={setSelectedSequenzaKey} value={selectedSequenzaKey || ""}>
-                <SelectTrigger>
-                    <SelectValue placeholder="Select a sequenza..." />
-                </SelectTrigger>
-                <SelectContent>
-                    {sequenzaKeys.map((key) => (
-                    <SelectItem key={key} value={key}>
-                        Sequenza {key}
-                    </SelectItem>
-                    ))}
-                </SelectContent>
-                </Select>
+             <div className="flex items-center gap-2">
+                <Button variant="outline" size="icon" onClick={() => handleSequenzaChange('prev')} disabled={sequenzaKeys.length < 2}>
+                    <Minus className="h-4 w-4" />
+                </Button>
+                <div className="w-48 h-10 flex items-center justify-center rounded-md border border-input bg-background px-3 py-2 text-sm">
+                    {selectedSequenzaKey ? `Sequenza ${selectedSequenzaKey}` : "Select a sequenza"}
+                </div>
+                 <Button variant="outline" size="icon" onClick={() => handleSequenzaChange('next')} disabled={sequenzaKeys.length < 2}>
+                    <Plus className="h-4 w-4" />
+                </Button>
             </div>
           </div>
 
@@ -191,7 +215,7 @@ export default function KataDisplay() {
                   {Object.keys(selectedPassaggi).map((passaggioKey) => {
                     const passaggio = selectedPassaggi[Number(passaggioKey)];
                     return (
-                      <TableRow key={passaggioKey}>
+                      <TableRow key={passaggioKey} onClick={() => handleRowClick(passaggio)} className={passaggio.notes ? "cursor-pointer" : ""}>
                         <TableCell className="font-medium">{passaggioKey}</TableCell>
                         <TableCell>{passaggio.movement}</TableCell>
                         <TableCell>{passaggio.tecnica}</TableCell>
@@ -206,7 +230,7 @@ export default function KataDisplay() {
           ) : (
             <div className="flex flex-col items-center justify-center text-center p-10 border-2 border-dashed rounded-lg">
               <p className="text-muted-foreground">
-                Please select a sequenza from the dropdown menu to view its details.
+                Please select a sequenza to view its details.
               </p>
             </div>
           )}

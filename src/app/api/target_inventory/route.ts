@@ -2,18 +2,9 @@ import { NextResponse } from 'next/server';
 
 const API_URL = "https://skiiapi-638356355820.europe-west12.run.app";
 
-export async function GET(
-  request: Request,
-  { params }: { params: { kata_id: string } }
-) {
-  const { kata_id } = params;
-
-  if (!kata_id) {
-    return NextResponse.json({ error: 'Missing kata_id' }, { status: 400 });
-  }
-
+export async function GET(request: Request) {
   try {
-    const res = await fetch(`${API_URL}/kata/${kata_id}`);
+    const res = await fetch(`${API_URL}/target_inventory`);
     
     if (!res.ok) {
       const errorText = await res.text();
