@@ -91,19 +91,6 @@ const EmbusenGrid = ({ embusen }: { embusen: string }) => {
                 className="relative bg-secondary/30 border border-border"
                 style={{ width: gridSize * cellSize, height: gridSize * cellSize }}
             >
-                {/* Grid lines */}
-                {Array.from({ length: gridSize + 1 }).map((_, i) => (
-                    <React.Fragment key={`grid-${i}`}>
-                        {/* Vertical line */}
-                        <div className="absolute bg-border/50" style={{ left: i * cellSize, top: 0, width: 1, height: '100%' }} />
-                        {/* Horizontal line */}
-                        <div className="absolute bg-border/50" style={{ top: i * cellSize, left: 0, height: 1, width: '100%' }} />
-                    </React.Fragment>
-                ))}
-                {/* Center lines */}
-                <div className="absolute bg-foreground/30" style={{ left: '50%', top: 0, width: 2, height: '100%', transform: 'translateX(-50%)' }} />
-                <div className="absolute bg-foreground/30" style={{ top: '50%', left: 0, height: 2, width: '100%', transform: 'translateY(-50%)' }} />
-
                 {/* Dot */}
                 <div
                     className="absolute w-4 h-4 rounded-full bg-primary border-2 border-primary-foreground shadow-lg"
@@ -334,7 +321,7 @@ export default function KataSelection() {
                             </CardDescription>
                         </CardHeader>
                         <CardContent>
-                           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                           <div className="flex flex-col gap-6">
                                 <div>
                                     <h4 className="font-semibold mb-2">Techniques:</h4>
                                     <ul className="space-y-2">
