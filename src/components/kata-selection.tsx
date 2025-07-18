@@ -308,6 +308,10 @@ export default function KataSelection() {
   const transactionToNextId = currentStep && transactionsMappingFrom ? transactionsMappingFrom[currentStep.id_sequence] : null;
   const transactionToNext = transactionToNextId && tx ? tx[transactionToNextId] : null;
 
+  const transactionToCurrentId = currentStep && transactionsMappingTo ? transactionsMappingTo[currentStep.id_sequence] : null;
+  const transactionToCurrent = transactionToCurrentId && tx ? tx[transactionToCurrentId] : null;
+
+
   const handleStepChange = (direction: 'next' | 'prev') => {
     if (!sortedKataSteps.length) return;
 
@@ -351,7 +355,7 @@ export default function KataSelection() {
         <CardContent>
           {loading && <p className="text-muted-foreground pt-4">Loading kata details...</p>}
 
-          {kataSteps && tx && transactionsMappingFrom && (
+          {kataSteps && tx && transactionsMappingFrom && transactionsMappingTo && (
             <Tabs defaultValue="generale" className="w-full">
               <TabsList>
                 <TabsTrigger value="generale">Generale</TabsTrigger>
@@ -434,29 +438,39 @@ export default function KataSelection() {
               <TabsContent value="dettagli">
                 {sortedKataSteps.length > 0 && currentStep ? (
                     <div className="space-y-4 pt-4">
-                      <div className="flex items-center justify-center gap-4">
-                          <Button variant="outline" size="icon" onClick={() => handleStepChange('prev')}>
-                              <ChevronLeft className="h-4 w-4" />
-                          </Button>
-                          <div className="w-48 text-center font-medium">
-                              Step {currentStep.seq_num} of {sortedKataSteps.length}
+                       <TooltipProvider>
+                          <div className="flex items-center justify-center gap-4">
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <Button variant="outline" size="icon" onClick={() => handleStepChange('prev')}>
+                                      <ChevronLeft className="h-4 w-4" />
+                                  </Button>
+                                </TooltipTrigger>
+                                {transactionToCurrent && (
+                                  <TooltipContent>
+                                    <p>Tempo: {transactionToCurrent.tempo}</p>
+                                    <p>Direction: {transactionToCurrent.direction}</p>
+                                  </TooltipContent>
+                                )}
+                              </Tooltip>
+                              <div className="w-48 text-center font-medium">
+                                  Step {currentStep.seq_num} of {sortedKataSteps.length}
+                              </div>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <Button variant="outline" size="icon" onClick={() => handleStepChange('next')}>
+                                      <ChevronRight className="h-4 w-4" />
+                                  </Button>
+                                </TooltipTrigger>
+                                {transactionToNext && (
+                                  <TooltipContent>
+                                    <p>Tempo: {transactionToNext.tempo}</p>
+                                    <p>Direction: {transactionToNext.direction}</p>
+                                  </TooltipContent>
+                                )}
+                              </Tooltip>
                           </div>
-                          <TooltipProvider>
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <Button variant="outline" size="icon" onClick={() => handleStepChange('next')}>
-                                    <ChevronRight className="h-4 w-4" />
-                                </Button>
-                              </TooltipTrigger>
-                              {transactionToNext && (
-                                <TooltipContent>
-                                  <p>Tempo: {transactionToNext.tempo}</p>
-                                  <p>Direction: {transactionToNext.direction}</p>
-                                </TooltipContent>
-                              )}
-                            </Tooltip>
-                          </TooltipProvider>
-                      </div>
+                        </TooltipProvider>
 
                       <Card className="w-full max-w-lg mx-auto">
                           <CardHeader>
