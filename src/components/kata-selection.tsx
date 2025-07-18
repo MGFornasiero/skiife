@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect } from "react";
@@ -23,7 +24,6 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogDescription,
 } from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
 
@@ -233,7 +233,12 @@ export default function KataSelection() {
       const res = await fetch(`/api/info_stand/${standId}`);
       const errorText = await res.text();
       if (!res.ok) {
-          throw new Error(errorText || `External API error with status: ${res.status}`);
+        try {
+            const errorJson = JSON.parse(errorText);
+            throw new Error(errorJson.error || `External API error: ${errorText}`);
+        } catch (e) {
+            throw new Error(errorText || `External API error with status: ${res.status}`);
+        }
       }
       const data = JSON.parse(errorText);
       setSelectedPosizioneInfo(data.info_stand);
@@ -299,6 +304,9 @@ export default function KataSelection() {
     : [];
     
   const currentStep: KataStep | undefined = sortedKataSteps[selectedStepIndex];
+  
+  const transactionToNextId = currentStep && transactionsMappingFrom ? transactionsMappingFrom[currentStep.id_sequence] : null;
+  const transactionToNext = transactionToNextId && tx ? tx[transactionToNextId] : null;
 
   const handleStepChange = (direction: 'next' | 'prev') => {
     if (!sortedKataSteps.length) return;
@@ -433,9 +441,21 @@ export default function KataSelection() {
                           <div className="w-48 text-center font-medium">
                               Step {currentStep.seq_num} of {sortedKataSteps.length}
                           </div>
-                          <Button variant="outline" size="icon" onClick={() => handleStepChange('next')}>
-                              <ChevronRight className="h-4 w-4" />
-                          </Button>
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Button variant="outline" size="icon" onClick={() => handleStepChange('next')}>
+                                    <ChevronRight className="h-4 w-4" />
+                                </Button>
+                              </TooltipTrigger>
+                              {transactionToNext && (
+                                <TooltipContent>
+                                  <p>Tempo: {transactionToNext.tempo}</p>
+                                  <p>Direction: {transactionToNext.direction}</p>
+                                </TooltipContent>
+                              )}
+                            </Tooltip>
+                          </TooltipProvider>
                       </div>
 
                       <Card className="w-full max-w-lg mx-auto">
