@@ -47,10 +47,17 @@ const facingArrowMap: { [key: string]: string } = {
 };
 
 const directionSymbolMap: { [key: string]: string } = {
-  'sx': '↺',      // Anticlockwise Open Circle Arrow
-  'dx': '↻',      // Clockwise Open Circle Arrow
-  'frontal': '⇓', // Downwards Double Arrow
+  'sx': '◐', // U+25D0
+  'dx': '◑', // U+25D1
+  'frontal': '◒', // U+25D2
 };
+
+const guardiaSymbolMap: { [key: string]: string } = {
+  'sx': '◐', // U+25D0
+  'dx': '◑', // U+25D1
+  'frontal': '◒', // U+25D2
+};
+
 
 const getFacingArrow = (facing: string) => {
   return facingArrowMap[facing] || facing;
@@ -59,6 +66,11 @@ const getFacingArrow = (facing: string) => {
 const getDirectionSymbol = (direction: string | null | undefined) => {
   if (!direction) return '⇓'; // Default for None or ""
   return directionSymbolMap[direction] || '⇓'; // Default for any other case
+}
+
+const getGuardiaSymbol = (guardia: string | null | undefined) => {
+  if (!guardia) return '';
+  return guardiaSymbolMap[guardia] || guardia;
 }
 
 const parseEmbusen = (embusen: string): { x: number; y: number } | null => {
@@ -362,7 +374,7 @@ export default function KataSelection() {
                                       </p>
                                     </div>
                                     <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                                      <span>{step.guardia}</span>
+                                      <span className="text-2xl" title={step.guardia || ''}>{getGuardiaSymbol(step.guardia)}</span>
                                       <span className="text-2xl font-bold" title={step.facing}>{getFacingArrow(step.facing)}</span>
                                     </div>
                                   </div>
@@ -437,7 +449,7 @@ export default function KataSelection() {
                                 </span>
                               </CardTitle>
                               <CardDescription>
-                                  Guardia: {currentStep.guardia}
+                                  Guardia: <span className="text-2xl" title={currentStep.guardia || ''}>{getGuardiaSymbol(currentStep.guardia)}</span>
                                   {currentStep.kiai && <span className="ml-2 font-bold text-destructive">KIAI!</span>}
                               </CardDescription>
                           </CardHeader>
