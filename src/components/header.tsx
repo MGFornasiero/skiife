@@ -10,7 +10,6 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 const navItems = [
-  { href: "/", label: "Home" },
   { href: "/kata", label: "Kata" },
   { href: "/kihon", label: "Kihon" },
   { href: "/ricerca", label: "Ricerca" },
