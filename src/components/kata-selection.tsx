@@ -456,6 +456,12 @@ export default function KataSelection() {
                                           ))}
                                       </ul>
                                   </div>
+                                  {currentStep.notes && (
+                                    <div>
+                                      <h4 className="font-semibold mb-2">Notes:</h4>
+                                      <p className="text-sm text-muted-foreground">{currentStep.notes}</p>
+                                    </div>
+                                  )}
                                   <div className="mt-4 flex justify-center">
                                       <EmbusenGrid embusen={currentStep.embusen} facing={currentStep.facing} />
                                   </div>
@@ -482,12 +488,13 @@ export default function KataSelection() {
             <AlertDialogTitle>
               {isPosizioneInfoLoading ? "Loading..." : selectedPosizioneInfo?.name || "Stand Details"}
             </AlertDialogTitle>
-            {isPosizioneInfoLoading ? (
-              <div className="flex justify-center items-center p-4">
-                <Loader2 className="h-6 w-6 animate-spin" />
-              </div>
-            ) : (
-              <div className="text-sm text-muted-foreground space-y-4 max-h-96 overflow-y-auto pr-2 mt-2">
+            <div className="text-sm text-muted-foreground space-y-4 max-h-96 overflow-y-auto pr-2 mt-2">
+              {isPosizioneInfoLoading ? (
+                <div className="flex justify-center items-center p-4">
+                  <Loader2 className="h-6 w-6 animate-spin" />
+                </div>
+              ) : (
+                <>
                   {selectedPosizioneInfo?.description && (
                       <div>
                           <h4 className="font-semibold text-foreground mb-1">Description</h4>
@@ -503,8 +510,9 @@ export default function KataSelection() {
                   {!selectedPosizioneInfo?.description && !selectedPosizioneInfo?.notes && (
                       <p>No details available for this stand.</p>
                   )}
-              </div>
-            )}
+                </>
+              )}
+            </div>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogAction onClick={() => setIsPosizioneInfoDialogOpen(false)}>Close</AlertDialogAction>
@@ -518,12 +526,13 @@ export default function KataSelection() {
             <AlertDialogTitle>
               {isTechnicInfoLoading ? "Loading..." : selectedTechnicInfo?.name || "Technique Details"}
             </AlertDialogTitle>
-             {isTechnicInfoLoading ? (
+             <div className="text-sm text-muted-foreground space-y-4 max-h-96 overflow-y-auto pr-2 mt-2">
+              {isTechnicInfoLoading ? (
               <div className="flex justify-center items-center p-4">
                 <Loader2 className="h-6 w-6 animate-spin" />
               </div>
             ) : (
-              <div className="text-sm text-muted-foreground space-y-4 max-h-96 overflow-y-auto pr-2 mt-2">
+              <>
                   {selectedTechnicInfo?.name && (
                       <div>
                           <h4 className="font-semibold text-foreground mb-1">Name</h4>
@@ -551,8 +560,9 @@ export default function KataSelection() {
                   {!selectedTechnicInfo?.name && !selectedTechnicInfo?.waza && !selectedTechnicInfo?.description && !selectedTechnicInfo?.notes && (
                       <p>No details available for this technique.</p>
                   )}
-              </div>
+              </>
             )}
+            </div>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogAction onClick={() => setIsTechnicInfoDialogOpen(false)}>Close</AlertDialogAction>
