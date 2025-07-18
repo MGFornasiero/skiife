@@ -29,7 +29,10 @@ export type KataSteps = {
 // Kept for compatibility if used elsewhere, can be removed if not needed.
 export type Passaggio = {
   movement: string;
+  technic_id: number;
+  gyaku: bool;
   tecnica: string;
+  stand_id:number;
   Stand: string;
   Target: string;
   notes?: string;
