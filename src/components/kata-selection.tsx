@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { type KataInventory, type KataSteps, type Transactions, type TransactionsMapping, type KataStep } from "@/lib/data";
+import { type KataInventory, type KataSteps, type Transactions, type TransactionsMapping, type KataStep, type Posizione } from "@/lib/data";
 import {
   Select,
   SelectContent,
@@ -13,9 +13,20 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import React from "react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { useToast } from "@/hooks/use-toast";
+
 
 interface KataData {
   steps: KataSteps;
@@ -140,6 +151,11 @@ export default function KataSelection() {
   const [transactionsMappingTo, setTransactionsMappingTo] = useState<TransactionsMapping | null>(null);
   const [selectedStepIndex, setSelectedStepIndex] = useState(0);
 
+  const [isInfoDialogOpen, setIsInfoDialogOpen] = useState(false);
+  const [selectedPosizioneInfo, setSelectedPosizioneInfo] = useState<Posizione | null>(null);
+  const [isInfoLoading, setIsInfoLoading] = useState(false);
+  const { toast } = useToast();
+
   useEffect(() => {
     fetch('/api/kata_inventory')
       .then(res => res.json())
@@ -189,6 +205,41 @@ export default function KataSelection() {
       });
 
   }, [kataId]);
+  
+  const handlePosizioneClick = async (standId: number) => {
+    setIsInfoLoading(true);
+    setIsInfoDialogOpen(true);
+    setSelectedPosizioneInfo(null);
+
+    try {
+      const res = await fetch(`/api/info_stand/${standId}`);
+      if (!res.ok) {
+        const errorText = await res.text();
+        let errorMessage = `Failed to fetch stand info with status: ${res.status}`;
+        try {
+          const errorJson = JSON.parse(errorText);
+          errorMessage = errorJson.error || errorMessage;
+        } catch (e) {
+            // Error text is not JSON, use the raw text
+            errorMessage = errorText || errorMessage;
+        }
+        throw new Error(errorMessage);
+      }
+      const data = await res.json();
+      setSelectedPosizioneInfo(data.info_stand);
+    } catch (error: any) {
+      console.error("Error fetching stand info:", error);
+      setIsInfoDialogOpen(false); // Close dialog on error
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: error.message || "An unexpected error occurred while fetching stand details.",
+      });
+    } finally {
+      setIsInfoLoading(false);
+    }
+  };
+
 
   const handleKataChange = (value: string) => {
       if (kataInventory) {
@@ -270,7 +321,12 @@ export default function KataSelection() {
                             <CardContent className="p-4 flex flex-col gap-2">
                                   <div className="flex justify-between items-start">
                                     <div className="flex-grow">
-                                      <p className="font-medium">{step.posizione}</p>
+                                      <p 
+                                        className="font-medium cursor-pointer hover:underline"
+                                        onClick={() => handlePosizioneClick(step.stand_id)}
+                                      >
+                                          {step.posizione}
+                                      </p>
                                     </div>
                                     <div className="flex items-center gap-2 text-sm text-muted-foreground">
                                       <span>{step.guardia}</span>
@@ -335,7 +391,12 @@ export default function KataSelection() {
                       <Card className="w-full max-w-lg mx-auto">
                           <CardHeader>
                               <CardTitle className="flex justify-between items-center">
-                                <span>{currentStep.posizione}</span>
+                                <span
+                                    className="cursor-pointer hover:underline"
+                                    onClick={() => handlePosizioneClick(currentStep.stand_id)}
+                                >
+                                    {currentStep.posizione}
+                                </span>
                                 <span className="text-4xl font-bold" title={currentStep.facing}>
                                     {getFacingArrow(currentStep.facing)}
                                 </span>
@@ -378,6 +439,44 @@ export default function KataSelection() {
           )}
         </CardContent>
       </Card>
+
+      <AlertDialog open={isInfoDialogOpen} onOpenChange={setIsInfoDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              {isInfoLoading ? "Loading..." : selectedPosizioneInfo?.name || "Stand Details"}
+            </AlertDialogTitle>
+            {isInfoLoading ? (
+              <div className="flex justify-center items-center p-4">
+                <Loader2 className="h-6 w-6 animate-spin" />
+              </div>
+            ) : (
+              <AlertDialogDescription>
+                <div className="space-y-4 max-h-96 overflow-y-auto pr-2">
+                    {selectedPosizioneInfo?.description && (
+                        <div>
+                            <h4 className="font-semibold text-foreground mb-1">Description</h4>
+                            <p>{selectedPosizioneInfo.description}</p>
+                        </div>
+                    )}
+                    {selectedPosizioneInfo?.notes && (
+                        <div>
+                            <h4 className="font-semibold text-foreground mb-1">Notes</h4>
+                            <p>{selectedPosizioneInfo.notes}</p>
+                        </div>
+                    )}
+                    {!selectedPosizioneInfo?.description && !selectedPosizioneInfo?.notes && (
+                        <p>No details available for this stand.</p>
+                    )}
+                </div>
+              </AlertDialogDescription>
+            )}
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogAction onClick={() => setIsInfoDialogOpen(false)}>Close</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 }
