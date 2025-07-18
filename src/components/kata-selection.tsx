@@ -10,7 +10,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
@@ -26,6 +25,8 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 
 
 interface KataData {
@@ -171,6 +172,8 @@ export default function KataSelection() {
   const [isTechnicInfoDialogOpen, setIsTechnicInfoDialogOpen] = useState(false);
   const [selectedTechnicInfo, setSelectedTechnicInfo] = useState<Tecnica | null>(null);
   const [isTechnicInfoLoading, setIsTechnicInfoLoading] = useState(false);
+
+  const [viewMode, setViewMode] = useState<"generale" | "dettagli">("generale");
 
   const { toast } = useToast();
 
@@ -326,8 +329,8 @@ export default function KataSelection() {
   return (
     <>
       <Card>
-        <CardHeader className="flex-row items-center justify-between">
-          <div>
+        <CardHeader className="flex-row items-start sm:items-center justify-between gap-4">
+          <div className="flex-grow">
             <CardTitle>{selectedKataName ? `Kata: ${selectedKataName}` : "Kata Selection"}</CardTitle>
             {!selectedKataName && <CardDescription>Select a kata to see its details.</CardDescription>}
           </div>
@@ -356,12 +359,18 @@ export default function KataSelection() {
           {loading && <p className="text-muted-foreground pt-4">Loading kata details...</p>}
 
           {kataSteps && tx && transactionsMappingFrom && transactionsMappingTo && (
-            <Tabs defaultValue="generale" className="w-full">
-              <TabsList>
-                <TabsTrigger value="generale">Generale</TabsTrigger>
-                <TabsTrigger value="dettagli">Dettagli</TabsTrigger>
-              </TabsList>
-              <TabsContent value="generale">
+            <div className="w-full">
+              <div className="flex items-center space-x-2 mb-4">
+                <Label htmlFor="view-mode-switch" className={cn("text-muted-foreground", viewMode === 'generale' && 'text-foreground')}>Generale</Label>
+                <Switch
+                  id="view-mode-switch"
+                  checked={viewMode === 'dettagli'}
+                  onCheckedChange={(checked) => setViewMode(checked ? 'dettagli' : 'generale')}
+                />
+                <Label htmlFor="view-mode-switch" className={cn("text-muted-foreground", viewMode === 'dettagli' && 'text-foreground')}>Dettagli</Label>
+              </div>
+
+              {viewMode === 'generale' ? (
                 <TooltipProvider>
                   <div className="mt-6 flex flex-col items-center gap-2">
                     {sortedKataSteps.map((step, index) => {
@@ -434,8 +443,8 @@ export default function KataSelection() {
                     })}
                   </div>
                 </TooltipProvider>
-              </TabsContent>
-              <TabsContent value="dettagli">
+              ) : (
+                <>
                 {sortedKataSteps.length > 0 && currentStep ? (
                     <div className="space-y-4 pt-4">
                        <TooltipProvider>
@@ -536,8 +545,9 @@ export default function KataSelection() {
                     </p>
                   </div>
                 )}
-              </TabsContent>
-            </Tabs>
+                </>
+              )}
+            </div>
           )}
         </CardContent>
       </Card>
