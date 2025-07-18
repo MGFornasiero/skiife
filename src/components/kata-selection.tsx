@@ -47,9 +47,10 @@ const facingArrowMap: { [key: string]: string } = {
 };
 
 const directionSymbolMap: { [key: string]: string } = {
-  'sx': '◐', // U+25D0
-  'dx': '◑', // U+25D1
-  'frontal': '◒', // U+25D2
+  'sx': '↰',
+  'dx': '↱',
+  'frontal': '↑',
+  'retro': '↓',
 };
 
 const guardiaSymbolMap: { [key: string]: string } = {
@@ -230,16 +231,11 @@ export default function KataSelection() {
 
     try {
       const res = await fetch(`/api/info_stand/${standId}`);
+      const errorText = await res.text();
       if (!res.ok) {
-        const errorText = await res.text();
-        try {
-          const errorJson = JSON.parse(errorText);
-          throw new Error(errorJson.error || `External API error: ${errorText}`);
-        } catch (e) {
           throw new Error(errorText || `External API error with status: ${res.status}`);
-        }
       }
-      const data = await res.json();
+      const data = JSON.parse(errorText);
       setSelectedPosizioneInfo(data.info_stand);
     } catch (error: any) {
       console.error("Error fetching stand info:", error);
@@ -374,7 +370,14 @@ export default function KataSelection() {
                                       </p>
                                     </div>
                                     <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                                      <span className="text-2xl" title={step.guardia || ''}>{getGuardiaSymbol(step.guardia)}</span>
+                                      <Tooltip>
+                                        <TooltipTrigger>
+                                          <span className="text-2xl">{getGuardiaSymbol(step.guardia)}</span>
+                                        </TooltipTrigger>
+                                        <TooltipContent>
+                                          <p>{step.guardia}</p>
+                                        </TooltipContent>
+                                      </Tooltip>
                                       <span className="text-2xl font-bold" title={step.facing}>{getFacingArrow(step.facing)}</span>
                                     </div>
                                   </div>
@@ -449,7 +452,17 @@ export default function KataSelection() {
                                 </span>
                               </CardTitle>
                               <CardDescription>
-                                  Guardia: <span className="text-2xl" title={currentStep.guardia || ''}>{getGuardiaSymbol(currentStep.guardia)}</span>
+                                  Guardia: 
+                                  <TooltipProvider>
+                                    <Tooltip>
+                                      <TooltipTrigger>
+                                        <span className="text-2xl ml-1">{getGuardiaSymbol(currentStep.guardia)}</span>
+                                      </TooltipTrigger>
+                                      <TooltipContent>
+                                        <p>{currentStep.guardia}</p>
+                                      </TooltipContent>
+                                    </Tooltip>
+                                  </TooltipProvider>
                                   {currentStep.kiai && <span className="ml-2 font-bold text-destructive">KIAI!</span>}
                               </CardDescription>
                           </CardHeader>
