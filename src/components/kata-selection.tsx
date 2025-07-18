@@ -447,23 +447,24 @@ export default function KataSelection() {
                                 >
                                     {currentStep.posizione}
                                 </span>
-                                <span className="text-4xl font-bold" title={currentStep.facing}>
-                                    {getFacingArrow(currentStep.facing)}
-                                </span>
+                                <div className="flex items-center gap-2 text-2xl font-bold">
+                                    <TooltipProvider>
+                                        <Tooltip>
+                                            <TooltipTrigger>
+                                                <span className="font-normal">{getGuardiaSymbol(currentStep.guardia)}</span>
+                                            </TooltipTrigger>
+                                            <TooltipContent>
+                                                <p>{currentStep.guardia}</p>
+                                            </TooltipContent>
+                                        </Tooltip>
+                                    </TooltipProvider>
+                                    <span title={currentStep.facing}>
+                                        {getFacingArrow(currentStep.facing)}
+                                    </span>
+                                </div>
                               </CardTitle>
                               <CardDescription>
-                                  Guardia: 
-                                  <TooltipProvider>
-                                    <Tooltip>
-                                      <TooltipTrigger>
-                                        <span className="text-2xl ml-1">{getGuardiaSymbol(currentStep.guardia)}</span>
-                                      </TooltipTrigger>
-                                      <TooltipContent>
-                                        <p>{currentStep.guardia}</p>
-                                      </TooltipContent>
-                                    </Tooltip>
-                                  </TooltipProvider>
-                                  {currentStep.kiai && <span className="ml-2 font-bold text-destructive">KIAI!</span>}
+                                  {currentStep.kiai && <span className="font-bold text-destructive">KIAI!</span>}
                               </CardDescription>
                           </CardHeader>
                           <CardContent>
