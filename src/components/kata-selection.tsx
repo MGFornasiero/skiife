@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { type KataInventory, type KataSteps, type Transactions, type TransactionsMapping, type KataStep, type Posizione } from "@/lib/data";
+import { type KataInventory, type KataSteps, type Transactions, type TransactionsMapping, type KataStep, type Posizione, type KataTechnic, type Tecnica } from "@/lib/data";
 import {
   Select,
   SelectContent,
@@ -23,6 +23,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
+  AlertDialogDescription,
 } from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
 
@@ -150,9 +151,14 @@ export default function KataSelection() {
   const [transactionsMappingTo, setTransactionsMappingTo] = useState<TransactionsMapping | null>(null);
   const [selectedStepIndex, setSelectedStepIndex] = useState(0);
 
-  const [isInfoDialogOpen, setIsInfoDialogOpen] = useState(false);
+  const [isPosizioneInfoDialogOpen, setIsPosizioneInfoDialogOpen] = useState(false);
   const [selectedPosizioneInfo, setSelectedPosizioneInfo] = useState<Posizione | null>(null);
-  const [isInfoLoading, setIsInfoLoading] = useState(false);
+  const [isPosizioneInfoLoading, setIsPosizioneInfoLoading] = useState(false);
+
+  const [isTechnicInfoDialogOpen, setIsTechnicInfoDialogOpen] = useState(false);
+  const [selectedTechnicInfo, setSelectedTechnicInfo] = useState<Tecnica | null>(null);
+  const [isTechnicInfoLoading, setIsTechnicInfoLoading] = useState(false);
+
   const { toast } = useToast();
 
   useEffect(() => {
@@ -206,8 +212,8 @@ export default function KataSelection() {
   }, [kataId]);
   
   const handlePosizioneClick = async (standId: number) => {
-    setIsInfoLoading(true);
-    setIsInfoDialogOpen(true);
+    setIsPosizioneInfoLoading(true);
+    setIsPosizioneInfoDialogOpen(true);
     setSelectedPosizioneInfo(null);
 
     try {
@@ -225,14 +231,45 @@ export default function KataSelection() {
       setSelectedPosizioneInfo(data.info_stand);
     } catch (error: any) {
       console.error("Error fetching stand info:", error);
-      setIsInfoDialogOpen(false); // Close dialog on error
+      setIsPosizioneInfoDialogOpen(false); // Close dialog on error
       toast({
         variant: "destructive",
         title: "Error",
         description: error.message || "An unexpected error occurred while fetching stand details.",
       });
     } finally {
-      setIsInfoLoading(false);
+      setIsPosizioneInfoLoading(false);
+    }
+  };
+
+  const handleTechnicClick = async (technicId: number) => {
+    setIsTechnicInfoLoading(true);
+    setIsTechnicInfoDialogOpen(true);
+    setSelectedTechnicInfo(null);
+
+    try {
+      const res = await fetch(`/api/info_technic/${technicId}`);
+      if (!res.ok) {
+        const errorText = await res.text();
+        try {
+            const errorJson = JSON.parse(errorText);
+            throw new Error(errorJson.error || `External API error: ${errorText}`);
+        } catch (e) {
+            throw new Error(`External API error: ${errorText}`);
+        }
+      }
+      const data = await res.json();
+      setSelectedTechnicInfo(data.info_technic);
+    } catch (error: any) {
+      console.error("Error fetching technic info:", error);
+      setIsTechnicInfoDialogOpen(false); // Close dialog on error
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: error.message || "An unexpected error occurred while fetching technic details.",
+      });
+    } finally {
+      setIsTechnicInfoLoading(false);
     }
   };
 
@@ -332,11 +369,13 @@ export default function KataSelection() {
                               
                                   <Tooltip>
                                   <TooltipTrigger asChild>
-                                      <div className="p-2 -mx-2 rounded-md hover:bg-accent/50 cursor-pointer">
+                                      <div className="p-2 -mx-2 rounded-md hover:bg-accent/50">
                                           <p className="text-sm text-muted-foreground">Techniques:</p>
                                           <ul className="list-disc pl-5 font-medium">
                                               {step.tecniche.map((tech) => (
-                                                  <li key={tech.technic_id} className="truncate text-sm">{tech.Tecnica}</li>
+                                                  <li key={tech.technic_id} className="truncate text-sm cursor-pointer hover:underline" onClick={() => handleTechnicClick(tech.technic_id)}>
+                                                      {tech.Tecnica}
+                                                  </li>
                                               ))}
                                           </ul>
                                       </div>
@@ -409,9 +448,10 @@ export default function KataSelection() {
                                       <ul className="space-y-2">
                                           {currentStep.tecniche.map(tech => (
                                               <li key={tech.technic_id} className="border-l-4 pl-4 py-1 border-primary/50 bg-secondary/50 rounded-r-md">
-                                                  <p><strong>Technique:</strong> {tech.Tecnica}</p>
-                                                  <p><strong>Limb:</strong> {tech.arto}</p>
-                                                  <p><strong>Target:</strong> {tech.Obiettivo || 'N/A'}</p>
+                                                  <p><strong className="cursor-pointer hover:underline" onClick={() => handleTechnicClick(tech.technic_id)}>Tecnica:</strong> {tech.Tecnica}</p>
+                                                  <p><strong>Arto:</strong> {tech.arto}</p>
+                                                  <p><strong>Obiettivo:</strong> {tech.Obiettivo || 'N/A'}</p>
+                                                  <p><strong>Note:</strong> {tech.waza_note || 'N/A'}</p>
                                               </li>
                                           ))}
                                       </ul>
@@ -436,13 +476,13 @@ export default function KataSelection() {
         </CardContent>
       </Card>
 
-      <AlertDialog open={isInfoDialogOpen} onOpenChange={setIsInfoDialogOpen}>
+      <AlertDialog open={isPosizioneInfoDialogOpen} onOpenChange={setIsPosizioneInfoDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>
-              {isInfoLoading ? "Loading..." : selectedPosizioneInfo?.name || "Stand Details"}
+              {isPosizioneInfoLoading ? "Loading..." : selectedPosizioneInfo?.name || "Stand Details"}
             </AlertDialogTitle>
-            {isInfoLoading ? (
+            {isPosizioneInfoLoading ? (
               <div className="flex justify-center items-center p-4">
                 <Loader2 className="h-6 w-6 animate-spin" />
               </div>
@@ -467,7 +507,55 @@ export default function KataSelection() {
             )}
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogAction onClick={() => setIsInfoDialogOpen(false)}>Close</AlertDialogAction>
+            <AlertDialogAction onClick={() => setIsPosizioneInfoDialogOpen(false)}>Close</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog open={isTechnicInfoDialogOpen} onOpenChange={setIsTechnicInfoDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              {isTechnicInfoLoading ? "Loading..." : selectedTechnicInfo?.name || "Technique Details"}
+            </AlertDialogTitle>
+             {isTechnicInfoLoading ? (
+              <div className="flex justify-center items-center p-4">
+                <Loader2 className="h-6 w-6 animate-spin" />
+              </div>
+            ) : (
+              <div className="text-sm text-muted-foreground space-y-4 max-h-96 overflow-y-auto pr-2 mt-2">
+                  {selectedTechnicInfo?.name && (
+                      <div>
+                          <h4 className="font-semibold text-foreground mb-1">Name</h4>
+                          <p>{selectedTechnicInfo.name}</p>
+                      </div>
+                  )}
+                   {selectedTechnicInfo?.waza && (
+                      <div>
+                          <h4 className="font-semibold text-foreground mb-1">Waza</h4>
+                          <p>{selectedTechnicInfo.waza}</p>
+                      </div>
+                  )}
+                  {selectedTechnicInfo?.description && (
+                      <div>
+                          <h4 className="font-semibold text-foreground mb-1">Description</h4>
+                          <p>{selectedTechnicInfo.description}</p>
+                      </div>
+                  )}
+                  {selectedTechnicInfo?.notes && (
+                      <div>
+                          <h4 className="font-semibold text-foreground mb-1">Notes</h4>
+                          <p>{selectedTechnicInfo.notes}</p>
+                      </div>
+                  )}
+                  {!selectedTechnicInfo?.name && !selectedTechnicInfo?.waza && !selectedTechnicInfo?.description && !selectedTechnicInfo?.notes && (
+                      <p>No details available for this technique.</p>
+                  )}
+              </div>
+            )}
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogAction onClick={() => setIsTechnicInfoDialogOpen(false)}>Close</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
