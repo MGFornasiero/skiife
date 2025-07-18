@@ -69,7 +69,13 @@ export default function KataDisplay() {
       })
       .then((kihonsData) => {
         if (kihonsData && kihonsData.kihons) {
+          const keys = Object.keys(kihonsData.kihons);
           setSequenzeData(kihonsData.kihons);
+          if (keys.length > 0) {
+            // Default to the first sequenza, assuming it's '1' or the first in the sorted list
+            const sortedKeys = keys.sort((a, b) => parseInt(a) - parseInt(b));
+            setSelectedSequenzaKey(sortedKeys[0]);
+          }
         } else {
           setSequenzeData(null);
         }
