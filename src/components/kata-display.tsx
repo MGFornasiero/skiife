@@ -31,6 +31,23 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { ChevronDown, ChevronUp, Minus, Plus, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "./ui/tooltip";
+
+const movementIconMap: { [key: string]: string } = {
+  'Fwd': '⏭',
+  'Bkw': '⏮',
+  'Still': '⏸',
+};
+
+const getMovementIcon = (movement: string) => {
+    for (const key in movementIconMap) {
+        if (movement.includes(key)) {
+            return movementIconMap[key];
+        }
+    }
+    return movement; // fallback to original text
+};
+
 
 export default function KataDisplay() {
   const [selectedSequenzaKey, setSelectedSequenzaKey] = useState<string | null>(null);
@@ -274,41 +291,52 @@ export default function KataDisplay() {
 
           {selectedPassaggi ? (
             <div className="overflow-hidden rounded-lg border">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="w-[50px]">#</TableHead>
-                    <TableHead>Movement</TableHead>
-                    <TableHead>Tecnica</TableHead>
-                    <TableHead>Stand</TableHead>
-                    <TableHead>Target</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {Object.keys(selectedPassaggi).map((passaggioKey) => {
-                    const passaggio = selectedPassaggi[Number(passaggioKey)];
-                    return (
-                      <TableRow key={passaggioKey}>
-                        <TableCell className="font-medium">{passaggioKey}</TableCell>
-                        <TableCell>{passaggio.movement}</TableCell>
-                        <TableCell 
-                          className="cursor-pointer hover:underline"
-                          onClick={() => handleTechnicClick(passaggio.technic_id)}
-                        >
-                          {passaggio.tecnica}
-                        </TableCell>
-                        <TableCell 
-                          className="cursor-pointer hover:underline"
-                          onClick={() => handleStandClick(passaggio.stand_id)}
-                        >
-                          {passaggio.Stand}
-                        </TableCell>
-                        <TableCell>{passaggio.Target}</TableCell>
-                      </TableRow>
-                    );
-                  })}
-                </TableBody>
-              </Table>
+              <TooltipProvider>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="w-[50px]">#</TableHead>
+                      <TableHead>Movement</TableHead>
+                      <TableHead>Tecnica</TableHead>
+                      <TableHead>Stand</TableHead>
+                      <TableHead>Target</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {Object.keys(selectedPassaggi).map((passaggioKey) => {
+                      const passaggio = selectedPassaggi[Number(passaggioKey)];
+                      return (
+                        <TableRow key={passaggioKey}>
+                          <TableCell className="font-medium">{passaggioKey}</TableCell>
+                          <TableCell>
+                            <Tooltip>
+                              <TooltipTrigger>
+                                  <span className="text-xl">{getMovementIcon(passaggio.movement)}</span>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p>{passaggio.movement}</p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </TableCell>
+                          <TableCell 
+                            className="cursor-pointer hover:underline"
+                            onClick={() => handleTechnicClick(passaggio.technic_id)}
+                          >
+                            {passaggio.tecnica}
+                          </TableCell>
+                          <TableCell 
+                            className="cursor-pointer hover:underline"
+                            onClick={() => handleStandClick(passaggio.stand_id)}
+                          >
+                            {passaggio.Stand}
+                          </TableCell>
+                          <TableCell>{passaggio.Target}</TableCell>
+                        </TableRow>
+                      );
+                    })}
+                  </TableBody>
+                </Table>
+              </TooltipProvider>
             </div>
           ) : (
             <div className="flex flex-col items-center justify-center text-center p-10 border-2 border-dashed rounded-lg">
