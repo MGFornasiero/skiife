@@ -20,7 +20,6 @@ import {
   AlertDialog,
   AlertDialogAction,
   AlertDialogContent,
-  AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
@@ -215,15 +214,12 @@ export default function KataSelection() {
       const res = await fetch(`/api/info_stand/${standId}`);
       if (!res.ok) {
         const errorText = await res.text();
-        let errorMessage = `Failed to fetch stand info with status: ${res.status}`;
         try {
           const errorJson = JSON.parse(errorText);
-          errorMessage = errorJson.error || errorMessage;
+          throw new Error(errorJson.error || `External API error: ${errorText}`);
         } catch (e) {
-            // Error text is not JSON, use the raw text
-            errorMessage = errorText || errorMessage;
+          throw new Error(errorText || `External API error with status: ${res.status}`);
         }
-        throw new Error(errorMessage);
       }
       const data = await res.json();
       setSelectedPosizioneInfo(data.info_stand);
@@ -451,25 +447,23 @@ export default function KataSelection() {
                 <Loader2 className="h-6 w-6 animate-spin" />
               </div>
             ) : (
-              <AlertDialogDescription>
-                <div className="space-y-4 max-h-96 overflow-y-auto pr-2">
-                    {selectedPosizioneInfo?.description && (
-                        <div>
-                            <h4 className="font-semibold text-foreground mb-1">Description</h4>
-                            <p>{selectedPosizioneInfo.description}</p>
-                        </div>
-                    )}
-                    {selectedPosizioneInfo?.notes && (
-                        <div>
-                            <h4 className="font-semibold text-foreground mb-1">Notes</h4>
-                            <p>{selectedPosizioneInfo.notes}</p>
-                        </div>
-                    )}
-                    {!selectedPosizioneInfo?.description && !selectedPosizioneInfo?.notes && (
-                        <p>No details available for this stand.</p>
-                    )}
-                </div>
-              </AlertDialogDescription>
+              <div className="text-sm text-muted-foreground space-y-4 max-h-96 overflow-y-auto pr-2 mt-2">
+                  {selectedPosizioneInfo?.description && (
+                      <div>
+                          <h4 className="font-semibold text-foreground mb-1">Description</h4>
+                          <p>{selectedPosizioneInfo.description}</p>
+                      </div>
+                  )}
+                  {selectedPosizioneInfo?.notes && (
+                      <div>
+                          <h4 className="font-semibold text-foreground mb-1">Notes</h4>
+                          <p>{selectedPosizioneInfo.notes}</p>
+                      </div>
+                  )}
+                  {!selectedPosizioneInfo?.description && !selectedPosizioneInfo?.notes && (
+                      <p>No details available for this stand.</p>
+                  )}
+              </div>
             )}
           </AlertDialogHeader>
           <AlertDialogFooter>
