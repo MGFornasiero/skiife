@@ -292,7 +292,7 @@ export default function KataSelection() {
       setSelectedTechnicInfo(data.info_technic);
     } catch (error: any) {
       console.error("Error fetching technic info:", error);
-      setIsTechnicInfoDialogOpen(false); // Close dialog on error
+      setIsPosizioneInfoDialogOpen(false); // Close dialog on error
       toast({
         variant: "destructive",
         title: "Error",
@@ -342,9 +342,29 @@ export default function KataSelection() {
 
   return (
     <>
+      {kataInventory ? (
+        <div className="w-full sm:w-[280px] mb-4">
+            <Select onValueChange={handleKataChange}>
+              <SelectTrigger id="kata-select">
+                <SelectValue placeholder="Select a kata..." />
+              </SelectTrigger>
+              <SelectContent>
+                {sortedKataNames.map((kataName) => (
+                  <SelectItem key={kataName} value={kataName}>
+                    {kataName}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+        </div>
+      ) : (
+          <div className="flex items-center justify-center mb-6">
+              <p className="text-sm text-muted-foreground">Loading...</p>
+          </div>
+      )}
       <Card>
         <CardHeader>
-            <div className="flex items-center gap-4">
+            <div className="flex items-center justify-between gap-4">
                 <div className="flex items-center space-x-2">
                     <Label htmlFor="view-mode-switch" className={cn("text-sm text-muted-foreground", viewMode === 'generale' && 'text-foreground')}>Generale</Label>
                     <Switch
@@ -354,33 +374,13 @@ export default function KataSelection() {
                     />
                     <Label htmlFor="view-mode-switch" className={cn("text-sm text-muted-foreground", viewMode === 'dettagli' && 'text-foreground')}>Dettagli</Label>
                 </div>
-                <div className="flex-grow">
+                <div className="flex-grow text-right">
                   <CardTitle>{selectedKataName ? `Kata: ${selectedKataName}` : "Kata Selection"}</CardTitle>
                 </div>
             </div>
-            {!selectedKataName && <CardDescription className="mt-2">Select a kata to see its details.</CardDescription>}
+            {!selectedKataName && <CardDescription className="mt-2 text-right">Select a kata to see its details.</CardDescription>}
         </CardHeader>
         <CardContent>
-          {kataInventory ? (
-            <div className="w-full sm:w-[280px] mb-6">
-                <Select onValueChange={handleKataChange}>
-                  <SelectTrigger id="kata-select">
-                    <SelectValue placeholder="Select a kata..." />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {sortedKataNames.map((kataName) => (
-                      <SelectItem key={kataName} value={kataName}>
-                        {kataName}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-            </div>
-          ) : (
-              <div className="flex items-center justify-center mb-6">
-                  <p className="text-sm text-muted-foreground">Loading...</p>
-              </div>
-          )}
           
           {loading && <p className="text-muted-foreground pt-4">Loading kata details...</p>}
 
@@ -673,3 +673,6 @@ export default function KataSelection() {
   );
 }
 
+
+
+    
