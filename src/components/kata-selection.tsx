@@ -13,7 +13,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight, Loader2, Link as LinkIcon, FastForward, Play, Wind, Hourglass, Turtle } from "lucide-react";
+import { ChevronLeft, ChevronRight, Loader2, Link as LinkIcon, FastForward, Play, Wind, Hourglass, Turtle, Rabbit, PersonStanding } from "lucide-react";
 import { cn } from "@/lib/utils";
 import React from "react";
 import {
@@ -62,8 +62,8 @@ const guardiaSymbolMap: { [key: string]: string } = {
 
 const tempoIconMap: { [key in Transaction['tempo']]: React.ElementType } = {
     'Legato': LinkIcon,
-    'Fast': FastForward,
-    'Normal': Play,
+    'Fast': Rabbit,
+    'Normal': PersonStanding,
     'Slow': Turtle,
     'Breath': Wind,
 };
