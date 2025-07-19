@@ -48,10 +48,10 @@ const facingArrowMap: { [key: string]: string } = {
 };
 
 const directionSymbolMap: { [key: string]: string } = {
-  'sx': '↰',
-  'dx': '↱',
-  'frontal': '↑',
-  'retro': '↓',
+  'sx': '↶',
+  'dx': '↷',
+  'frontal': '=',
+  null:'⤫'
 };
 
 const guardiaSymbolMap: { [key: string]: string } = {

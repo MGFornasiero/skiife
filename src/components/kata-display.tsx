@@ -297,10 +297,10 @@ export default function KataDisplay() {
                   <TableHeader>
                     <TableRow>
                       <TableHead className="w-[50px]">#</TableHead>
-                      <TableHead>Movement</TableHead>
+                      <TableHead>Mov</TableHead>
                       <TableHead>Tecnica</TableHead>
-                      <TableHead>Stand</TableHead>
-                      <TableHead>Target</TableHead>
+                      <TableHead>Posizione</TableHead>
+                      <TableHead>Obiettivo</TableHead>
                       <TableHead>Note</TableHead>
                     </TableRow>
                   </TableHeader>
