@@ -26,11 +26,10 @@ export type KataSteps = {
   [key: number]: KataStep;
 };
 
-// Kept for compatibility if used elsewhere, can be removed if not needed.
 export type Passaggio = {
   movement: string;
   technic_id: number;
-  gyaku: bool;
+  gyaku: boolean;
   tecnica: string;
   stand_id:number;
   Stand: string;
@@ -51,7 +50,7 @@ export type KataInventory = {
 };
 
 export type Transaction = {
-  tempo: string;
+  tempo: 'Legato' | 'Fast' | 'Normal' | 'Slow' | 'Breath';
   direction: string;
 };
 
