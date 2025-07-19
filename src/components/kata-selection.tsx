@@ -2,7 +2,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { type KataInventory, type KataSteps, type Transactions, type TransactionsMapping, type KataStep, type Posizione, type KataTechnic, type Tecnica } from "@/lib/data";
+import { type KataInventory, type KataSteps, type Transactions, type TransactionsMapping, type KataStep, type Posizione, type KataTechnic, type Tecnica, Transaction } from "@/lib/data";
 import {
   Select,
   SelectContent,
@@ -13,7 +13,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
+import { ChevronLeft, ChevronRight, Loader2, Link as LinkIcon, FastForward, Play, Slow, Wind, Hourglass } from "lucide-react";
 import { cn } from "@/lib/utils";
 import React from "react";
 import {
@@ -60,6 +60,14 @@ const guardiaSymbolMap: { [key: string]: string } = {
   'frontal': '◒', // U+25D2
 };
 
+const tempoIconMap: { [key in Transaction['tempo']]: React.ElementType } = {
+    'Legato': LinkIcon,
+    'Fast': FastForward,
+    'Normal': Play,
+    'Slow': Slow,
+    'Breath': Wind,
+};
+
 
 const getFacingArrow = (facing: string) => {
   return facingArrowMap[facing] || facing;
@@ -74,6 +82,12 @@ const getGuardiaSymbol = (guardia: string | null | undefined) => {
   if (!guardia) return '';
   return guardiaSymbolMap[guardia] || guardia;
 }
+
+const getTempoIcon = (tempo: Transaction['tempo']) => {
+    const Icon = tempoIconMap[tempo] || Hourglass;
+    return <Icon className="h-4 w-4" />;
+};
+
 
 const parseEmbusen = (embusen: string): { x: number; y: number } | null => {
     try {
@@ -432,7 +446,14 @@ export default function KataSelection() {
                             <div className="flex items-center justify-center my-2 text-muted-foreground">
                               {transaction && (
                                 <div className="flex items-center gap-2">
-                                  <p className="text-xs">{transaction.tempo}</p>
+                                   <Tooltip>
+                                    <TooltipTrigger>
+                                      {getTempoIcon(transaction.tempo)}
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                      <p>{transaction.tempo}</p>
+                                    </TooltipContent>
+                                  </Tooltip>
                                   <p className="text-2xl font-bold" title={transaction.direction}>{getDirectionSymbol(transaction.direction)}</p>
                                 </div>
                               )}
@@ -457,7 +478,10 @@ export default function KataSelection() {
                                 </TooltipTrigger>
                                 {transactionToCurrent && (
                                   <TooltipContent>
-                                    <p>Tempo: {transactionToCurrent.tempo}</p>
+                                     <div className="flex items-center gap-2">
+                                        {getTempoIcon(transactionToCurrent.tempo)}
+                                        <span>{transactionToCurrent.tempo}</span>
+                                      </div>
                                     <p>Direction: {transactionToCurrent.direction}</p>
                                   </TooltipContent>
                                 )}
@@ -473,7 +497,10 @@ export default function KataSelection() {
                                 </TooltipTrigger>
                                 {transactionToNext && (
                                   <TooltipContent>
-                                    <p>Tempo: {transactionToNext.tempo}</p>
+                                    <div className="flex items-center gap-2">
+                                      {getTempoIcon(transactionToNext.tempo)}
+                                      <span>{transactionToNext.tempo}</span>
+                                    </div>
                                     <p>Direction: {transactionToNext.direction}</p>
                                   </TooltipContent>
                                 )}
