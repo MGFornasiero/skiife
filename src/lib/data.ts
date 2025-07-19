@@ -35,7 +35,7 @@ export type Passaggio = {
   stand_id:number;
   Stand: string;
   Target: string;
-  notes?: string;
+  Note: string | null;
 };
 
 export type Passaggi = {

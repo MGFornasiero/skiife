@@ -1,7 +1,8 @@
+
 "use client";
 
 import { useState, useEffect } from "react";
-import { type Sequenze, type Passaggio, type Posizione, type Tecnica } from "@/lib/data";
+import { type Sequenze, type Posizione, type Tecnica } from "@/lib/data";
 import {
   Select,
   SelectContent,
@@ -29,7 +30,7 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { ChevronDown, ChevronUp, Minus, Plus, Loader2 } from "lucide-react";
+import { ChevronDown, ChevronUp, Minus, Plus, Loader2, Notebook } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "./ui/tooltip";
 
@@ -300,6 +301,7 @@ export default function KataDisplay() {
                       <TableHead>Tecnica</TableHead>
                       <TableHead>Stand</TableHead>
                       <TableHead>Target</TableHead>
+                      <TableHead>Note</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -331,6 +333,18 @@ export default function KataDisplay() {
                             {passaggio.Stand}
                           </TableCell>
                           <TableCell>{passaggio.Target}</TableCell>
+                          <TableCell>
+                            {passaggio.Note && passaggio.Note.trim() !== '' && (
+                                <Tooltip>
+                                    <TooltipTrigger>
+                                        <Notebook className="h-5 w-5 text-muted-foreground" />
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                        <p>{passaggio.Note}</p>
+                                    </TooltipContent>
+                                </Tooltip>
+                            )}
+                          </TableCell>
                         </TableRow>
                       );
                     })}
