@@ -13,7 +13,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight, Loader2, Link as LinkIcon, FastForward, Play, Wind, Hourglass, Turtle, Rabbit, PersonStanding } from "lucide-react";
+import { ChevronLeft, ChevronRight, Loader2, Link as LinkIcon, Rabbit, Wind, Hourglass, PersonStanding, Turtle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import React from "react";
 import {
@@ -343,13 +343,26 @@ export default function KataSelection() {
   return (
     <>
       <Card>
-        <CardHeader className="flex-row items-start sm:items-center justify-between gap-4">
-          <div className="flex-grow">
-            <CardTitle>{selectedKataName ? `Kata: ${selectedKataName}` : "Kata Selection"}</CardTitle>
-            {!selectedKataName && <CardDescription>Select a kata to see its details.</CardDescription>}
-          </div>
+        <CardHeader>
+            <div className="flex items-center gap-4">
+                <div className="flex items-center space-x-2">
+                    <Label htmlFor="view-mode-switch" className={cn("text-sm text-muted-foreground", viewMode === 'generale' && 'text-foreground')}>Generale</Label>
+                    <Switch
+                        id="view-mode-switch"
+                        checked={viewMode === 'dettagli'}
+                        onCheckedChange={(checked) => setViewMode(checked ? 'dettagli' : 'generale')}
+                    />
+                    <Label htmlFor="view-mode-switch" className={cn("text-sm text-muted-foreground", viewMode === 'dettagli' && 'text-foreground')}>Dettagli</Label>
+                </div>
+                <div className="flex-grow">
+                  <CardTitle>{selectedKataName ? `Kata: ${selectedKataName}` : "Kata Selection"}</CardTitle>
+                </div>
+            </div>
+            {!selectedKataName && <CardDescription className="mt-2">Select a kata to see its details.</CardDescription>}
+        </CardHeader>
+        <CardContent>
           {kataInventory ? (
-            <div className="w-full sm:w-[280px]">
+            <div className="w-full sm:w-[280px] mb-6">
                 <Select onValueChange={handleKataChange}>
                   <SelectTrigger id="kata-select">
                     <SelectValue placeholder="Select a kata..." />
@@ -364,26 +377,16 @@ export default function KataSelection() {
                 </Select>
             </div>
           ) : (
-              <div className="flex items-center justify-center">
+              <div className="flex items-center justify-center mb-6">
                   <p className="text-sm text-muted-foreground">Loading...</p>
               </div>
           )}
-        </CardHeader>
-        <CardContent>
+          
           {loading && <p className="text-muted-foreground pt-4">Loading kata details...</p>}
 
           {kataSteps && tx && transactionsMappingFrom && transactionsMappingTo && (
             <div className="w-full">
-              <div className="flex items-center space-x-2 mb-4">
-                <Label htmlFor="view-mode-switch" className={cn("text-muted-foreground", viewMode === 'generale' && 'text-foreground')}>Generale</Label>
-                <Switch
-                  id="view-mode-switch"
-                  checked={viewMode === 'dettagli'}
-                  onCheckedChange={(checked) => setViewMode(checked ? 'dettagli' : 'generale')}
-                />
-                <Label htmlFor="view-mode-switch" className={cn("text-muted-foreground", viewMode === 'dettagli' && 'text-foreground')}>Dettagli</Label>
-              </div>
-
+              
               {viewMode === 'generale' ? (
                 <TooltipProvider>
                   <div className="mt-6 flex flex-col items-center gap-2">
@@ -669,3 +672,4 @@ export default function KataSelection() {
     </>
   );
 }
+
