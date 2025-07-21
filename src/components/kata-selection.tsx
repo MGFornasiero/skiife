@@ -35,6 +35,7 @@ interface KataData {
   transactions_mapping_from: TransactionsMapping;
   transactions_mapping_to: TransactionsMapping;
   notes: string | null;
+  Gamba: string | null;
 }
 
 const facingArrowMap: { [key: string]: string } = {
@@ -56,6 +57,12 @@ const directionSymbolMap: { [key: string]: string } = {
 };
 
 const guardiaSymbolMap: { [key: string]: string } = {
+  'sx': '◐', // U+25D0
+  'dx': '◑', // U+25D1
+  'frontal': '◒', // U+25D2
+};
+
+const gambaSymbolMap: { [key: string]: string } = {
   'sx': '◐', // U+25D0
   'dx': '◑', // U+25D1
   'frontal': '◒', // U+25D2
@@ -176,6 +183,7 @@ export default function KataSelection() {
   const [loading, setLoading] = useState(false);
   const [kataSteps, setKataSteps] = useState<KataSteps | null>(null);
   const [kataNotes, setKataNotes] = useState<string | null>(null);
+  const [kataGamba, setKataGamba] = useState<string | null>(null);
   const [tx, setTx] = useState<Transactions | null>(null);
   const [transactionsMappingFrom, setTransactionsMappingFrom] = useState<TransactionsMapping | null>(null);
   const [transactionsMappingTo, setTransactionsMappingTo] = useState<TransactionsMapping | null>(null);
@@ -211,6 +219,7 @@ export default function KataSelection() {
       setTransactionsMappingFrom(null);
       setTransactionsMappingTo(null);
       setKataNotes(null);
+      setKataGamba(null);
       setSelectedStepIndex(0);
       return;
     }
@@ -221,6 +230,7 @@ export default function KataSelection() {
     setTransactionsMappingFrom(null);
     setTransactionsMappingTo(null);
     setKataNotes(null);
+    setKataGamba(null);
     setSelectedStepIndex(0);
 
     fetch(`/api/kata/${kataId}`)
@@ -236,6 +246,7 @@ export default function KataSelection() {
         setTransactionsMappingFrom(data.transactions_mapping_from);
         setTransactionsMappingTo(data.transactions_mapping_to);
         setKataNotes(data.notes);
+        setKataGamba(data.Gamba);
       })
       .catch(error => {
         console.error("Error fetching kata data:", error);
@@ -333,6 +344,7 @@ export default function KataSelection() {
   const transactionToCurrentId = currentStep && transactionsMappingTo ? transactionsMappingTo[currentStep.id_sequence] : null;
   const transactionToCurrent = transactionToCurrentId && tx ? tx[transactionToCurrentId] : null;
 
+  const gambaSymbol = kataGamba ? gambaSymbolMap[kataGamba] : null;
 
   const handleStepChange = (direction: 'next' | 'prev') => {
     if (!sortedKataSteps.length) return;
@@ -347,8 +359,8 @@ export default function KataSelection() {
 
   return (
     <>
-      {kataInventory ? (
-        <div className="w-full sm:w-[280px] mb-4">
+      <div className="w-full sm:w-[280px] mb-4">
+        {kataInventory ? (
             <Select onValueChange={handleKataChange}>
               <SelectTrigger id="kata-select">
                 <SelectValue placeholder="Select a kata..." />
@@ -361,12 +373,12 @@ export default function KataSelection() {
                 ))}
               </SelectContent>
             </Select>
-        </div>
-      ) : (
-          <div className="flex items-center justify-center mb-6">
-              <p className="text-sm text-muted-foreground">Loading...</p>
-          </div>
-      )}
+        ) : (
+            <div className="flex items-center justify-center h-10">
+                <p className="text-sm text-muted-foreground">Loading...</p>
+            </div>
+        )}
+      </div>
       <Card>
         <CardHeader>
             <div className="flex items-center justify-between gap-4">
@@ -379,8 +391,22 @@ export default function KataSelection() {
                     />
                     <Label htmlFor="view-mode-switch" className={cn("text-sm text-muted-foreground", viewMode === 'dettagli' && 'text-foreground')}>Dettagli</Label>
                 </div>
-                <div className="flex-grow text-right">
-                  <CardTitle>{selectedKataName ? `Kata: ${selectedKataName}` : "Kata Selection"}</CardTitle>
+                <div className="flex-grow">
+                   <TooltipProvider>
+                      <CardTitle className="flex items-center justify-end gap-2 text-primary">
+                        {gambaSymbol && (
+                           <Tooltip>
+                              <TooltipTrigger>
+                                  <span className="text-2xl">{gambaSymbol}</span>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                  <p>{kataGamba}</p>
+                              </TooltipContent>
+                          </Tooltip>
+                        )}
+                        {selectedKataName ? `Kata: ${selectedKataName}` : "Kata Selection"}
+                      </CardTitle>
+                    </TooltipProvider>
                 </div>
             </div>
             {!selectedKataName && <CardDescription className="mt-2 text-right">Select a kata to see its details.</CardDescription>}
@@ -519,7 +545,7 @@ export default function KataSelection() {
 
                       <Card className="w-full max-w-lg mx-auto">
                           <CardHeader>
-                              <CardTitle className="flex justify-between items-center">
+                              <CardTitle className="flex justify-between items-center text-primary">
                                 <span
                                     className="cursor-pointer hover:underline"
                                     onClick={() => handlePosizioneClick(currentStep.stand_id)}
