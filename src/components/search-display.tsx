@@ -167,7 +167,6 @@ export default function SearchDisplay() {
     <Card>
       <CardHeader>
         <CardTitle>Ricerca</CardTitle>
-        <CardDescription>Search for specific techniques or movements.</CardDescription>
       </CardHeader>
       <CardContent>
         <div className="flex w-full max-w-sm items-center space-x-2">

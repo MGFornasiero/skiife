@@ -101,14 +101,13 @@ export default function SegnapostoDisplay() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Segnaposto</CardTitle>
-        <CardDescription>This is a placeholder tab showing various inventories.</CardDescription>
+        <CardTitle>Glossario</CardTitle>
       </CardHeader>
       <CardContent>
         {loading && <p className="text-muted-foreground">Loading...</p>}
         {error && <p className="text-destructive">Error: {error}</p>}
         
-        <Accordion type="single" collapsible className="w-full" defaultValue="item-1">
+        <Accordion type="single" collapsible className="w-full">
             <AccordionItem value="item-1">
                 <AccordionTrigger>Techniques Inventory</AccordionTrigger>
                 <AccordionContent>

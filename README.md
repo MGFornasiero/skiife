@@ -1,5 +1,6 @@
-# Firebase Studio
+# SKI-I compendium
 
-This is a NextJS starter in Firebase Studio.
 
-To get started, take a look at src/app/page.tsx.
+
+scrivere qui il readme
+
