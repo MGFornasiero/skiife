@@ -2,7 +2,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { type KataInventory, type KataSteps, type Transactions, type TransactionsMapping, type KataStep, type Posizione, type KataTechnic, type Tecnica, Transaction } from "@/lib/data";
+import { type KataInventory, type KataSteps, type Transactions, type TransactionsMapping, type KataStep, type Posizione, type Tecnica, Transaction } from "@/lib/data";
 import {
   Select,
   SelectContent,
@@ -34,6 +34,7 @@ interface KataData {
   transactions: Transactions;
   transactions_mapping_from: TransactionsMapping;
   transactions_mapping_to: TransactionsMapping;
+  notes: string | null;
 }
 
 const facingArrowMap: { [key: string]: string } = {
@@ -174,6 +175,7 @@ export default function KataSelection() {
   const [kataId, setKataId] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
   const [kataSteps, setKataSteps] = useState<KataSteps | null>(null);
+  const [kataNotes, setKataNotes] = useState<string | null>(null);
   const [tx, setTx] = useState<Transactions | null>(null);
   const [transactionsMappingFrom, setTransactionsMappingFrom] = useState<TransactionsMapping | null>(null);
   const [transactionsMappingTo, setTransactionsMappingTo] = useState<TransactionsMapping | null>(null);
@@ -208,6 +210,7 @@ export default function KataSelection() {
       setTx(null);
       setTransactionsMappingFrom(null);
       setTransactionsMappingTo(null);
+      setKataNotes(null);
       setSelectedStepIndex(0);
       return;
     }
@@ -217,6 +220,7 @@ export default function KataSelection() {
     setTx(null);
     setTransactionsMappingFrom(null);
     setTransactionsMappingTo(null);
+    setKataNotes(null);
     setSelectedStepIndex(0);
 
     fetch(`/api/kata/${kataId}`)
@@ -231,6 +235,7 @@ export default function KataSelection() {
         setTx(data.transactions);
         setTransactionsMappingFrom(data.transactions_mapping_from);
         setTransactionsMappingTo(data.transactions_mapping_to);
+        setKataNotes(data.notes);
       })
       .catch(error => {
         console.error("Error fetching kata data:", error);
@@ -379,6 +384,7 @@ export default function KataSelection() {
                 </div>
             </div>
             {!selectedKataName && <CardDescription className="mt-2 text-right">Select a kata to see its details.</CardDescription>}
+            {kataNotes && <CardDescription className="mt-2 text-left">{kataNotes}</CardDescription>}
         </CardHeader>
         <CardContent>
           
@@ -674,5 +680,7 @@ export default function KataSelection() {
 }
 
 
+
+    
 
     
