@@ -30,7 +30,7 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { ChevronDown, ChevronUp, Minus, Plus, Loader2, Notebook } from "lucide-react";
+import { ChevronDown, ChevronUp, Loader2, Notebook } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "./ui/tooltip";
 
@@ -133,6 +133,7 @@ export default function KataDisplay() {
   const handleGradeChange = (value: string) => {
     setGrade(Number(value));
     setSelectedSequenzaKey(null);
+    setShowGradeSelection(false);
   };
   
   const handleGradeTypeChange = (checked: boolean) => {
@@ -279,13 +280,13 @@ export default function KataDisplay() {
           <div className="flex items-center gap-4">
              <div className="flex items-center gap-2">
                 <Button variant="outline" size="icon" onClick={() => handleSequenzaChange('prev')} disabled={sequenzaKeys.length < 2}>
-                    <Minus className="h-4 w-4" />
+                    <span className="text-xl">⧏</span>
                 </Button>
                 <div className="w-48 h-10 flex items-center justify-center rounded-md border border-input bg-background px-3 py-2 text-sm">
                     {selectedSequenzaKey ? `Sequenza ${selectedSequenzaKey}` : "Select a sequenza"}
                 </div>
                  <Button variant="outline" size="icon" onClick={() => handleSequenzaChange('next')} disabled={sequenzaKeys.length < 2}>
-                    <Plus className="h-4 w-4" />
+                    <span className="text-xl">⧐</span>
                 </Button>
             </div>
           </div>
