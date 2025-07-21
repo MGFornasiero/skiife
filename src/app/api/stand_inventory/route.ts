@@ -1,6 +1,9 @@
 import { NextResponse } from 'next/server';
 
-const API_URL = "https://skiiapi-638356355820.europe-west12.run.app";
+const API_URL = `https://${process.env.API_URI || "skiiapi-638356355820.europe-west12.run.app"}`;
+if (process.env.NODE_ENV === 'development') {
+    console.log(`Using API_URL: ${API_URL}`);
+}
 
 export async function GET(request: Request) {
   try {
