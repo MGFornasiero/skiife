@@ -16,6 +16,10 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 
 const ITEMS_PER_PAGE = 10;
 
+// Helper function for sorting
+const sortByName = <T extends { name: string }>(a: T, b: T) => a.name.localeCompare(b.name);
+
+
 export default function SegnapostoDisplay() {
   const [inventoryTechnics, setInventoryTechnics] = useState<Tecniche | null>(null);
   const [inventoryStands, setInventoryStands] = useState<Posizioni | null>(null);
@@ -70,28 +74,28 @@ export default function SegnapostoDisplay() {
     fetchData();
   }, []);
 
-  const technicsArray = inventoryTechnics ? Object.values(inventoryTechnics) : [];
+  const technicsArray = inventoryTechnics ? Object.values(inventoryTechnics).sort(sortByName) : [];
   const totalTechnicsPages = Math.ceil(technicsArray.length / ITEMS_PER_PAGE);
   const paginatedTechnics = technicsArray.slice(
     (currentTechnicsPage - 1) * ITEMS_PER_PAGE,
     currentTechnicsPage * ITEMS_PER_PAGE
   );
 
-  const standsArray = inventoryStands ? Object.values(inventoryStands) : [];
+  const standsArray = inventoryStands ? Object.values(inventoryStands).sort(sortByName) : [];
   const totalStandsPages = Math.ceil(standsArray.length / ITEMS_PER_PAGE);
   const paginatedStands = standsArray.slice(
     (currentStandsPage - 1) * ITEMS_PER_PAGE,
     currentStandsPage * ITEMS_PER_PAGE
   );
 
-  const strikingPartsArray = inventoryStrikingParts ? Object.values(inventoryStrikingParts) : [];
+  const strikingPartsArray = inventoryStrikingParts ? Object.values(inventoryStrikingParts).sort(sortByName) : [];
   const totalStrikingPartsPages = Math.ceil(strikingPartsArray.length / ITEMS_PER_PAGE);
   const paginatedStrikingParts = strikingPartsArray.slice(
     (currentStrikingPartsPage - 1) * ITEMS_PER_PAGE,
     currentStrikingPartsPage * ITEMS_PER_PAGE
   );
 
-  const targetsArray = inventoryTargets ? Object.values(inventoryTargets) : [];
+  const targetsArray = inventoryTargets ? Object.values(inventoryTargets).sort(sortByName) : [];
   const totalTargetsPages = Math.ceil(targetsArray.length / ITEMS_PER_PAGE);
   const paginatedTargets = targetsArray.slice(
     (currentTargetsPage - 1) * ITEMS_PER_PAGE,
@@ -256,7 +260,7 @@ export default function SegnapostoDisplay() {
             <AccordionItem value="item-4">
                 <AccordionTrigger>Targets Parts Inventory</AccordionTrigger>
                 <AccordionContent>
-                    {inventoryStrikingParts && (
+                    {inventoryTargets && (
                         <>
                             <div className="overflow-hidden rounded-lg border">
                                 <Table>
@@ -267,8 +271,8 @@ export default function SegnapostoDisplay() {
                                         </TableRow>
                                     </TableHeader>
                                     <TableBody>
-                                        {paginatedStrikingParts.map((target) => (
-                                            <TableRow key={target.id_part}>
+                                        {paginatedTargets.map((target) => (
+                                            <TableRow key={target.id_target}>
                                                 <TableCell>{target.name}</TableCell>
                                                 <TableCell>{target.description}</TableCell>
                                             </TableRow>
