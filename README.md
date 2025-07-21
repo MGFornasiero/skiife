@@ -24,10 +24,5 @@ This project is a comprehensive compendium for Shotokan Karate International Ita
 2. Install dependencies using `npm install`.
 3. Run the development server using `npm run dev`.
 
-## Contributing
-
-Contributions are welcome! Please refer to the documentation (when available) for contribution guidelines.
-
-## License
-
-This project is licensed under the [License Name] - see the LICENSE file for details.
+## Env
+use API_URI env vaiable to set the url of the backend API (defalut value skiiapi-638356355820.europe-west12.run.app)
