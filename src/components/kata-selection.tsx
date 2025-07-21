@@ -13,7 +13,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight, Loader2, Link as LinkIcon, Rabbit, Wind, Hourglass, PersonStanding, Turtle, Volume2 } from "lucide-react";
+import { ChevronLeft, ChevronRight, Loader2, Link as LinkIcon, Rabbit, Wind, Hourglass, PersonStanding, Turtle, Volume2, MapPin } from "lucide-react";
 import { cn } from "@/lib/utils";
 import React from "react";
 import {
@@ -146,7 +146,7 @@ const EmbusenGrid = ({ embusen, facing }: { embusen: string; facing: string }) =
             >
                 {/* Origin Marker */}
                 <div
-                    className="absolute flex items-center justify-center text-muted-foreground text-2xl"
+                    className="absolute flex items-center justify-center text-muted-foreground"
                     style={{
                         width: cellSize,
                         height: cellSize,
@@ -154,7 +154,7 @@ const EmbusenGrid = ({ embusen, facing }: { embusen: string; facing: string }) =
                         top: centerOffset * cellSize,
                     }}
                 >
-                    ▢
+                    <MapPin className="h-6 w-6" />
                 </div>
                 {/* Position Marker */}
                 <div
@@ -400,7 +400,7 @@ export default function KataSelection() {
                                   <span className="text-2xl">{gambaSymbol}</span>
                               </TooltipTrigger>
                               <TooltipContent>
-                                  <p>{kataGamba}</p>
+                                  <p>Chiusura: {kataGamba}</p>
                               </TooltipContent>
                           </Tooltip>
                         )}
@@ -729,3 +729,4 @@ export default function KataSelection() {
     
 
     
+
