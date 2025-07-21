@@ -5,6 +5,7 @@ export type KataTechnic = {
   Tecnica: string;
   technic_target_id: number | null;
   Obiettivo: string | null;
+  waza_note:string | null;
 };
 
 export type KataStep = {
@@ -13,24 +14,27 @@ export type KataStep = {
   seq_num: number;
   stand_id: number;
   posizione: string;
-  guardia: string;
-  facing: string;
+  guardia: string | null;
+  facing: string | null;
   tecniche: KataTechnic[];
-  embusen: string; // From example, it looks like a string representation of a tuple
-  kiai: boolean;
+  embusen: string | null; // From example, it looks like a string representation of a tuple
+  kiai: boolean | null;
+  notes:string | null;
 };
 
 export type KataSteps = {
   [key: number]: KataStep;
 };
 
-// Kept for compatibility if used elsewhere, can be removed if not needed.
 export type Passaggio = {
   movement: string;
+  technic_id: number;
+  gyaku: boolean;
   tecnica: string;
+  stand_id:number;
   Stand: string;
   Target: string;
-  notes?: string;
+  Note: string | null;
 };
 
 export type Passaggi = {
@@ -46,7 +50,7 @@ export type KataInventory = {
 };
 
 export type Transaction = {
-  tempo: string;
+  tempo: 'Legato' | 'Fast' | 'Normal' | 'Slow' | 'Breath';
   direction: string;
 };
 
@@ -93,7 +97,7 @@ export type Parte = {
 };
 
 export type Parti = {
-  [key: string]: Parte;
+  [key:string]: Parte;
 };
 
 export type Obiettivo = {
