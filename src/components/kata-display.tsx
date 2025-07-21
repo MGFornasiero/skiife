@@ -33,6 +33,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { ChevronDown, ChevronUp, Loader2, Notebook } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "./ui/tooltip";
+import { cn } from "@/lib/utils";
 
 const movementIconMap: { [key: string]: string } = {
   'Fwd': '⏭',
@@ -52,7 +53,7 @@ const getMovementIcon = (movement: string) => {
 
 export default function KataDisplay() {
   const [selectedSequenzaKey, setSelectedSequenzaKey] = useState<string | null>(null);
-  const [gradeType, setGradeType] = useState<"dan" | "kyu">("dan");
+  const [gradeType, setGradeType] = useState<"dan" | "kyu">("kyu");
   const [grade, setGrade] = useState<number | null>(null);
   const [gradeId, setGradeId] = useState<string | null>(null);
   const [sequenzeData, setSequenzeData] = useState<Sequenze | null>(null);
@@ -242,13 +243,13 @@ export default function KataDisplay() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-end pt-4 border-t">
               <div className="space-y-2">
                 <div className="flex items-center space-x-2">
-                  <Label htmlFor="grade-type-switch" className={gradeType === 'kyu' ? '' : 'text-muted-foreground'}>Kyu</Label>
+                  <Label htmlFor="grade-type-switch" className={cn("text-sm text-muted-foreground", gradeType === 'kyu' && 'text-foreground')}>Kyu</Label>
                   <Switch
                     id="grade-type-switch"
                     checked={gradeType === "dan"}
                     onCheckedChange={handleGradeTypeChange}
                   />
-                  <Label htmlFor="grade-type-switch" className={gradeType === 'dan' ? '' : 'text-muted-foreground'}>Dan</Label>
+                  <Label htmlFor="grade-type-switch" className={cn("text-sm text-muted-foreground", gradeType === 'dan' && 'text-foreground')}>Dan</Label>
                 </div>
               </div>
 
