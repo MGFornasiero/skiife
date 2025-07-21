@@ -13,7 +13,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight, Loader2, Link as LinkIcon, Rabbit, Wind, Hourglass, PersonStanding, Turtle } from "lucide-react";
+import { ChevronLeft, ChevronRight, Loader2, Link as LinkIcon, Rabbit, Wind, Hourglass, PersonStanding, Turtle, Volume2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import React from "react";
 import {
@@ -63,9 +63,9 @@ const guardiaSymbolMap: { [key: string]: string } = {
 };
 
 const gambaSymbolMap: { [key: string]: string } = {
-  'sx': '◐', // U+25D0
-  'dx': '◑', // U+25D1
-  'frontal': '◒', // U+25D2
+  'sx': '◐',
+  'dx': '◑',
+  'frontal': '◒',
 };
 
 const tempoIconMap: { [key in Transaction['tempo']]: React.ElementType } = {
@@ -393,7 +393,7 @@ export default function KataSelection() {
                 </div>
                 <div className="flex-grow">
                    <TooltipProvider>
-                      <CardTitle className="flex items-center justify-end gap-2 text-primary">
+                      <CardTitle className="flex items-center justify-end gap-2">
                         {gambaSymbol && (
                            <Tooltip>
                               <TooltipTrigger>
@@ -409,8 +409,8 @@ export default function KataSelection() {
                     </TooltipProvider>
                 </div>
             </div>
-            {!selectedKataName && <CardDescription className="mt-2 text-right">Select a kata to see its details.</CardDescription>}
             {kataNotes && <CardDescription className="mt-2 text-left">{kataNotes}</CardDescription>}
+            {!selectedKataName && !kataNotes && <CardDescription className="mt-2 text-right">Select a kata to see its details.</CardDescription>}
         </CardHeader>
         <CardContent>
           
@@ -428,7 +428,7 @@ export default function KataSelection() {
 
                       return (
                         <React.Fragment key={step.id_sequence}>
-                          <Card className={cn("w-full max-w-md flex flex-col", step.kiai && "bg-accent/20 border-accent")}>
+                          <Card className={cn("w-full max-w-md flex flex-col", step.kiai && "border-primary")}>
                             <CardContent className="p-4 flex flex-col gap-2">
                                   <div className="flex justify-between items-start">
                                     <div className="flex-grow">
@@ -440,6 +440,16 @@ export default function KataSelection() {
                                       </p>
                                     </div>
                                     <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                                      {step.kiai && (
+                                          <Tooltip>
+                                              <TooltipTrigger>
+                                                  <Volume2 className="h-5 w-5 text-destructive" />
+                                              </TooltipTrigger>
+                                              <TooltipContent>
+                                                  <p>Kiai!</p>
+                                              </TooltipContent>
+                                          </Tooltip>
+                                      )}
                                       <Tooltip>
                                         <TooltipTrigger>
                                           <span className="text-2xl">{getGuardiaSymbol(step.guardia)}</span>
@@ -545,7 +555,7 @@ export default function KataSelection() {
 
                       <Card className="w-full max-w-lg mx-auto">
                           <CardHeader>
-                              <CardTitle className="flex justify-between items-center text-primary">
+                              <CardTitle className="flex justify-between items-center">
                                 <span
                                     className="cursor-pointer hover:underline"
                                     onClick={() => handlePosizioneClick(currentStep.stand_id)}
@@ -553,6 +563,18 @@ export default function KataSelection() {
                                     {currentStep.posizione}
                                 </span>
                                 <div className="flex items-center gap-2 text-2xl font-bold">
+                                    {currentStep.kiai && (
+                                        <TooltipProvider>
+                                            <Tooltip>
+                                                <TooltipTrigger>
+                                                    <Volume2 className="h-6 w-6 text-destructive" />
+                                                </TooltipTrigger>
+                                                <TooltipContent>
+                                                    <p>Kiai!</p>
+                                                </TooltipContent>
+                                            </Tooltip>
+                                        </TooltipProvider>
+                                    )}
                                     <TooltipProvider>
                                         <Tooltip>
                                             <TooltipTrigger>
@@ -568,9 +590,6 @@ export default function KataSelection() {
                                     </span>
                                 </div>
                               </CardTitle>
-                              <CardDescription>
-                                  {currentStep.kiai && <span className="font-bold text-destructive">KIAI!</span>}
-                              </CardDescription>
                           </CardHeader>
                           <CardContent>
                             <div className="flex flex-col gap-6">
