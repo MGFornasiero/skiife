@@ -11,7 +11,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight, Loader2, Link as LinkIcon, Rabbit, Wind, Hourglass, PersonStanding, Turtle, Volume2, MapPin } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -392,21 +392,19 @@ export default function KataSelection() {
                     <Label htmlFor="view-mode-switch" className={cn("text-sm text-muted-foreground", viewMode === 'dettagli' && 'text-foreground')}>Dettagli</Label>
                 </div>
                 <div className="flex-grow">
-                   <TooltipProvider>
                       <CardTitle className="flex items-center justify-end gap-2">
                         {gambaSymbol && (
-                           <Tooltip>
-                              <TooltipTrigger>
-                                  <span className="text-2xl">{gambaSymbol}</span>
-                              </TooltipTrigger>
-                              <TooltipContent>
+                           <Popover>
+                              <PopoverTrigger asChild>
+                                  <span className="text-2xl cursor-pointer">{gambaSymbol}</span>
+                              </PopoverTrigger>
+                              <PopoverContent className="w-auto p-2">
                                   <p>Chiusura: {kataGamba}</p>
-                              </TooltipContent>
-                          </Tooltip>
+                              </PopoverContent>
+                          </Popover>
                         )}
                         {selectedKataName ? `Kata: ${selectedKataName}` : "Kata Selection"}
                       </CardTitle>
-                    </TooltipProvider>
                 </div>
             </div>
             {kataNotes && <CardDescription className="mt-2 text-left">{kataNotes}</CardDescription>}
@@ -420,7 +418,6 @@ export default function KataSelection() {
             <div className="w-full">
               
               {viewMode === 'generale' ? (
-                <TooltipProvider>
                   <div className="mt-6 flex flex-col items-center gap-2">
                     {sortedKataSteps.map((step, index) => {
                       const transactionId = transactionsMappingFrom[step.id_sequence];
@@ -441,64 +438,66 @@ export default function KataSelection() {
                                     </div>
                                     <div className="flex items-center gap-2 text-sm text-muted-foreground">
                                       {step.kiai && (
-                                          <Tooltip>
-                                              <TooltipTrigger>
-                                                  <Volume2 className="h-5 w-5 text-destructive" />
-                                              </TooltipTrigger>
-                                              <TooltipContent>
+                                          <Popover>
+                                              <PopoverTrigger asChild>
+                                                  <Volume2 className="h-5 w-5 text-destructive cursor-pointer" />
+                                              </PopoverTrigger>
+                                              <PopoverContent className="w-auto p-2">
                                                   <p>Kiai!</p>
-                                              </TooltipContent>
-                                          </Tooltip>
+                                              </PopoverContent>
+                                          </Popover>
                                       )}
-                                      <Tooltip>
-                                        <TooltipTrigger>
-                                          <span className="text-2xl">{getGuardiaSymbol(step.guardia)}</span>
-                                        </TooltipTrigger>
-                                        <TooltipContent>
+                                      <Popover>
+                                        <PopoverTrigger asChild>
+                                          <span className="text-2xl cursor-pointer">{getGuardiaSymbol(step.guardia)}</span>
+                                        </PopoverTrigger>
+                                        <PopoverContent className="w-auto p-2">
                                           <p>{step.guardia}</p>
-                                        </TooltipContent>
-                                      </Tooltip>
+                                        </PopoverContent>
+                                      </Popover>
                                       <span className="text-2xl font-bold" title={step.facing}>{getFacingArrow(step.facing)}</span>
                                     </div>
                                   </div>
                               
-                                  <Tooltip>
-                                  <TooltipTrigger asChild>
-                                      <div className="p-2 -mx-2 rounded-md hover:bg-accent/50">
+                                  <Popover>
+                                    <PopoverTrigger asChild>
+                                      <div className="p-2 -mx-2 rounded-md hover:bg-accent/50 cursor-pointer">
                                           <p className="text-sm text-muted-foreground">Techniques:</p>
                                           <ul className="list-disc pl-5 font-medium">
                                               {step.tecniche.map((tech) => (
-                                                  <li key={tech.technic_id} className="truncate text-sm cursor-pointer hover:underline" onClick={() => handleTechnicClick(tech.technic_id)}>
+                                                  <li key={tech.technic_id} className="truncate text-sm cursor-pointer hover:underline" onClick={(e) => {e.stopPropagation(); handleTechnicClick(tech.technic_id)}}>
                                                       {tech.Tecnica}
                                                   </li>
                                               ))}
                                           </ul>
                                       </div>
-                                  </TooltipTrigger>
-                                  <TooltipContent side="top" align="start">
-                                      {step.tecniche.map((tech) => (
-                                          <div key={tech.technic_id} className="mb-2 last:mb-0">
-                                              <p><strong>Arto:</strong> {tech.arto}</p>
-                                              <p><strong>Tecnica:</strong> {tech.Tecnica}</p>
-                                              <p><strong>Obiettivo:</strong> {tech.Obiettivo || 'N/A'}</p>
-                                          </div>
-                                      ))}
-                                  </TooltipContent>
-                                  </Tooltip>
+                                    </PopoverTrigger>
+                                    <PopoverContent side="top" align="start">
+                                      <div className="space-y-2">
+                                        {step.tecniche.map((tech) => (
+                                            <div key={tech.technic_id} className="mb-2 last:mb-0 text-sm">
+                                                <p><strong>Arto:</strong> {tech.arto}</p>
+                                                <p><strong>Tecnica:</strong> {tech.Tecnica}</p>
+                                                <p><strong>Obiettivo:</strong> {tech.Obiettivo || 'N/A'}</p>
+                                            </div>
+                                        ))}
+                                      </div>
+                                    </PopoverContent>
+                                  </Popover>
                             </CardContent>
                           </Card>
                           {index < sortedKataSteps.length - 1 && (
                             <div className="flex items-center justify-center my-2 text-muted-foreground">
                               {transaction && (
                                 <div className="flex items-center gap-2">
-                                   <Tooltip>
-                                    <TooltipTrigger>
-                                      {getTempoIcon(transaction.tempo)}
-                                    </TooltipTrigger>
-                                    <TooltipContent>
+                                   <Popover>
+                                    <PopoverTrigger asChild>
+                                      <div className="cursor-pointer">{getTempoIcon(transaction.tempo)}</div>
+                                    </PopoverTrigger>
+                                    <PopoverContent className="w-auto p-2">
                                       <p>{transaction.tempo}</p>
-                                    </TooltipContent>
-                                  </Tooltip>
+                                    </PopoverContent>
+                                  </Popover>
                                   <p className="text-2xl font-bold" title={transaction.direction}>{getDirectionSymbol(transaction.direction)}</p>
                                 </div>
                               )}
@@ -508,50 +507,47 @@ export default function KataSelection() {
                       )
                     })}
                   </div>
-                </TooltipProvider>
               ) : (
                 <>
                 {sortedKataSteps.length > 0 && currentStep ? (
                     <div className="space-y-4 pt-4">
-                       <TooltipProvider>
                           <div className="flex items-center justify-center gap-4">
-                              <Tooltip>
-                                <TooltipTrigger asChild>
+                              <Popover>
+                                <PopoverTrigger asChild>
                                   <Button variant="outline" size="icon" onClick={() => handleStepChange('prev')}>
                                       <ChevronLeft className="h-4 w-4" />
                                   </Button>
-                                </TooltipTrigger>
+                                </PopoverTrigger>
                                 {transactionToCurrent && (
-                                  <TooltipContent>
+                                  <PopoverContent>
                                      <div className="flex items-center gap-2">
                                         {getTempoIcon(transactionToCurrent.tempo)}
                                         <span>{transactionToCurrent.tempo}</span>
                                       </div>
                                     <p>Direction: {transactionToCurrent.direction}</p>
-                                  </TooltipContent>
+                                  </PopoverContent>
                                 )}
-                              </Tooltip>
+                              </Popover>
                               <div className="w-48 text-center font-medium">
                                   Step {currentStep.seq_num} of {sortedKataSteps.length}
                               </div>
-                              <Tooltip>
-                                <TooltipTrigger asChild>
+                              <Popover>
+                                <PopoverTrigger asChild>
                                   <Button variant="outline" size="icon" onClick={() => handleStepChange('next')}>
                                       <ChevronRight className="h-4 w-4" />
                                   </Button>
-                                </TooltipTrigger>
+                                </PopoverTrigger>
                                 {transactionToNext && (
-                                  <TooltipContent>
+                                  <PopoverContent>
                                     <div className="flex items-center gap-2">
                                       {getTempoIcon(transactionToNext.tempo)}
                                       <span>{transactionToNext.tempo}</span>
                                     </div>
                                     <p>Direction: {transactionToNext.direction}</p>
-                                  </TooltipContent>
+                                  </PopoverContent>
                                 )}
-                              </Tooltip>
+                              </Popover>
                           </div>
-                        </TooltipProvider>
 
                       <Card className="w-full max-w-lg mx-auto">
                           <CardHeader>
@@ -564,27 +560,23 @@ export default function KataSelection() {
                                 </span>
                                 <div className="flex items-center gap-2 text-2xl font-bold">
                                     {currentStep.kiai && (
-                                        <TooltipProvider>
-                                            <Tooltip>
-                                                <TooltipTrigger>
-                                                    <Volume2 className="h-6 w-6 text-destructive" />
-                                                </TooltipTrigger>
-                                                <TooltipContent>
-                                                    <p>Kiai!</p>
-                                                </TooltipContent>
-                                            </Tooltip>
-                                        </TooltipProvider>
+                                        <Popover>
+                                            <PopoverTrigger asChild>
+                                                <Volume2 className="h-6 w-6 text-destructive cursor-pointer" />
+                                            </PopoverTrigger>
+                                            <PopoverContent className="w-auto p-2">
+                                                <p>Kiai!</p>
+                                            </PopoverContent>
+                                        </Popover>
                                     )}
-                                    <TooltipProvider>
-                                        <Tooltip>
-                                            <TooltipTrigger>
-                                                <span className="font-normal">{getGuardiaSymbol(currentStep.guardia)}</span>
-                                            </TooltipTrigger>
-                                            <TooltipContent>
-                                                <p>{currentStep.guardia}</p>
-                                            </TooltipContent>
-                                        </Tooltip>
-                                    </TooltipProvider>
+                                    <Popover>
+                                        <PopoverTrigger asChild>
+                                            <span className="font-normal cursor-pointer">{getGuardiaSymbol(currentStep.guardia)}</span>
+                                        </PopoverTrigger>
+                                        <PopoverContent className="w-auto p-2">
+                                            <p>{currentStep.guardia}</p>
+                                        </PopoverContent>
+                                    </Popover>
                                     <span title={currentStep.facing}>
                                         {getFacingArrow(currentStep.facing)}
                                     </span>
@@ -723,10 +715,3 @@ export default function KataSelection() {
     </>
   );
 }
-
-
-
-    
-
-    
-

@@ -32,7 +32,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { ChevronDown, ChevronUp, Loader2, Notebook } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "./ui/tooltip";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 
 const movementIconMap: { [key: string]: string } = {
@@ -242,12 +242,13 @@ export default function KataDisplay() {
           <CardContent>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-end pt-4 border-t">
               <div className="space-y-2">
-                <div className="flex items-center space-x-2">
+                 <div className="flex items-center space-x-2">
                   <Label htmlFor="grade-type-switch" className={cn("text-sm text-muted-foreground", gradeType === 'kyu' && 'text-foreground')}>Kyu</Label>
                   <Switch
                     id="grade-type-switch"
-                    checked={gradeType === "dan"}
+                    checked={gradeType === 'dan'}
                     onCheckedChange={handleGradeTypeChange}
+                    aria-readonly
                   />
                   <Label htmlFor="grade-type-switch" className={cn("text-sm text-muted-foreground", gradeType === 'dan' && 'text-foreground')}>Dan</Label>
                 </div>
@@ -294,7 +295,6 @@ export default function KataDisplay() {
 
           {selectedPassaggi ? (
             <div className="overflow-hidden rounded-lg border">
-              <TooltipProvider>
                 <Table>
                   <TableHeader>
                     <TableRow>
@@ -313,14 +313,14 @@ export default function KataDisplay() {
                         <TableRow key={passaggioKey}>
                           <TableCell className="font-medium">{passaggioKey}</TableCell>
                           <TableCell>
-                            <Tooltip>
-                              <TooltipTrigger>
-                                  <span className="text-xl">{getMovementIcon(passaggio.movement)}</span>
-                              </TooltipTrigger>
-                              <TooltipContent>
+                            <Popover>
+                              <PopoverTrigger>
+                                  <span className="text-xl cursor-pointer">{getMovementIcon(passaggio.movement)}</span>
+                              </PopoverTrigger>
+                              <PopoverContent className="w-auto p-2">
                                 <p>{passaggio.movement}</p>
-                              </TooltipContent>
-                            </Tooltip>
+                              </PopoverContent>
+                            </Popover>
                           </TableCell>
                           <TableCell 
                             className="cursor-pointer hover:underline"
@@ -337,14 +337,14 @@ export default function KataDisplay() {
                           <TableCell>{passaggio.Target}</TableCell>
                           <TableCell>
                             {passaggio.Note && passaggio.Note.trim() !== '' && (
-                                <Tooltip>
-                                    <TooltipTrigger>
-                                        <Notebook className="h-5 w-5 text-muted-foreground" />
-                                    </TooltipTrigger>
-                                    <TooltipContent>
+                                <Popover>
+                                    <PopoverTrigger>
+                                        <Notebook className="h-5 w-5 text-muted-foreground cursor-pointer" />
+                                    </PopoverTrigger>
+                                    <PopoverContent>
                                         <p>{passaggio.Note}</p>
-                                    </TooltipContent>
-                                </Tooltip>
+                                    </PopoverContent>
+                                </Popover>
                             )}
                           </TableCell>
                         </TableRow>
@@ -352,7 +352,6 @@ export default function KataDisplay() {
                     })}
                   </TableBody>
                 </Table>
-              </TooltipProvider>
             </div>
           ) : (
             <div className="flex flex-col items-center justify-center text-center p-10 border-2 border-dashed rounded-lg">
