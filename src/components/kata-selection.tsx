@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useEffect } from "react";
@@ -27,6 +26,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 
 interface KataData {
@@ -257,9 +257,11 @@ export default function KataSelection() {
 
   }, [kataId]);
   
-  const handlePosizioneClick = async (standId: number) => {
+  const handlePosizioneClick = async (standId: number, event?: React.MouseEvent<HTMLElement>) => {
     setIsPosizioneInfoLoading(true);
     setIsPosizioneInfoDialogOpen(true);
+    setPopoverStandOpen(true);
+    if (event) setPopoverAnchor(event.currentTarget);
     setSelectedPosizioneInfo(null);
 
     try {
@@ -288,9 +290,11 @@ export default function KataSelection() {
     }
   };
 
-  const handleTechnicClick = async (technicId: number) => {
+  const handleTechnicClick = async (technicId: number, event?: React.MouseEvent<HTMLElement>) => {
     setIsTechnicInfoLoading(true);
     setIsTechnicInfoDialogOpen(true);
+    setPopoverTechnicOpen(true);
+    if (event) setPopoverTechnicAnchor(event.currentTarget);
     setSelectedTechnicInfo(null);
 
     try {
@@ -434,7 +438,7 @@ export default function KataSelection() {
                                     <div className="flex-grow">
                                       <p 
                                         className="font-medium cursor-pointer hover:underline"
-                                        onClick={() => handlePosizioneClick(step.stand_id)}
+                                        onClick={(e) => handlePosizioneClick(step.stand_id, e)}
                                       >
                                           {step.posizione}
                                       </p>
@@ -468,7 +472,7 @@ export default function KataSelection() {
                                           <p className="text-sm text-muted-foreground">Techniques:</p>
                                           <ul className="list-disc pl-5 font-medium">
                                               {step.tecniche.map((tech) => (
-                                                  <li key={tech.technic_id} className="truncate text-sm cursor-pointer hover:underline" onClick={() => handleTechnicClick(tech.technic_id)}>
+                                                  <li key={tech.technic_id} className="truncate text-sm cursor-pointer hover:underline" onClick={(e) => handleTechnicClick(tech.technic_id, e)}>
                                                       {tech.Tecnica}
                                                   </li>
                                               ))}
@@ -633,13 +637,17 @@ export default function KataSelection() {
         </CardContent>
       </Card>
 
-      <AlertDialog open={isPosizioneInfoDialogOpen} onOpenChange={setIsPosizioneInfoDialogOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>
+      {/* Stand Popover */}
+      <Popover open={popoverStandOpen} onOpenChange={setPopoverStandOpen}>
+        <PopoverTrigger asChild>
+          <span style={{ display: "none" }} />
+        </PopoverTrigger>
+        <PopoverContent side="right" align="start" className="max-w-md" style={{ minWidth: 300 }}>
+          <div className="space-y-2">
+            <h4 className="font-semibold">
               {isPosizioneInfoLoading ? "Loading..." : selectedPosizioneInfo?.name || "Stand Details"}
-            </AlertDialogTitle>
-            <div className="text-sm text-muted-foreground space-y-4 max-h-96 overflow-y-auto pr-2 mt-2">
+            </h4>
+            <div className="text-sm text-muted-foreground space-y-2 max-h-64 overflow-y-auto">
               {isPosizioneInfoLoading ? (
                 <div className="flex justify-center items-center p-4">
                   <Loader2 className="h-6 w-6 animate-spin" />
@@ -647,86 +655,84 @@ export default function KataSelection() {
               ) : (
                 <>
                   {selectedPosizioneInfo?.description && (
-                      <div>
-                          <h4 className="font-semibold text-foreground mb-1">Description</h4>
-                          <p>{selectedPosizioneInfo.description}</p>
-                      </div>
+                    <div>
+                      <h4 className="font-semibold text-foreground mb-1">Description</h4>
+                      <p>{selectedPosizioneInfo.description}</p>
+                    </div>
                   )}
                   {selectedPosizioneInfo?.notes && (
-                      <div>
-                          <h4 className="font-semibold text-foreground mb-1">Notes</h4>
-                          <p>{selectedPosizioneInfo.notes}</p>
-                      </div>
+                    <div>
+                      <h4 className="font-semibold text-foreground mb-1">Notes</h4>
+                      <p>{selectedPosizioneInfo.notes}</p>
+                    </div>
                   )}
                   {!selectedPosizioneInfo?.description && !selectedPosizioneInfo?.notes && (
-                      <p>No details available for this stand.</p>
+                    <p>No details available for this stand.</p>
                   )}
                 </>
               )}
             </div>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogAction onClick={() => setIsPosizioneInfoDialogOpen(false)}>Close</AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+          </div>
+        </PopoverContent>
+      </Popover>
 
-      <AlertDialog open={isTechnicInfoDialogOpen} onOpenChange={setIsTechnicInfoDialogOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>
+      {/* Technic Popover */}
+      <Popover open={popoverTechnicOpen} onOpenChange={setPopoverTechnicOpen}>
+        <PopoverTrigger asChild>
+          <span style={{ display: "none" }} />
+        </PopoverTrigger>
+        <PopoverContent side="right" align="start" className="max-w-md" style={{ minWidth: 300 }}>
+          <div className="space-y-2">
+            <h4 className="font-semibold">
               {isTechnicInfoLoading ? "Loading..." : selectedTechnicInfo?.name || "Technique Details"}
-            </AlertDialogTitle>
-             <div className="text-sm text-muted-foreground space-y-4 max-h-96 overflow-y-auto pr-2 mt-2">
+            </h4>
+            <div className="text-sm text-muted-foreground space-y-2 max-h-64 overflow-y-auto">
               {isTechnicInfoLoading ? (
-              <div className="flex justify-center items-center p-4">
-                <Loader2 className="h-6 w-6 animate-spin" />
-              </div>
-            ) : (
-              <>
+                <div className="flex justify-center items-center p-4">
+                  <Loader2 className="h-6 w-6 animate-spin" />
+                </div>
+              ) : (
+                <>
                   {selectedTechnicInfo?.name && (
-                      <div>
-                          <h4 className="font-semibold text-foreground mb-1">Name</h4>
-                          <p>{selectedTechnicInfo.name}</p>
-                      </div>
+                    <div>
+                      <h4 className="font-semibold text-foreground mb-1">Name</h4>
+                      <p>{selectedTechnicInfo.name}</p>
+                    </div>
                   )}
-                   {selectedTechnicInfo?.waza && (
-                      <div>
-                          <h4 className="font-semibold text-foreground mb-1">Waza</h4>
-                          <p>{selectedTechnicInfo.waza}</p>
-                      </div>
+                  {selectedTechnicInfo?.waza && (
+                    <div>
+                      <h4 className="font-semibold text-foreground mb-1">Waza</h4>
+                      <p>{selectedTechnicInfo.waza}</p>
+                    </div>
                   )}
                   {selectedTechnicInfo?.description && (
-                      <div>
-                          <h4 className="font-semibold text-foreground mb-1">Description</h4>
-                          <p>{selectedTechnicInfo.description}</p>
-                      </div>
+                    <div>
+                      <h4 className="font-semibold text-foreground mb-1">Description</h4>
+                      <p>{selectedTechnicInfo.description}</p>
+                    </div>
                   )}
                   {selectedTechnicInfo?.notes && (
-                      <div>
-                          <h4 className="font-semibold text-foreground mb-1">Notes</h4>
-                          <p>{selectedTechnicInfo.notes}</p>
-                      </div>
+                    <div>
+                      <h4 className="font-semibold text-foreground mb-1">Notes</h4>
+                      <p>{selectedTechnicInfo.notes}</p>
+                    </div>
                   )}
                   {!selectedTechnicInfo?.name && !selectedTechnicInfo?.waza && !selectedTechnicInfo?.description && !selectedTechnicInfo?.notes && (
-                      <p>No details available for this technique.</p>
+                    <p>No details available for this technique.</p>
                   )}
-              </>
-            )}
+                </>
+              )}
             </div>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogAction onClick={() => setIsTechnicInfoDialogOpen(false)}>Close</AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+          </div>
+        </PopoverContent>
+      </Popover>
     </>
   );
 }
 
 
 
-    
 
-    
+
+
 

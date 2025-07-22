@@ -13,6 +13,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 const ITEMS_PER_PAGE = 10;
 
@@ -33,6 +34,11 @@ export default function SegnapostoDisplay() {
   const [currentStandsPage, setCurrentStandsPage] = useState(1);
   const [currentStrikingPartsPage, setCurrentStrikingPartsPage] = useState(1);
   const [currentTargetsPage, setCurrentTargetsPage] = useState(1);
+
+  // Add state for popover info
+  const [popoverOpen, setPopoverOpen] = useState(false);
+  const [popoverAnchor, setPopoverAnchor] = useState<HTMLElement | null>(null);
+  const [popoverInfo, setPopoverInfo] = useState<any>(null);
 
 
   useEffect(() => {
@@ -102,6 +108,20 @@ export default function SegnapostoDisplay() {
     currentTargetsPage * ITEMS_PER_PAGE
   );
 
+  const handleInfoClick = async (type: string, id: number, event: React.MouseEvent<HTMLElement>) => {
+    setPopoverOpen(true);
+    setPopoverAnchor(event.currentTarget);
+    setPopoverInfo(null);
+    try {
+      const res = await fetch(`/api/info_${type}/${id}`);
+      if (!res.ok) throw new Error("Failed to fetch info");
+      const data = await res.json();
+      setPopoverInfo(data[`info_${type}`]);
+    } catch (err) {
+      setPopoverInfo({ error: "Failed to load info." });
+    }
+  };
+
   return (
     <Card>
       <CardHeader>
@@ -123,6 +143,7 @@ export default function SegnapostoDisplay() {
                                         <TableRow>
                                             <TableHead>Name</TableHead>
                                             <TableHead>Description</TableHead>
+                                            <TableHead>Info</TableHead>
                                         </TableRow>
                                     </TableHeader>
                                     <TableBody>
@@ -130,6 +151,11 @@ export default function SegnapostoDisplay() {
                                             <TableRow key={tecnica.id_technic}>
                                                 <TableCell>{tecnica.name}</TableCell>
                                                 <TableCell>{tecnica.description}</TableCell>
+                                                <TableCell>
+                                                  <Button variant="ghost" size="icon" onClick={(e) => handleInfoClick("technic", tecnica.id_technic, e)}>
+                                                    ℹ️
+                                                  </Button>
+                                                </TableCell>
                                             </TableRow>
                                         ))}
                                     </TableBody>
@@ -171,6 +197,7 @@ export default function SegnapostoDisplay() {
                                         <TableRow>
                                             <TableHead>Name</TableHead>
                                             <TableHead>Description</TableHead>
+                                            <TableHead>Info</TableHead>
                                         </TableRow>
                                     </TableHeader>
                                     <TableBody>
@@ -178,6 +205,11 @@ export default function SegnapostoDisplay() {
                                             <TableRow key={stand.id_stand}>
                                                 <TableCell>{stand.name}</TableCell>
                                                 <TableCell>{stand.description}</TableCell>
+                                                <TableCell>
+                                                  <Button variant="ghost" size="icon" onClick={(e) => handleInfoClick("stand", stand.id_stand, e)}>
+                                                    ℹ️
+                                                  </Button>
+                                                </TableCell>
                                             </TableRow>
                                         ))}
                                     </TableBody>
@@ -219,6 +251,7 @@ export default function SegnapostoDisplay() {
                                         <TableRow>
                                             <TableHead>Name</TableHead>
                                             <TableHead>Description</TableHead>
+                                            <TableHead>Info</TableHead>
                                         </TableRow>
                                     </TableHeader>
                                     <TableBody>
@@ -226,6 +259,11 @@ export default function SegnapostoDisplay() {
                                             <TableRow key={part.id_part}>
                                                 <TableCell>{part.name}</TableCell>
                                                 <TableCell>{part.description}</TableCell>
+                                                <TableCell>
+                                                  <Button variant="ghost" size="icon" onClick={(e) => handleInfoClick("strikingpart", part.id_part, e)}>
+                                                    ℹ️
+                                                  </Button>
+                                                </TableCell>
                                             </TableRow>
                                         ))}
                                     </TableBody>
@@ -268,6 +306,7 @@ export default function SegnapostoDisplay() {
                                         <TableRow>
                                             <TableHead>Name</TableHead>
                                             <TableHead>Description</TableHead>
+                                            <TableHead>Info</TableHead>
                                         </TableRow>
                                     </TableHeader>
                                     <TableBody>
@@ -275,6 +314,11 @@ export default function SegnapostoDisplay() {
                                             <TableRow key={target.id_target}>
                                                 <TableCell>{target.name}</TableCell>
                                                 <TableCell>{target.description}</TableCell>
+                                                <TableCell>
+                                                  <Button variant="ghost" size="icon" onClick={(e) => handleInfoClick("target", target.id_target, e)}>
+                                                    ℹ️
+                                                  </Button>
+                                                </TableCell>
                                             </TableRow>
                                         ))}
                                     </TableBody>
@@ -307,6 +351,36 @@ export default function SegnapostoDisplay() {
             </AccordionItem>
 
         </Accordion>
+
+        {/* Info Popover */}
+        <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
+          <PopoverTrigger asChild>
+            <span style={{ display: "none" }} />
+          </PopoverTrigger>
+          <PopoverContent side="right" align="start" className="max-w-md" style={{ minWidth: 300 }}>
+            <div className="space-y-2">
+              <h4 className="font-semibold">Details</h4>
+              <div className="text-sm text-muted-foreground space-y-2 max-h-64 overflow-y-auto">
+                {popoverInfo ? (
+                  popoverInfo.error ? (
+                    <p>{popoverInfo.error}</p>
+                  ) : (
+                    Object.entries(popoverInfo).map(([key, value]) => (
+                      <div key={key}>
+                        <strong>{key}:</strong> {String(value)}
+                      </div>
+                    ))
+                  )
+                ) : (
+                  <div className="flex justify-center items-center p-4">
+                    Loading...
+                  </div>
+                )}
+              </div>
+            </div>
+          </PopoverContent>
+        </Popover>
+
       </CardContent>
     </Card>
   );
