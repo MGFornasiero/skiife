@@ -354,9 +354,7 @@ export default function SegnapostoDisplay() {
 
         {/* Info Popover */}
         <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
-          <PopoverTrigger asChild>
-            <span style={{ display: "none" }} />
-          </PopoverTrigger>
+          {/* Remove PopoverTrigger */}
           <PopoverContent side="right" align="start" className="max-w-md" style={{ minWidth: 300 }}>
             <div className="space-y-2">
               <h4 className="font-semibold">Details</h4>
@@ -383,5 +381,7 @@ export default function SegnapostoDisplay() {
 
       </CardContent>
     </Card>
+  );
+}
   );
 }

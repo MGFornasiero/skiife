@@ -371,9 +371,6 @@ export default function KataDisplay() {
 
       {/* Stand Popover */}
       <Popover open={popoverStandOpen} onOpenChange={setPopoverStandOpen}>
-        <PopoverTrigger asChild>
-          <span style={{ display: "none" }} /> {/* Hidden trigger, popover is controlled */}
-        </PopoverTrigger>
         <PopoverContent side="right" align="start" className="max-w-md" style={{ minWidth: 300 }}>
           <div className="space-y-2">
             <h4 className="font-semibold">
@@ -410,9 +407,6 @@ export default function KataDisplay() {
 
       {/* Technic Popover */}
       <Popover open={popoverTechnicOpen} onOpenChange={setPopoverTechnicOpen}>
-        <PopoverTrigger asChild>
-          <span style={{ display: "none" }} />
-        </PopoverTrigger>
         <PopoverContent side="right" align="start" className="max-w-md" style={{ minWidth: 300 }}>
           <div className="space-y-2">
             <h4 className="font-semibold">
@@ -455,6 +449,12 @@ export default function KataDisplay() {
                 </>
               )}
             </div>
+          </div>
+        </PopoverContent>
+      </Popover>
+    </div>
+  );
+}
           </div>
         </PopoverContent>
       </Popover>
