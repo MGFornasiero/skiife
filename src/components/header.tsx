@@ -5,7 +5,7 @@ import { Menu } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { ThemeToggle } from "./theme-toggle";
@@ -54,6 +54,12 @@ export default function Header() {
               </Button>
             </SheetTrigger>
             <SheetContent side="right">
+              <SheetHeader>
+                <SheetTitle>Menu</SheetTitle>
+                <SheetDescription>
+                  Select a page to navigate to.
+                </SheetDescription>
+              </SheetHeader>
               <div className="flex flex-col space-y-4 pt-8">
                 {navItems.map((item) => (
                   <Link
