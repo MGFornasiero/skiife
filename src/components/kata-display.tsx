@@ -41,7 +41,10 @@ const movementIconMap: { [key: string]: string } = {
   'Still': '⏸',
 };
 
-const getMovementIcon = (movement: string) => {
+const getMovementIcon = (movement: string | null) => {
+    if (!movement) {
+        return ''; // Or some default icon/text
+    }
     for (const key in movementIconMap) {
         if (movement.includes(key)) {
             return movementIconMap[key];
@@ -241,19 +244,15 @@ export default function KataDisplay() {
         {showGradeSelection && (
           <CardContent>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-end pt-4 border-t">
-              <div className="space-y-2">
-                 <div className="flex items-center space-x-2">
-                  <Label htmlFor="grade-type-switch" className={cn("text-sm text-muted-foreground", gradeType === 'kyu' && 'text-foreground')}>Kyu</Label>
-                  <Switch
-                    id="grade-type-switch"
-                    checked={gradeType === 'dan'}
-                    onCheckedChange={handleGradeTypeChange}
-                    aria-readonly
-                  />
-                  <Label htmlFor="grade-type-switch" className={cn("text-sm text-muted-foreground", gradeType === 'dan' && 'text-foreground')}>Dan</Label>
+                <div className="flex items-center space-x-2">
+                    <Label htmlFor="grade-type-switch" className={cn("text-sm text-muted-foreground", gradeType === 'kyu' && 'text-foreground')}>Kyu</Label>
+                    <Switch
+                        id="grade-type-switch"
+                        checked={gradeType === 'dan'}
+                        onCheckedChange={handleGradeTypeChange}
+                    />
+                    <Label htmlFor="grade-type-switch" className={cn("text-sm text-muted-foreground", gradeType === 'dan' && 'text-foreground')}>Dan</Label>
                 </div>
-              </div>
-
               <div className="space-y-2">
                 <Select onValueChange={handleGradeChange} value={grade?.toString() || ""}>
                   <SelectTrigger id="grade-select" className="w-full sm:w-[180px]">
