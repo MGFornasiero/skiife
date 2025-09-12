@@ -290,7 +290,7 @@ export default function KataSelection() {
 
   const handleTechnicClick = async (technicId: number) => {
     setIsTechnicInfoLoading(true);
-    setIsTechnicInfoDialogOpen(true);
+    setIsTechnizioneInfoDialogOpen(true);
     setSelectedTechnicInfo(null);
 
     try {
@@ -512,6 +512,13 @@ export default function KataSelection() {
                 {sortedKataSteps.length > 0 && currentStep ? (
                     <div className="space-y-4 pt-4">
                         <div className="flex items-center justify-center gap-4">
+                            {transactionToCurrent && (
+                              <div className="flex items-center gap-2 text-sm text-muted-foreground border p-2 rounded-md">
+                                <span className="text-lg font-bold">{getDirectionSymbol(transactionToCurrent.direction)}</span>
+                                <span>{transactionToCurrent.tempo}</span>
+                                {getTempoIcon(transactionToCurrent.tempo)}
+                              </div>
+                            )}
                             <Button variant="outline" size="icon" onClick={() => handleStepChange('prev')}>
                                 <ChevronLeft className="h-4 w-4" />
                             </Button>
@@ -677,7 +684,7 @@ export default function KataSelection() {
                   )}
                   {selectedTechnicInfo?.notes && (
                       <div>
-                          <h4 className="font-semibold text-foreground mb-1">Notes</h4>
+                          <h4 className="font-semibold mb-1">Notes</h4>
                           <p>{selectedTechnicInfo.notes}</p>
                       </div>
                   )}
@@ -697,3 +704,5 @@ export default function KataSelection() {
   );
 }
 
+
+    
