@@ -511,43 +511,24 @@ export default function KataSelection() {
                 <>
                 {sortedKataSteps.length > 0 && currentStep ? (
                     <div className="space-y-4 pt-4">
-                          <div className="flex items-center justify-center gap-4">
-                              <Popover>
-                                <PopoverTrigger asChild>
-                                  <Button variant="outline" size="icon" onClick={() => handleStepChange('prev')}>
-                                      <ChevronLeft className="h-4 w-4" />
-                                  </Button>
-                                </PopoverTrigger>
-                                {transactionToCurrent && (
-                                  <PopoverContent>
-                                     <div className="flex items-center gap-2">
-                                        {getTempoIcon(transactionToCurrent.tempo)}
-                                        <span>{transactionToCurrent.tempo}</span>
-                                      </div>
-                                    <p>Direction: {transactionToCurrent.direction}</p>
-                                  </PopoverContent>
-                                )}
-                              </Popover>
-                              <div className="w-48 text-center font-medium">
-                                  Step {currentStep.seq_num} of {sortedKataSteps.length}
+                        <div className="flex items-center justify-center gap-4">
+                            <Button variant="outline" size="icon" onClick={() => handleStepChange('prev')}>
+                                <ChevronLeft className="h-4 w-4" />
+                            </Button>
+                            <div className="w-32 text-center font-medium">
+                                Step {currentStep.seq_num} of {sortedKataSteps.length}
+                            </div>
+                            <Button variant="outline" size="icon" onClick={() => handleStepChange('next')}>
+                                <ChevronRight className="h-4 w-4" />
+                            </Button>
+                            {transactionToNext && (
+                              <div className="flex items-center gap-2 text-sm text-muted-foreground border p-2 rounded-md">
+                                {getTempoIcon(transactionToNext.tempo)}
+                                <span>{transactionToNext.tempo}</span>
+                                <span className="text-lg font-bold">{getDirectionSymbol(transactionToNext.direction)}</span>
                               </div>
-                              <Popover>
-                                <PopoverTrigger asChild>
-                                  <Button variant="outline" size="icon" onClick={() => handleStepChange('next')}>
-                                      <ChevronRight className="h-4 w-4" />
-                                  </Button>
-                                </PopoverTrigger>
-                                {transactionToNext && (
-                                  <PopoverContent>
-                                    <div className="flex items-center gap-2">
-                                      {getTempoIcon(transactionToNext.tempo)}
-                                      <span>{transactionToNext.tempo}</span>
-                                    </div>
-                                    <p>Direction: {transactionToNext.direction}</p>
-                                  </PopoverContent>
-                                )}
-                              </Popover>
-                          </div>
+                            )}
+                        </div>
 
                       <Card className="w-full max-w-lg mx-auto">
                           <CardHeader>
