@@ -62,7 +62,7 @@ const guardiaSymbolMap: { [key: string]: string } = {
   'frontal': '◒', // U+25D2
 };
 
-const gambaSymbolMap: { [key: string]: string } = {
+const gambaSymbolMap: { [key in string]: string } = {
   'sx': '◐',
   'dx': '◑',
   'frontal': '◒',
@@ -752,6 +752,8 @@ export default function KataSelection() {
   );
 }
 
+
+    
 
     
 
