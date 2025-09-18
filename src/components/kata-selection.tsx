@@ -592,9 +592,8 @@ export default function KataSelection() {
                                               <li key={tech.technic_id} className="border-l-4 pl-4 py-1 border-primary/50 bg-secondary/50 rounded-r-md">
                                                   <p><strong className="cursor-pointer hover:underline" onClick={() => handleTechnicClick(tech.technic_id)}>Tecnica:</strong> {tech.Tecnica}</p>
                                                   <p><strong>Arto:</strong> {tech.arto}</p>
-                                                  <p><strong>Obiettivo:</strong> {tech.Obiettivo || 'N/A'}</p>
+                                                  <p className="flex items-center gap-2"><strong>Obiettivo:</strong> {tech.Obiettivo || 'N/A'}
                                                   {tech.waza_note && tech.waza_note.trim() !== '' && (
-                                                    <p className="flex items-center gap-2">
                                                       <Popover>
                                                         <PopoverTrigger>
                                                           <Notebook className="h-5 w-5 text-muted-foreground cursor-pointer" />
@@ -603,8 +602,8 @@ export default function KataSelection() {
                                                           <p>{tech.waza_note}</p>
                                                         </PopoverContent>
                                                       </Popover>
-                                                    </p>
                                                   )}
+                                                  </p>
                                               </li>
                                           ))}
                                       </ul>
