@@ -521,6 +521,16 @@ export default function KataSelection() {
                                         </div>
                                         <div className="flex items-center gap-1">
                                             <span className="text-lg font-bold">{getDirectionSymbol(transactionToCurrent.direction)}</span>
+                                            {transactionToCurrent.notes && (
+                                                <Popover>
+                                                    <PopoverTrigger>
+                                                        <Notebook className="h-5 w-5 text-muted-foreground cursor-pointer" />
+                                                    </PopoverTrigger>
+                                                    <PopoverContent>
+                                                        <p>{transactionToCurrent.notes}</p>
+                                                    </PopoverContent>
+                                                </Popover>
+                                            )}
                                         </div>
                                     </>
                                 ) : <div className="h-full w-full"/>}
@@ -534,7 +544,7 @@ export default function KataSelection() {
                             <Button variant="outline" size="icon" onClick={() => handleStepChange('next')}>
                                 <ChevronRight className="h-4 w-4" />
                             </Button>
-                            <div className="flex flex-col items-center justify-center text-sm text-muted-foreground border p-2 rounded-md w-24 h-16">
+                             <div className="flex flex-col items-center justify-center text-sm text-muted-foreground border p-2 rounded-md w-24 h-16">
                                 {transactionToNext ? (
                                     <>
                                         <div className="flex items-center gap-1">
@@ -742,5 +752,7 @@ export default function KataSelection() {
   );
 }
 
+
+    
 
     
