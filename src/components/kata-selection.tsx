@@ -595,7 +595,6 @@ export default function KataSelection() {
                                                   <p><strong>Obiettivo:</strong> {tech.Obiettivo || 'N/A'}</p>
                                                   {tech.waza_note && tech.waza_note.trim() !== '' && (
                                                     <p className="flex items-center gap-2">
-                                                      <strong>Note:</strong>
                                                       <Popover>
                                                         <PopoverTrigger>
                                                           <Notebook className="h-5 w-5 text-muted-foreground cursor-pointer" />
@@ -612,7 +611,6 @@ export default function KataSelection() {
                                   </div>
                                   {currentStep.notes && (
                                     <div className="flex items-start gap-2">
-                                      <h4 className="font-semibold">Notes:</h4>
                                       <Popover>
                                           <PopoverTrigger>
                                               <Notebook className="h-5 w-5 text-muted-foreground cursor-pointer" />
