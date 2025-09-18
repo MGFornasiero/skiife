@@ -13,7 +13,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight, Loader2, Link as LinkIcon, Rabbit, Wind, Hourglass, PersonStanding, Turtle, Volume2, MapPin } from "lucide-react";
+import { ChevronLeft, ChevronRight, Loader2, Link as LinkIcon, Rabbit, Wind, Hourglass, PersonStanding, Turtle, Volume2, MapPin, Notebook } from "lucide-react";
 import { cn } from "@/lib/utils";
 import React from "react";
 import {
@@ -290,7 +290,7 @@ export default function KataSelection() {
 
   const handleTechnicClick = async (technicId: number) => {
     setIsTechnicInfoLoading(true);
-    setIsTechnizioneInfoDialogOpen(true);
+    setIsTechnicInfoDialogOpen(true);
     setSelectedTechnicInfo(null);
 
     try {
@@ -512,13 +512,19 @@ export default function KataSelection() {
                 {sortedKataSteps.length > 0 && currentStep ? (
                     <div className="space-y-4 pt-4">
                         <div className="flex items-center justify-center gap-4">
-                            {transactionToCurrent && (
-                              <div className="flex items-center gap-2 text-sm text-muted-foreground border p-2 rounded-md">
-                                <span className="text-lg font-bold">{getDirectionSymbol(transactionToCurrent.direction)}</span>
-                                <span>{transactionToCurrent.tempo}</span>
-                                {getTempoIcon(transactionToCurrent.tempo)}
-                              </div>
-                            )}
+                            <div className="flex flex-col items-center justify-center text-sm text-muted-foreground border p-2 rounded-md w-24 h-16">
+                                {transactionToCurrent ? (
+                                    <>
+                                        <div className="flex items-center gap-1">
+                                            {getTempoIcon(transactionToCurrent.tempo)}
+                                            <span>{transactionToCurrent.tempo}</span>
+                                        </div>
+                                        <div className="flex items-center gap-1">
+                                            <span className="text-lg font-bold">{getDirectionSymbol(transactionToCurrent.direction)}</span>
+                                        </div>
+                                    </>
+                                ) : <div className="h-full w-full"/>}
+                            </div>
                             <Button variant="outline" size="icon" onClick={() => handleStepChange('prev')}>
                                 <ChevronLeft className="h-4 w-4" />
                             </Button>
@@ -528,13 +534,19 @@ export default function KataSelection() {
                             <Button variant="outline" size="icon" onClick={() => handleStepChange('next')}>
                                 <ChevronRight className="h-4 w-4" />
                             </Button>
-                            {transactionToNext && (
-                              <div className="flex items-center gap-2 text-sm text-muted-foreground border p-2 rounded-md">
-                                {getTempoIcon(transactionToNext.tempo)}
-                                <span>{transactionToNext.tempo}</span>
-                                <span className="text-lg font-bold">{getDirectionSymbol(transactionToNext.direction)}</span>
-                              </div>
-                            )}
+                            <div className="flex flex-col items-center justify-center text-sm text-muted-foreground border p-2 rounded-md w-24 h-16">
+                                {transactionToNext ? (
+                                    <>
+                                        <div className="flex items-center gap-1">
+                                            {getTempoIcon(transactionToNext.tempo)}
+                                            <span>{transactionToNext.tempo}</span>
+                                        </div>
+                                        <div className="flex items-center gap-1">
+                                            <span className="text-lg font-bold">{getDirectionSymbol(transactionToNext.direction)}</span>
+                                        </div>
+                                    </>
+                                ) : <div className="h-full w-full"/>}
+                            </div>
                         </div>
 
                       <Card className="w-full max-w-lg mx-auto">
@@ -581,15 +593,34 @@ export default function KataSelection() {
                                                   <p><strong className="cursor-pointer hover:underline" onClick={() => handleTechnicClick(tech.technic_id)}>Tecnica:</strong> {tech.Tecnica}</p>
                                                   <p><strong>Arto:</strong> {tech.arto}</p>
                                                   <p><strong>Obiettivo:</strong> {tech.Obiettivo || 'N/A'}</p>
-                                                  <p><strong>Note:</strong> {tech.waza_note || 'N/A'}</p>
+                                                  {tech.waza_note && tech.waza_note.trim() !== '' && (
+                                                    <p className="flex items-center gap-2">
+                                                      <strong>Note:</strong>
+                                                      <Popover>
+                                                        <PopoverTrigger>
+                                                          <Notebook className="h-5 w-5 text-muted-foreground cursor-pointer" />
+                                                        </PopoverTrigger>
+                                                        <PopoverContent>
+                                                          <p>{tech.waza_note}</p>
+                                                        </PopoverContent>
+                                                      </Popover>
+                                                    </p>
+                                                  )}
                                               </li>
                                           ))}
                                       </ul>
                                   </div>
                                   {currentStep.notes && (
-                                    <div>
-                                      <h4 className="font-semibold mb-2">Notes:</h4>
-                                      <p className="text-sm text-muted-foreground">{currentStep.notes}</p>
+                                    <div className="flex items-start gap-2">
+                                      <h4 className="font-semibold">Notes:</h4>
+                                      <Popover>
+                                          <PopoverTrigger>
+                                              <Notebook className="h-5 w-5 text-muted-foreground cursor-pointer" />
+                                          </PopoverTrigger>
+                                          <PopoverContent>
+                                              <p>{currentStep.notes}</p>
+                                          </PopoverContent>
+                                      </Popover>
                                     </div>
                                   )}
                                   <div className="mt-4 flex justify-center">
@@ -684,7 +715,7 @@ export default function KataSelection() {
                   )}
                   {selectedTechnicInfo?.notes && (
                       <div>
-                          <h4 className="font-semibold mb-1">Notes</h4>
+                          <h4 className="font-semibold text-foreground mb-1">Notes</h4>
                           <p>{selectedTechnicInfo.notes}</p>
                       </div>
                   )}
