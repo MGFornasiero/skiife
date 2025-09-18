@@ -52,6 +52,7 @@ export type KataInventory = {
 export type Transaction = {
   tempo: 'Legato' | 'Fast' | 'Normal' | 'Slow' | 'Breath';
   direction: string;
+  notes: string | null;
 };
 
 export type Transactions = {

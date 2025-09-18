@@ -543,6 +543,16 @@ export default function KataSelection() {
                                         </div>
                                         <div className="flex items-center gap-1">
                                             <span className="text-lg font-bold">{getDirectionSymbol(transactionToNext.direction)}</span>
+                                            {transactionToNext.notes && (
+                                                <Popover>
+                                                    <PopoverTrigger>
+                                                        <Notebook className="h-5 w-5 text-muted-foreground cursor-pointer" />
+                                                    </PopoverTrigger>
+                                                    <PopoverContent>
+                                                        <p>{transactionToNext.notes}</p>
+                                                    </PopoverContent>
+                                                </Popover>
+                                            )}
                                         </div>
                                     </>
                                 ) : <div className="h-full w-full"/>}
