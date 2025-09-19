@@ -25,8 +25,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
-import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 
 interface KataData {
@@ -380,285 +379,281 @@ export default function KataSelection() {
         )}
       </div>
       <Card>
-        <CardHeader>
-            <div className="flex items-center justify-between gap-4">
-                <div className="flex items-center space-x-2">
-                    <Label htmlFor="view-mode-switch" className={cn("text-sm text-muted-foreground", viewMode === 'generale' && 'text-foreground')}>Generale</Label>
-                    <Switch
-                        id="view-mode-switch"
-                        checked={viewMode === 'dettagli'}
-                        onCheckedChange={(checked) => setViewMode(checked ? 'dettagli' : 'generale')}
-                    />
-                    <Label htmlFor="view-mode-switch" className={cn("text-sm text-muted-foreground", viewMode === 'dettagli' && 'text-foreground')}>Dettagli</Label>
-                </div>
-                <div className="flex-grow">
-                      <CardTitle className="flex items-center justify-end gap-2">
-                        {gambaSymbol && (
-                           <Popover>
-                              <PopoverTrigger asChild>
-                                  <span className="text-2xl cursor-pointer">{gambaSymbol}</span>
-                              </PopoverTrigger>
-                              <PopoverContent className="w-auto p-2">
-                                  <p>Chiusura: {kataGamba}</p>
-                              </PopoverContent>
-                          </Popover>
-                        )}
-                        {selectedKataName ? `Kata: ${selectedKataName}` : "Kata Selection"}
-                      </CardTitle>
-                </div>
-            </div>
-            {kataNotes && <CardDescription className="mt-2 text-left">{kataNotes}</CardDescription>}
-            {!selectedKataName && !kataNotes && <CardDescription className="mt-2 text-right">Select a kata to see its details.</CardDescription>}
-        </CardHeader>
-        <CardContent>
-          
-          {loading && <p className="text-muted-foreground pt-4">Loading kata details...</p>}
-
-          {kataSteps && tx && transactionsMappingFrom && transactionsMappingTo && (
-            <div className="w-full">
-              
-              {viewMode === 'generale' ? (
-                  <div className="mt-6 flex flex-col items-center gap-2">
-                    {sortedKataSteps.map((step, index) => {
-                      const transactionId = transactionsMappingFrom[step.id_sequence];
-                      const transaction = transactionId ? tx[transactionId] : null;
-
-                      return (
-                        <React.Fragment key={step.id_sequence}>
-                          <Card className={cn("w-full max-w-md flex flex-col", step.kiai && "border-primary")}>
-                            <CardContent className="p-4 flex flex-col gap-2">
-                                  <div className="flex justify-between items-start">
-                                    <div className="flex-grow">
-                                      <p 
-                                        className="font-medium cursor-pointer hover:underline"
-                                        onClick={() => handlePosizioneClick(step.stand_id)}
-                                      >
-                                          {step.posizione}
-                                      </p>
-                                    </div>
-                                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                                      {step.kiai && (
-                                          <Popover>
-                                              <PopoverTrigger asChild>
-                                                  <Volume2 className="h-5 w-5 text-destructive cursor-pointer" />
-                                              </PopoverTrigger>
-                                              <PopoverContent className="w-auto p-2">
-                                                  <p>Kiai!</p>
-                                              </PopoverContent>
-                                          </Popover>
-                                      )}
-                                      <Popover>
-                                        <PopoverTrigger asChild>
-                                          <span className="text-2xl cursor-pointer">{getGuardiaSymbol(step.guardia)}</span>
-                                        </PopoverTrigger>
-                                        <PopoverContent className="w-auto p-2">
-                                          <p>{step.guardia}</p>
-                                        </PopoverContent>
-                                      </Popover>
-                                      <span className="text-2xl font-bold" title={step.facing}>{getFacingArrow(step.facing)}</span>
-                                    </div>
-                                  </div>
-                              
+          <Tabs value={viewMode} onValueChange={(value) => setViewMode(value as "generale" | "dettagli")}>
+              <CardHeader>
+                  <div className="flex items-center justify-between gap-4">
+                      <TabsList>
+                          <TabsTrigger value="generale">Generale</TabsTrigger>
+                          <TabsTrigger value="dettagli">Dettagli</TabsTrigger>
+                      </TabsList>
+                      <div className="flex-grow">
+                          <CardTitle className="flex items-center justify-end gap-2">
+                              {gambaSymbol && (
                                   <Popover>
-                                    <PopoverTrigger asChild>
-                                      <div className="p-2 -mx-2 rounded-md hover:bg-accent/50 cursor-pointer">
-                                          <p className="text-sm text-muted-foreground">Techniques:</p>
-                                          <ul className="list-disc pl-5 font-medium">
-                                              {step.tecniche.map((tech) => (
-                                                  <li key={tech.technic_id} className="truncate text-sm cursor-pointer hover:underline" onClick={(e) => {e.stopPropagation(); handleTechnicClick(tech.technic_id)}}>
-                                                      {tech.Tecnica}
-                                                  </li>
-                                              ))}
-                                          </ul>
-                                      </div>
-                                    </PopoverTrigger>
-                                    <PopoverContent side="top" align="start">
-                                      <div className="space-y-2">
-                                        {step.tecniche.map((tech) => (
-                                            <div key={tech.technic_id} className="mb-2 last:mb-0 text-sm">
-                                                <p><strong>Arto:</strong> {tech.arto}</p>
-                                                <p><strong>Tecnica:</strong> {tech.Tecnica}</p>
-                                                <p><strong>Obiettivo:</strong> {tech.Obiettivo || 'N/A'}</p>
-                                            </div>
-                                        ))}
-                                      </div>
-                                    </PopoverContent>
+                                      <PopoverTrigger asChild>
+                                          <span className="text-2xl cursor-pointer">{gambaSymbol}</span>
+                                      </PopoverTrigger>
+                                      <PopoverContent className="w-auto p-2">
+                                          <p>Chiusura: {kataGamba}</p>
+                                      </PopoverContent>
                                   </Popover>
-                            </CardContent>
-                          </Card>
-                          {index < sortedKataSteps.length - 1 && (
-                            <div className="flex items-center justify-center my-2 text-muted-foreground">
-                              {transaction && (
-                                <div className="flex items-center gap-2">
-                                   <Popover>
-                                    <PopoverTrigger asChild>
-                                      <div className="cursor-pointer">{getTempoIcon(transaction.tempo)}</div>
-                                    </PopoverTrigger>
-                                    <PopoverContent className="w-auto p-2">
-                                      <p>{transaction.tempo}</p>
-                                    </PopoverContent>
-                                  </Popover>
-                                  <p className="text-2xl font-bold" title={transaction.direction}>{getDirectionSymbol(transaction.direction)}</p>
-                                </div>
                               )}
-                            </div>
-                          )}
-                        </React.Fragment>
-                      )
-                    })}
+                              {selectedKataName ? `Kata: ${selectedKataName}` : "Kata Selection"}
+                          </CardTitle>
+                      </div>
                   </div>
-              ) : (
-                <>
-                {sortedKataSteps.length > 0 && currentStep ? (
-                    <div className="space-y-4 pt-4">
-                        <div className="flex items-center justify-center gap-4">
-                            <div className="flex flex-col items-center justify-center text-sm text-muted-foreground border p-2 rounded-md w-24 h-16">
-                                {transactionToCurrent ? (
-                                    <>
-                                        <div className="flex items-center gap-1">
-                                            {getTempoIcon(transactionToCurrent.tempo)}
-                                            <span>{transactionToCurrent.tempo}</span>
-                                        </div>
-                                        <div className="flex items-center gap-1">
-                                            <span className="text-lg font-bold">{getDirectionSymbol(transactionToCurrent.direction)}</span>
-                                            {transactionToCurrent.notes && (
-                                                <Popover>
-                                                    <PopoverTrigger>
-                                                        <Notebook className="h-5 w-5 text-muted-foreground cursor-pointer" />
-                                                    </PopoverTrigger>
-                                                    <PopoverContent>
-                                                        <p>{transactionToCurrent.notes}</p>
-                                                    </PopoverContent>
-                                                </Popover>
-                                            )}
-                                        </div>
-                                    </>
-                                ) : <div className="h-full w-full"/>}
-                            </div>
-                            <Button variant="outline" size="icon" onClick={() => handleStepChange('prev')}>
-                                <ChevronLeft className="h-4 w-4" />
-                            </Button>
-                            <div className="w-32 text-center font-medium">
-                                Step {currentStep.seq_num} of {sortedKataSteps.length}
-                            </div>
-                            <Button variant="outline" size="icon" onClick={() => handleStepChange('next')}>
-                                <ChevronRight className="h-4 w-4" />
-                            </Button>
-                             <div className="flex flex-col items-center justify-center text-sm text-muted-foreground border p-2 rounded-md w-24 h-16">
-                                {transactionToNext ? (
-                                    <>
-                                        <div className="flex items-center gap-1">
-                                            {getTempoIcon(transactionToNext.tempo)}
-                                            <span>{transactionToNext.tempo}</span>
-                                        </div>
-                                        <div className="flex items-center gap-1">
-                                            <span className="text-lg font-bold">{getDirectionSymbol(transactionToNext.direction)}</span>
-                                            {transactionToNext.notes && (
-                                                <Popover>
-                                                    <PopoverTrigger>
-                                                        <Notebook className="h-5 w-5 text-muted-foreground cursor-pointer" />
-                                                    </PopoverTrigger>
-                                                    <PopoverContent>
-                                                        <p>{transactionToNext.notes}</p>
-                                                    </PopoverContent>
-                                                </Popover>
-                                            )}
-                                        </div>
-                                    </>
-                                ) : <div className="h-full w-full"/>}
-                            </div>
-                        </div>
+                  {kataNotes && <CardDescription className="mt-2 text-left">{kataNotes}</CardDescription>}
+                  {!selectedKataName && !kataNotes && <CardDescription className="mt-2 text-right">Select a kata to see its details.</CardDescription>}
+              </CardHeader>
+              <CardContent>
+                  {loading && <p className="text-muted-foreground pt-4">Loading kata details...</p>}
 
-                      <Card className="w-full max-w-lg mx-auto">
-                          <CardHeader>
-                              <CardTitle className="flex justify-between items-center">
-                                <span
-                                    className="cursor-pointer hover:underline"
-                                    onClick={() => handlePosizioneClick(currentStep.stand_id)}
-                                >
-                                    {currentStep.posizione}
-                                </span>
-                                <div className="flex items-center gap-2 text-2xl font-bold">
-                                    {currentStep.kiai && (
-                                        <Popover>
-                                            <PopoverTrigger asChild>
-                                                <Volume2 className="h-6 w-6 text-destructive cursor-pointer" />
-                                            </PopoverTrigger>
-                                            <PopoverContent className="w-auto p-2">
-                                                <p>Kiai!</p>
-                                            </PopoverContent>
-                                        </Popover>
-                                    )}
-                                    <Popover>
-                                        <PopoverTrigger asChild>
-                                            <span className="font-normal cursor-pointer">{getGuardiaSymbol(currentStep.guardia)}</span>
-                                        </PopoverTrigger>
-                                        <PopoverContent className="w-auto p-2">
-                                            <p>{currentStep.guardia}</p>
-                                        </PopoverContent>
-                                    </Popover>
-                                    <span title={currentStep.facing}>
-                                        {getFacingArrow(currentStep.facing)}
-                                    </span>
-                                </div>
-                              </CardTitle>
-                          </CardHeader>
-                          <CardContent>
-                            <div className="flex flex-col gap-6">
-                                  <div>
-                                      <h4 className="font-semibold mb-2">Techniques:</h4>
-                                      <ul className="space-y-2">
-                                          {currentStep.tecniche.map(tech => (
-                                              <li key={tech.technic_id} className="border-l-4 pl-4 py-1 border-primary/50 bg-secondary/50 rounded-r-md">
-                                                  <p><strong className="cursor-pointer hover:underline" onClick={() => handleTechnicClick(tech.technic_id)}>Tecnica:</strong> {tech.Tecnica}</p>
-                                                  <p><strong>Arto:</strong> {tech.arto}</p>
-                                                  <p className="flex items-center gap-2"><strong>Obiettivo:</strong> {tech.Obiettivo || 'N/A'}
-                                                  {tech.waza_note && tech.waza_note.trim() !== '' && (
+                  {kataSteps && tx && transactionsMappingFrom && transactionsMappingTo && (
+                      <div className="w-full">
+                          <TabsContent value="generale">
+                              <div className="mt-6 flex flex-col items-center gap-2">
+                                  {sortedKataSteps.map((step, index) => {
+                                      const transactionId = transactionsMappingFrom[step.id_sequence];
+                                      const transaction = transactionId ? tx[transactionId] : null;
+
+                                      return (
+                                          <React.Fragment key={step.id_sequence}>
+                                              <Card className={cn("w-full max-w-md flex flex-col", step.kiai && "border-primary")}>
+                                                  <CardContent className="p-4 flex flex-col gap-2">
+                                                      <div className="flex justify-between items-start">
+                                                          <div className="flex-grow">
+                                                              <p
+                                                                  className="font-medium cursor-pointer hover:underline"
+                                                                  onClick={() => handlePosizioneClick(step.stand_id)}
+                                                              >
+                                                                  {step.posizione}
+                                                              </p>
+                                                          </div>
+                                                          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                                                              {step.kiai && (
+                                                                  <Popover>
+                                                                      <PopoverTrigger asChild>
+                                                                          <Volume2 className="h-5 w-5 text-destructive cursor-pointer" />
+                                                                      </PopoverTrigger>
+                                                                      <PopoverContent className="w-auto p-2">
+                                                                          <p>Kiai!</p>
+                                                                      </PopoverContent>
+                                                                  </Popover>
+                                                              )}
+                                                              <Popover>
+                                                                  <PopoverTrigger asChild>
+                                                                      <span className="text-2xl cursor-pointer">{getGuardiaSymbol(step.guardia)}</span>
+                                                                  </PopoverTrigger>
+                                                                  <PopoverContent className="w-auto p-2">
+                                                                      <p>{step.guardia}</p>
+                                                                  </PopoverContent>
+                                                              </Popover>
+                                                              <span className="text-2xl font-bold" title={step.facing}>{getFacingArrow(step.facing)}</span>
+                                                          </div>
+                                                      </div>
+
                                                       <Popover>
-                                                        <PopoverTrigger>
-                                                          <Notebook className="h-5 w-5 text-muted-foreground cursor-pointer" />
-                                                        </PopoverTrigger>
-                                                        <PopoverContent>
-                                                          <p>{tech.waza_note}</p>
-                                                        </PopoverContent>
+                                                          <PopoverTrigger asChild>
+                                                              <div className="p-2 -mx-2 rounded-md hover:bg-accent/50 cursor-pointer">
+                                                                  <p className="text-sm text-muted-foreground">Techniques:</p>
+                                                                  <ul className="list-disc pl-5 font-medium">
+                                                                      {step.tecniche.map((tech) => (
+                                                                          <li key={tech.technic_id} className="truncate text-sm cursor-pointer hover:underline" onClick={(e) => { e.stopPropagation(); handleTechnicClick(tech.technic_id) }}>
+                                                                              {tech.Tecnica}
+                                                                          </li>
+                                                                      ))}
+                                                                  </ul>
+                                                              </div>
+                                                          </PopoverTrigger>
+                                                          <PopoverContent side="top" align="start">
+                                                              <div className="space-y-2">
+                                                                  {step.tecniche.map((tech) => (
+                                                                      <div key={tech.technic_id} className="mb-2 last:mb-0 text-sm">
+                                                                          <p><strong>Arto:</strong> {tech.arto}</p>
+                                                                          <p><strong>Tecnica:</strong> {tech.Tecnica}</p>
+                                                                          <p><strong>Obiettivo:</strong> {tech.Obiettivo || 'N/A'}</p>
+                                                                      </div>
+                                                                  ))}
+                                                              </div>
+                                                          </PopoverContent>
                                                       </Popover>
-                                                  )}
-                                                  </p>
-                                              </li>
-                                          ))}
-                                      </ul>
-                                  </div>
-                                  {currentStep.notes && (
-                                    <div className="flex items-start gap-2">
-                                      <Popover>
-                                          <PopoverTrigger>
-                                              <Notebook className="h-5 w-5 text-muted-foreground cursor-pointer" />
-                                          </PopoverTrigger>
-                                          <PopoverContent>
-                                              <p>{currentStep.notes}</p>
-                                          </PopoverContent>
-                                      </Popover>
-                                    </div>
+                                                  </CardContent>
+                                              </Card>
+                                              {index < sortedKataSteps.length - 1 && (
+                                                  <div className="flex items-center justify-center my-2 text-muted-foreground">
+                                                      {transaction && (
+                                                          <div className="flex items-center gap-2">
+                                                              <Popover>
+                                                                  <PopoverTrigger asChild>
+                                                                      <div className="cursor-pointer">{getTempoIcon(transaction.tempo)}</div>
+                                                                  </PopoverTrigger>
+                                                                  <PopoverContent className="w-auto p-2">
+                                                                      <p>{transaction.tempo}</p>
+                                                                  </PopoverContent>
+                                                              </Popover>
+                                                              <p className="text-2xl font-bold" title={transaction.direction}>{getDirectionSymbol(transaction.direction)}</p>
+                                                          </div>
+                                                      )}
+                                                  </div>
+                                              )}
+                                          </React.Fragment>
+                                      )
+                                  })}
+                              </div>
+                          </TabsContent>
+                          <TabsContent value="dettagli">
+                              <>
+                                  {sortedKataSteps.length > 0 && currentStep ? (
+                                      <div className="space-y-4 pt-4">
+                                          <div className="flex items-center justify-center gap-4">
+                                              <div className="flex flex-col items-center justify-center text-sm text-muted-foreground border p-2 rounded-md w-24 h-16">
+                                                  {transactionToCurrent ? (
+                                                      <>
+                                                          <div className="flex items-center gap-1">
+                                                              {getTempoIcon(transactionToCurrent.tempo)}
+                                                              <span>{transactionToCurrent.tempo}</span>
+                                                          </div>
+                                                          <div className="flex items-center gap-1">
+                                                              <span className="text-lg font-bold">{getDirectionSymbol(transactionToCurrent.direction)}</span>
+                                                              {transactionToCurrent.notes && (
+                                                                  <Popover>
+                                                                      <PopoverTrigger>
+                                                                          <Notebook className="h-5 w-5 text-muted-foreground cursor-pointer" />
+                                                                      </PopoverTrigger>
+                                                                      <PopoverContent>
+                                                                          <p>{transactionToCurrent.notes}</p>
+                                                                      </PopoverContent>
+                                                                  </Popover>
+                                                              )}
+                                                          </div>
+                                                      </>
+                                                  ) : <div className="h-full w-full" />}
+                                              </div>
+                                              <Button variant="outline" size="icon" onClick={() => handleStepChange('prev')}>
+                                                  <ChevronLeft className="h-4 w-4" />
+                                              </Button>
+                                              <div className="w-32 text-center font-medium">
+                                                  Step {currentStep.seq_num} of {sortedKataSteps.length}
+                                              </div>
+                                              <Button variant="outline" size="icon" onClick={() => handleStepChange('next')}>
+                                                  <ChevronRight className="h-4 w-4" />
+                                              </Button>
+                                              <div className="flex flex-col items-center justify-center text-sm text-muted-foreground border p-2 rounded-md w-24 h-16">
+                                                  {transactionToNext ? (
+                                                      <>
+                                                          <div className="flex items-center gap-1">
+                                                              {getTempoIcon(transactionToNext.tempo)}
+                                                              <span>{transactionToNext.tempo}</span>
+                                                          </div>
+                                                          <div className="flex items-center gap-1">
+                                                              <span className="text-lg font-bold">{getDirectionSymbol(transactionToNext.direction)}</span>
+                                                              {transactionToNext.notes && (
+                                                                  <Popover>
+                                                                      <PopoverTrigger>
+                                                                          <Notebook className="h-5 w-5 text-muted-foreground cursor-pointer" />
+                                                                      </PopoverTrigger>
+                                                                      <PopoverContent>
+                                                                          <p>{transactionToNext.notes}</p>
+                                                                      </PopoverContent>
+                                                                  </Popover>
+                                                              )}
+                                                          </div>
+                                                      </>
+                                                  ) : <div className="h-full w-full" />}
+                                              </div>
+                                          </div>
+
+                                          <Card className="w-full max-w-lg mx-auto">
+                                              <CardHeader>
+                                                  <CardTitle className="flex justify-between items-center">
+                                                      <span
+                                                          className="cursor-pointer hover:underline"
+                                                          onClick={() => handlePosizioneClick(currentStep.stand_id)}
+                                                      >
+                                                          {currentStep.posizione}
+                                                      </span>
+                                                      <div className="flex items-center gap-2 text-2xl font-bold">
+                                                          {currentStep.kiai && (
+                                                              <Popover>
+                                                                  <PopoverTrigger asChild>
+                                                                      <Volume2 className="h-6 w-6 text-destructive cursor-pointer" />
+                                                                  </PopoverTrigger>
+                                                                  <PopoverContent className="w-auto p-2">
+                                                                      <p>Kiai!</p>
+                                                                  </PopoverContent>
+                                                              </Popover>
+                                                          )}
+                                                          <Popover>
+                                                              <PopoverTrigger asChild>
+                                                                  <span className="font-normal cursor-pointer">{getGuardiaSymbol(currentStep.guardia)}</span>
+                                                              </PopoverTrigger>
+                                                              <PopoverContent className="w-auto p-2">
+                                                                  <p>{currentStep.guardia}</p>
+                                                              </PopoverContent>
+                                                          </Popover>
+                                                          <span title={currentStep.facing}>
+                                                              {getFacingArrow(currentStep.facing)}
+                                                          </span>
+                                                      </div>
+                                                  </CardTitle>
+                                              </CardHeader>
+                                              <CardContent>
+                                                  <div className="flex flex-col gap-6">
+                                                      <div>
+                                                          <h4 className="font-semibold mb-2">Techniques:</h4>
+                                                          <ul className="space-y-2">
+                                                              {currentStep.tecniche.map(tech => (
+                                                                  <li key={tech.technic_id} className="border-l-4 pl-4 py-1 border-primary/50 bg-secondary/50 rounded-r-md">
+                                                                      <p><strong className="cursor-pointer hover:underline" onClick={() => handleTechnicClick(tech.technic_id)}>Tecnica:</strong> {tech.Tecnica}</p>
+                                                                      <p><strong>Arto:</strong> {tech.arto}</p>
+                                                                      <p className="flex items-center gap-2"><strong>Obiettivo:</strong> {tech.Obiettivo || 'N/A'}
+                                                                          {tech.waza_note && tech.waza_note.trim() !== '' && (
+                                                                              <Popover>
+                                                                                  <PopoverTrigger>
+                                                                                      <Notebook className="h-5 w-5 text-muted-foreground cursor-pointer" />
+                                                                                  </PopoverTrigger>
+                                                                                  <PopoverContent>
+                                                                                      <p>{tech.waza_note}</p>
+                                                                                  </PopoverContent>
+                                                                              </Popover>
+                                                                          )}
+                                                                      </p>
+                                                                  </li>
+                                                              ))}
+                                                          </ul>
+                                                      </div>
+                                                      {currentStep.notes && (
+                                                          <div className="flex items-start gap-2">
+                                                              <Popover>
+                                                                  <PopoverTrigger>
+                                                                      <Notebook className="h-5 w-5 text-muted-foreground cursor-pointer" />
+                                                                  </PopoverTrigger>
+                                                                  <PopoverContent>
+                                                                      <p>{currentStep.notes}</p>
+                                                                  </PopoverContent>
+                                                              </Popover>
+                                                          </div>
+                                                      )}
+                                                      <div className="mt-4 flex justify-center">
+                                                          <EmbusenGrid embusen={currentStep.embusen} facing={currentStep.facing} />
+                                                      </div>
+                                                  </div>
+                                              </CardContent>
+                                          </Card>
+                                      </div>
+                                  ) : (
+                                      <div className="flex flex-col items-center justify-center text-center p-10 border-2 border-dashed rounded-lg mt-4">
+                                          <p className="text-muted-foreground">
+                                              Select a kata to see step-by-step details.
+                                          </p>
+                                      </div>
                                   )}
-                                  <div className="mt-4 flex justify-center">
-                                      <EmbusenGrid embusen={currentStep.embusen} facing={currentStep.facing} />
-                                  </div>
-                            </div>
-                          </CardContent>
-                      </Card>
-                    </div>
-                ) : (
-                  <div className="flex flex-col items-center justify-center text-center p-10 border-2 border-dashed rounded-lg mt-4">
-                    <p className="text-muted-foreground">
-                      Select a kata to see step-by-step details.
-                    </p>
-                  </div>
-                )}
-                </>
-              )}
-            </div>
-          )}
-        </CardContent>
+                              </>
+                          </TabsContent>
+                      </div>
+                  )}
+              </CardContent>
+          </Tabs>
       </Card>
 
       <AlertDialog open={isPosizioneInfoDialogOpen} onOpenChange={setIsPosizioneInfoDialogOpen}>
@@ -752,6 +747,8 @@ export default function KataSelection() {
   );
 }
 
+
+    
 
     
 
