@@ -533,7 +533,7 @@ export default function KataSelection() {
                                                   <ChevronLeft className="h-4 w-4" />
                                               </Button>
                                               <div className="w-32 text-center font-medium">
-                                                  Step {currentStep.seq_num} of {sortedKataSteps.length}
+                                                  {currentStep.seq_num}/{sortedKataSteps.length}
                                               </div>
                                               <Button variant="outline" size="icon" onClick={() => handleStepChange('next')}>
                                                   <ChevronRight className="h-4 w-4" />
@@ -747,6 +747,8 @@ export default function KataSelection() {
   );
 }
 
+
+    
 
     
 
