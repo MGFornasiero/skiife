@@ -603,10 +603,13 @@ export default function KataSelection() {
                                                           <h4 className="font-semibold mb-2">Techniques:</h4>
                                                           <ul className="space-y-2">
                                                               {currentStep.tecniche.map(tech => (
-                                                                  <li key={tech.technic_id} className="border-l-4 pl-4 py-1 border-primary/50 bg-secondary/50 rounded-r-md">
-                                                                      <p><strong className="cursor-pointer hover:underline" onClick={() => handleTechnicClick(tech.technic_id)}>Tecnica:</strong> {tech.Tecnica}</p>
-                                                                      <p><strong>Arto:</strong> {tech.arto}</p>
-                                                                      <p className="flex items-center gap-2"><strong>Obiettivo:</strong> {tech.Obiettivo || 'N/A'}
+                                                                  <li key={tech.technic_id} className="border-l-4 pl-4 py-1 border-primary/50 bg-secondary/50 rounded-r-md relative">
+                                                                      <div className="flex justify-between items-start">
+                                                                          <div>
+                                                                              <p><strong className="cursor-pointer hover:underline" onClick={() => handleTechnicClick(tech.technic_id)}>Tecnica:</strong> {tech.Tecnica}</p>
+                                                                              <p><strong>Arto:</strong> {tech.arto}</p>
+                                                                              <p><strong>Obiettivo:</strong> {tech.Obiettivo || 'N/A'}</p>
+                                                                          </div>
                                                                           {tech.waza_note && tech.waza_note.trim() !== '' && (
                                                                               <Popover>
                                                                                   <PopoverTrigger>
@@ -617,13 +620,13 @@ export default function KataSelection() {
                                                                                   </PopoverContent>
                                                                               </Popover>
                                                                           )}
-                                                                      </p>
+                                                                      </div>
                                                                   </li>
                                                               ))}
                                                           </ul>
                                                       </div>
-                                                      {currentStep.notes && (
-                                                          <div className="flex items-start gap-2 justify-end">
+                                                      <div className="flex items-start gap-2 justify-end">
+                                                          {currentStep.notes && (
                                                               <Popover>
                                                                   <PopoverTrigger>
                                                                       <Notebook className="h-5 w-5 text-muted-foreground cursor-pointer" />
@@ -632,8 +635,8 @@ export default function KataSelection() {
                                                                       <p>{currentStep.notes}</p>
                                                                   </PopoverContent>
                                                               </Popover>
-                                                          </div>
-                                                      )}
+                                                          )}
+                                                      </div>
                                                       <div className="mt-4 flex justify-center">
                                                           <EmbusenGrid embusen={currentStep.embusen} facing={currentStep.facing} />
                                                       </div>
@@ -755,6 +758,8 @@ export default function KataSelection() {
     
 
     
+    
+
     
 
     
