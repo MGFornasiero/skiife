@@ -623,7 +623,7 @@ export default function KataSelection() {
                                                           </ul>
                                                       </div>
                                                       {currentStep.notes && (
-                                                          <div className="flex items-start gap-2">
+                                                          <div className="flex items-start gap-2 justify-end">
                                                               <Popover>
                                                                   <PopoverTrigger>
                                                                       <Notebook className="h-5 w-5 text-muted-foreground cursor-pointer" />
@@ -755,6 +755,8 @@ export default function KataSelection() {
     
 
     
+    
+
     
 
     
