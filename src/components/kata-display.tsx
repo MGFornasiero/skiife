@@ -217,6 +217,8 @@ export default function KataDisplay() {
     
     setSelectedSequenzaKey(sequenzaKeys[nextIndex]);
   };
+  
+  const gradeNumbers = Array.from({ length: 9 }, (_, i) => i + 1);
 
   return (
     <div className="space-y-6">
