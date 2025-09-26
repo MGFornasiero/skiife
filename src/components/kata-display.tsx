@@ -125,7 +125,6 @@ export default function KataDisplay() {
   }, [gradeType, grade]);
 
   const sequenzaKeys = kihonData ? Object.keys(kihonData).sort((a, b) => parseInt(a) - parseInt(b)) : [];
-  const gradeNumbers = Array.from({ length: 9 }, (_, i) => i + 1);
   
   const selectedSequenza = selectedSequenzaKey && kihonData ? kihonData[selectedSequenzaKey] : null;
   const selectedPassaggi = selectedSequenza && selectedSequenza.tecniche ? Object.values(selectedSequenza.tecniche).sort((a,b) => a.seq_num - b.seq_num) : [];
