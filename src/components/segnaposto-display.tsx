@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Tecniche, Tecnica, Posizioni, Posizione, Parti, Parte , Obbiettivi, Obiettivo} from "@/lib/data";
+import { TechnicInventory, StandInventory, StrikingPartsInventory, TargetInventory } from "@/lib/data";
 import {
   Table,
   TableBody,
@@ -21,10 +21,10 @@ const sortByName = <T extends { name: string }>(a: T, b: T) => a.name.localeComp
 
 
 export default function SegnapostoDisplay() {
-  const [inventoryTechnics, setInventoryTechnics] = useState<Tecniche | null>(null);
-  const [inventoryStands, setInventoryStands] = useState<Posizioni | null>(null);
-  const [inventoryStrikingParts, setInventoryStrikingParts] = useState<Parti | null>(null);
-  const [inventoryTargets, setInventoryTargets] = useState<Obiettivi | null>(null);
+  const [inventoryTechnics, setInventoryTechnics] = useState<TechnicInventory | null>(null);
+  const [inventoryStands, setInventoryStands] = useState<StandInventory | null>(null);
+  const [inventoryStrikingParts, setInventoryStrikingParts] = useState<StrikingPartsInventory | null>(null);
+  const [inventoryTargets, setInventoryTargets] = useState<TargetInventory | null>(null);
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -48,20 +48,20 @@ export default function SegnapostoDisplay() {
         ]);
         
         if (!technicsRes.ok) throw new Error("Failed to fetch technic inventory");
-        const technicsData = await technicsRes.json();
-        setInventoryTechnics(technicsData.technics_inventory);
+        const technicsData: TechnicInventory = await technicsRes.json();
+        setInventoryTechnics(technicsData);
 
         if (!standsRes.ok) throw new Error("Failed to fetch stand inventory");
-        const standsData = await standsRes.json();
-        setInventoryStands(standsData.stands_inventory);
+        const standsData: StandInventory = await standsRes.json();
+        setInventoryStands(standsData);
 
         if (!strikingPartsRes.ok) throw new Error("Failed to fetch striking parts inventory");
-        const strikingPartsData = await strikingPartsRes.json();
-        setInventoryStrikingParts(strikingPartsData.strikingparts_inventory);
+        const strikingPartsData: StrikingPartsInventory = await strikingPartsRes.json();
+        setInventoryStrikingParts(strikingPartsData);
         
         if (!targetsRes.ok) throw new Error("Failed to fetch targets inventory");
-        const targetsData = await targetsRes.json();
-        setInventoryTargets(targetsData.targets_inventory);
+        const targetsData: TargetInventory = await targetsRes.json();
+        setInventoryTargets(targetsData);
 
       } catch (err: any) {
         setError(err.message || "An unexpected error occurred.");
@@ -74,28 +74,28 @@ export default function SegnapostoDisplay() {
     fetchData();
   }, []);
 
-  const technicsArray = inventoryTechnics ? Object.values(inventoryTechnics).sort(sortByName) : [];
+  const technicsArray = inventoryTechnics ? Object.values(inventoryTechnics.technics_inventory).sort(sortByName) : [];
   const totalTechnicsPages = Math.ceil(technicsArray.length / ITEMS_PER_PAGE);
   const paginatedTechnics = technicsArray.slice(
     (currentTechnicsPage - 1) * ITEMS_PER_PAGE,
     currentTechnicsPage * ITEMS_PER_PAGE
   );
 
-  const standsArray = inventoryStands ? Object.values(inventoryStands).sort(sortByName) : [];
+  const standsArray = inventoryStands ? Object.values(inventoryStands.stands_inventory).sort(sortByName) : [];
   const totalStandsPages = Math.ceil(standsArray.length / ITEMS_PER_PAGE);
   const paginatedStands = standsArray.slice(
     (currentStandsPage - 1) * ITEMS_PER_PAGE,
     currentStandsPage * ITEMS_PER_PAGE
   );
 
-  const strikingPartsArray = inventoryStrikingParts ? Object.values(inventoryStrikingParts).sort(sortByName) : [];
+  const strikingPartsArray = inventoryStrikingParts ? Object.values(inventoryStrikingParts.strikingparts_inventory).sort(sortByName) : [];
   const totalStrikingPartsPages = Math.ceil(strikingPartsArray.length / ITEMS_PER_PAGE);
   const paginatedStrikingParts = strikingPartsArray.slice(
     (currentStrikingPartsPage - 1) * ITEMS_PER_PAGE,
     currentStrikingPartsPage * ITEMS_PER_PAGE
   );
 
-  const targetsArray = inventoryTargets ? Object.values(inventoryTargets).sort(sortByName) : [];
+  const targetsArray = inventoryTargets ? Object.values(inventoryTargets.targets_inventory).sort(sortByName) : [];
   const totalTargetsPages = Math.ceil(targetsArray.length / ITEMS_PER_PAGE);
   const paginatedTargets = targetsArray.slice(
     (currentTargetsPage - 1) * ITEMS_PER_PAGE,

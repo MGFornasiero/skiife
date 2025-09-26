@@ -2,7 +2,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { type Sequenze, type Posizione, type Tecnica } from "@/lib/data";
+import { type KihonDetails, type KihonStep, type KihonTransaction, type StandInfo, type TechnicInfo } from "@/lib/data";
 import {
   Select,
   SelectContent,
@@ -59,24 +59,23 @@ export default function KataDisplay() {
   const [gradeType, setGradeType] = useState<"dan" | "kyu">("kyu");
   const [grade, setGrade] = useState<number | null>(null);
   const [gradeId, setGradeId] = useState<string | null>(null);
-  const [sequenzeData, setSequenzeData] = useState<Sequenze | null>(null);
+  const [kihonData, setKihonData] = useState<Record<string, KihonDetails> | null>(null);
   const [loading, setLoading] = useState(false);
   const [showGradeSelection, setShowGradeSelection] = useState(true);
   const { toast } = useToast();
   
   const [isPosizioneInfoDialogOpen, setIsPosizioneInfoDialogOpen] = useState(false);
-  const [selectedPosizioneInfo, setSelectedPosizioneInfo] = useState<Posizione | null>(null);
+  const [selectedPosizioneInfo, setSelectedPosizioneInfo] = useState<StandInfo | null>(null);
   const [isPosizioneInfoLoading, setIsPosizioneInfoLoading] = useState(false);
 
   const [isTechnicInfoDialogOpen, setIsTechnicInfoDialogOpen] = useState(false);
-  const [selectedTechnicInfo, setSelectedTechnicInfo] = useState<Tecnica | null>(null);
+  const [selectedTechnicInfo, setSelectedTechnicInfo] = useState<TechnicInfo | null>(null);
   const [isTechnicInfoLoading, setIsTechnicInfoLoading] = useState(false);
 
 
   useEffect(() => {
-    // Reset state when grade or type changes
     setGradeId(null);
-    setSequenzeData(null);
+    setKihonData(null);
     setSelectedSequenzaKey(null);
 
     if (grade === null) {
@@ -84,7 +83,6 @@ export default function KataDisplay() {
     }
 
     setLoading(true);
-    let gradeRes: Response;
     fetch(`/api/grade_id/${gradeType}/${grade}`)
       .then((res) => {
         if (!res.ok) {
@@ -98,42 +96,40 @@ export default function KataDisplay() {
         return fetch(`/api/kihons/${newGradeId}`);
       })
       .then(async (res) => {
-        gradeRes = res;
         if (!res.ok) {
             const errorBody = await res.text();
             throw new Error(`Network response was not ok for kihons. Status: ${res.status}. Body: ${errorBody}`);
         }
         return res.json();
       })
-      .then((kihonsData) => {
-        if (kihonsData && kihonsData.kihons) {
-          const keys = Object.keys(kihonsData.kihons);
-          setSequenzeData(kihonsData.kihons);
+      .then((data) => {
+        if (data) {
+          const keys = Object.keys(data);
+          setKihonData(data);
           if (keys.length > 0) {
             const sortedKeys = keys.sort((a, b) => parseInt(a) - parseInt(b));
             setSelectedSequenzaKey(sortedKeys[0]);
           }
         } else {
-          setSequenzeData(null);
+          setKihonData(null);
         }
       })
       .catch((error) => {
         console.error("Error fetching data:", error);
         setGradeId(null);
-        setSequenzeData(null);
+        setKihonData(null);
       })
       .finally(() => {
         setLoading(false);
       });
   }, [gradeType, grade]);
 
-  const sequenzaKeys = sequenzeData ? Object.keys(sequenzeData).sort((a, b) => parseInt(a) - parseInt(b)) : [];
+  const sequenzaKeys = kihonData ? Object.keys(kihonData).sort((a, b) => parseInt(a) - parseInt(b)) : [];
   const gradeNumbers = Array.from({ length: 9 }, (_, i) => i + 1);
-  const selectedPassaggi =
-    selectedSequenzaKey && sequenzeData
-      ? sequenzeData[Number(selectedSequenzaKey)]
-      : undefined;
-
+  
+  const selectedSequenza = selectedSequenzaKey && kihonData ? kihonData[selectedSequenzaKey] : null;
+  const selectedPassaggi = selectedSequenza ? Object.values(selectedSequenza.tecniche).sort((a,b) => a.seq_num - b.seq_num) : [];
+  
   const handleGradeChange = (value: string) => {
     setGrade(Number(value));
     setSelectedSequenzaKey(null);
@@ -276,7 +272,7 @@ export default function KataDisplay() {
         <div className="flex flex-col items-center justify-center text-center p-10 border-2 border-dashed rounded-lg">
           <p className="text-muted-foreground">Loading data...</p>
         </div>
-      ) : gradeId && sequenzeData ? (
+      ) : gradeId && kihonData ? (
         <>
           <div className="flex items-center gap-4">
              <div className="flex items-center gap-2">
@@ -292,7 +288,7 @@ export default function KataDisplay() {
             </div>
           </div>
 
-          {selectedPassaggi ? (
+          {selectedPassaggi.length > 0 && selectedSequenza ? (
             <div className="overflow-hidden rounded-lg border">
                 <Table>
                   <TableHeader>
@@ -301,47 +297,49 @@ export default function KataDisplay() {
                       <TableHead>Mov</TableHead>
                       <TableHead>Tecnica</TableHead>
                       <TableHead>Posizione</TableHead>
-                      <TableHead>Obiettivo</TableHead>
+                      <TableHead>Altezza</TableHead>
                       <TableHead>Note</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {Object.keys(selectedPassaggi).map((passaggioKey) => {
-                      const passaggio = selectedPassaggi[Number(passaggioKey)];
+                    {selectedPassaggi.map((passaggio) => {
+                      const transactionId = selectedSequenza.transactions_mapping_from[passaggio.id_sequence];
+                      const transaction = transactionId ? selectedSequenza.transactions[transactionId] : null;
+
                       return (
-                        <TableRow key={passaggioKey}>
-                          <TableCell className="font-medium">{passaggioKey}</TableCell>
+                        <TableRow key={passaggio.id_sequence}>
+                          <TableCell className="font-medium">{passaggio.seq_num}</TableCell>
                           <TableCell>
                             <Popover>
                               <PopoverTrigger>
-                                  <span className="text-xl cursor-pointer">{getMovementIcon(passaggio.movement)}</span>
+                                  <span className="text-xl cursor-pointer">{getMovementIcon(transaction?.movement || null)}</span>
                               </PopoverTrigger>
                               <PopoverContent className="w-auto p-2">
-                                <p>{passaggio.movement}</p>
+                                <p>{transaction?.movement}</p>
                               </PopoverContent>
                             </Popover>
                           </TableCell>
                           <TableCell 
                             className="cursor-pointer hover:underline"
-                            onClick={() => handleTechnicClick(passaggio.technic_id)}
+                            onClick={() => handleTechnicClick(passaggio.techinc)}
                           >
-                            {passaggio.tecnica}
+                            {passaggio.technic_name}
                           </TableCell>
                           <TableCell 
                             className="cursor-pointer hover:underline"
-                            onClick={() => handleStandClick(passaggio.stand_id)}
+                            onClick={() => handleStandClick(passaggio.stand)}
                           >
-                            {passaggio.Stand}
+                            {passaggio.stand_name}
                           </TableCell>
-                          <TableCell>{passaggio.Target}</TableCell>
+                          <TableCell>{passaggio.target_hgt}</TableCell>
                           <TableCell>
-                            {passaggio.Note && passaggio.Note.trim() !== '' && (
+                            {passaggio.notes && passaggio.notes.trim() !== '' && (
                                 <Popover>
                                     <PopoverTrigger>
                                         <Notebook className="h-5 w-5 text-muted-foreground cursor-pointer" />
                                     </PopoverTrigger>
                                     <PopoverContent>
-                                        <p>{passaggio.Note}</p>
+                                        <p>{passaggio.notes}</p>
                                     </PopoverContent>
                                 </Popover>
                             )}

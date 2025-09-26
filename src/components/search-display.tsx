@@ -7,25 +7,12 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Search } from "lucide-react";
-import { type Rilevanze, type Obiettivi, type Tecniche, type Posizioni, type Parti } from "@/lib/data";
-
-interface SearchResult {
-  ts: string;
-  max_relevance: number;
-  Targets_relevance: Rilevanze;
-  Technics_relevance: Rilevanze;
-  Stands_relevance: Rilevanze;
-  Striking_parts_relevance: Rilevanze;
-  Targets: any[];
-  Technics: any[];
-  Stands: any[];
-  Striking_parts: any[];
-}
+import { type FinderResult } from "@/lib/data";
 
 
 export default function SearchDisplay() {
   const [searchText, setSearchText] = useState("");
-  const [searched, setSearched] = useState<SearchResult | null>(null);
+  const [searched, setSearched] = useState<FinderResult | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -44,7 +31,7 @@ export default function SearchDisplay() {
         throw new Error(`API error: ${errorText}`);
       }
 
-      const data: SearchResult = await response.json();
+      const data: FinderResult = await response.json();
       setSearched(data);
 
     } catch (err: any) {
@@ -55,11 +42,16 @@ export default function SearchDisplay() {
     }
   };
 
+  const stands = searched?.Stands ? Object.values(searched.Stands) : [];
+  const technics = searched?.Technics ? Object.values(searched.Technics) : [];
+  const targets = searched?.Targets ? Object.values(searched.Targets) : [];
+  const strikingParts = searched?.Striking_parts ? Object.values(searched.Striking_parts) : [];
+
   const renderStands = () => {
-    if (!searched?.Stands?.length) return null;
+    if (stands.length === 0) return null;
     return (
       <AccordionItem value="stands">
-        <AccordionTrigger>Stands ({searched.Stands.length})</AccordionTrigger>
+        <AccordionTrigger>Stands ({stands.length})</AccordionTrigger>
         <AccordionContent>
           <Table>
             <TableHeader>
@@ -69,10 +61,10 @@ export default function SearchDisplay() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {searched.Stands.map((stand) => (
-                <TableRow key={stand[2]}>
-                  <TableCell>{stand[3]}</TableCell>
-                  <TableCell>{stand[4]}</TableCell>
+              {stands.map((stand) => (
+                <TableRow key={stand.id_stand}>
+                  <TableCell>{stand.name}</TableCell>
+                  <TableCell>{stand.description}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
@@ -83,10 +75,10 @@ export default function SearchDisplay() {
   };
   
   const renderTechnics = () => {
-    if (!searched?.Technics?.length) return null;
+    if (technics.length === 0) return null;
     return (
       <AccordionItem value="technics">
-        <AccordionTrigger>Techniques ({searched.Technics.length})</AccordionTrigger>
+        <AccordionTrigger>Techniques ({technics.length})</AccordionTrigger>
         <AccordionContent>
           <Table>
             <TableHeader>
@@ -96,10 +88,10 @@ export default function SearchDisplay() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {searched.Technics.map((tech) => (
-                <TableRow key={tech[2]}>
-                  <TableCell>{tech[4]}</TableCell>
-                  <TableCell>{tech[5]}</TableCell>
+              {technics.map((tech) => (
+                <TableRow key={tech.id_technic}>
+                  <TableCell>{tech.name}</TableCell>
+                  <TableCell>{tech.description}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
@@ -110,10 +102,10 @@ export default function SearchDisplay() {
   };
 
   const renderTargets = () => {
-    if (!searched?.Targets?.length) return null;
+    if (targets.length === 0) return null;
     return (
       <AccordionItem value="targets">
-        <AccordionTrigger>Targets ({searched.Targets.length})</AccordionTrigger>
+        <AccordionTrigger>Targets ({targets.length})</AccordionTrigger>
         <AccordionContent>
           <Table>
             <TableHeader>
@@ -123,10 +115,10 @@ export default function SearchDisplay() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {searched.Targets.map((target) => (
-                <TableRow key={target[2]}>
-                  <TableCell>{target[3]}</TableCell>
-                  <TableCell>{target[4]}</TableCell>
+              {targets.map((target) => (
+                <TableRow key={target.id_target}>
+                  <TableCell>{target.name}</TableCell>
+                  <TableCell>{target.description}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
@@ -137,10 +129,10 @@ export default function SearchDisplay() {
   };
 
   const renderStrikingParts = () => {
-    if (!searched?.Striking_parts?.length) return null;
+    if (strikingParts.length === 0) return null;
     return (
       <AccordionItem value="striking_parts">
-        <AccordionTrigger>Striking Parts ({searched.Striking_parts.length})</AccordionTrigger>
+        <AccordionTrigger>Striking Parts ({strikingParts.length})</AccordionTrigger>
         <AccordionContent>
           <Table>
             <TableHeader>
@@ -150,10 +142,10 @@ export default function SearchDisplay() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {searched.Striking_parts.map((part) => (
-                <TableRow key={part[2]}>
-                  <TableCell>{part[3]}</TableCell>
-                  <TableCell>{part[5]}</TableCell>
+              {strikingParts.map((part) => (
+                <TableRow key={part.id_part}>
+                  <TableCell>{part.name}</TableCell>
+                  <TableCell>{part.description}</TableCell>
                 </TableRow>
               ))}
             </TableBody>

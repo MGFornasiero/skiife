@@ -2,7 +2,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { type KataInventory, type KataSteps, type Transactions, type TransactionsMapping, type KataStep, type Posizione, type Tecnica, Transaction } from "@/lib/data";
+import { type KataInventory, type KataDetails, type KataStep, type KataTransaction, type StandInfo, type TechnicInfo, type KataTechnic } from "@/lib/data";
 import {
   Select,
   SelectContent,
@@ -27,15 +27,6 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-
-interface KataData {
-  steps: KataSteps;
-  transactions: Transactions;
-  transactions_mapping_from: TransactionsMapping;
-  transactions_mapping_to: TransactionsMapping;
-  notes: string | null;
-  Gamba: string | null;
-}
 
 const facingArrowMap: { [key: string]: string } = {
   'N': '↑',  // Upwards Arrow
@@ -67,7 +58,7 @@ const gambaSymbolMap: { [key in string]: string } = {
   'frontal': '◒',
 };
 
-const tempoIconMap: { [key in Transaction['tempo']]: React.ElementType } = {
+const tempoIconMap: { [key: string]: React.ElementType } = {
     'Legato': LinkIcon,
     'Fast': Rabbit,
     'Normal': PersonStanding,
@@ -90,7 +81,7 @@ const getGuardiaSymbol = (guardia: string | null | undefined) => {
   return guardiaSymbolMap[guardia] || guardia;
 }
 
-const getTempoIcon = (tempo: Transaction['tempo']) => {
+const getTempoIcon = (tempo: KataTransaction['tempo']) => {
     const Icon = tempoIconMap[tempo] || Hourglass;
     return <Icon className="h-4 w-4" />;
 };
@@ -180,20 +171,16 @@ export default function KataSelection() {
   const [selectedKataName, setSelectedKataName] = useState<string | null>(null);
   const [kataId, setKataId] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
-  const [kataSteps, setKataSteps] = useState<KataSteps | null>(null);
-  const [kataNotes, setKataNotes] = useState<string | null>(null);
-  const [kataGamba, setKataGamba] = useState<string | null>(null);
-  const [tx, setTx] = useState<Transactions | null>(null);
-  const [transactionsMappingFrom, setTransactionsMappingFrom] = useState<TransactionsMapping | null>(null);
-  const [transactionsMappingTo, setTransactionsMappingTo] = useState<TransactionsMapping | null>(null);
+  const [kataDetails, setKataDetails] = useState<KataDetails | null>(null);
+
   const [selectedStepIndex, setSelectedStepIndex] = useState(0);
 
   const [isPosizioneInfoDialogOpen, setIsPosizioneInfoDialogOpen] = useState(false);
-  const [selectedPosizioneInfo, setSelectedPosizioneInfo] = useState<Posizione | null>(null);
+  const [selectedPosizioneInfo, setSelectedPosizioneInfo] = useState<StandInfo | null>(null);
   const [isPosizioneInfoLoading, setIsPosizioneInfoLoading] = useState(false);
 
   const [isTechnicInfoDialogOpen, setIsTechnicInfoDialogOpen] = useState(false);
-  const [selectedTechnicInfo, setSelectedTechnicInfo] = useState<Tecnica | null>(null);
+  const [selectedTechnicInfo, setSelectedTechnicInfo] = useState<TechnicInfo | null>(null);
   const [isTechnicInfoLoading, setIsTechnicInfoLoading] = useState(false);
 
   const [viewMode, setViewMode] = useState<"generale" | "dettagli">("generale");
@@ -203,9 +190,9 @@ export default function KataSelection() {
   useEffect(() => {
     fetch('/api/kata_inventory')
       .then(res => res.json())
-      .then(data => {
+      .then((data: KataInventory) => {
         if (data && data.kata) {
-            setKataInventory(data.kata);
+            setKataInventory(data);
         }
       })
       .catch(console.error);
@@ -213,23 +200,13 @@ export default function KataSelection() {
 
   useEffect(() => {
     if (kataId === null) {
-      setKataSteps(null);
-      setTx(null);
-      setTransactionsMappingFrom(null);
-      setTransactionsMappingTo(null);
-      setKataNotes(null);
-      setKataGamba(null);
+      setKataDetails(null);
       setSelectedStepIndex(0);
       return;
     }
 
     setLoading(true);
-    setKataSteps(null);
-    setTx(null);
-    setTransactionsMappingFrom(null);
-    setTransactionsMappingTo(null);
-    setKataNotes(null);
-    setKataGamba(null);
+    setKataDetails(null);
     setSelectedStepIndex(0);
 
     fetch(`/api/kata/${kataId}`)
@@ -239,13 +216,8 @@ export default function KataSelection() {
         }
         return res.json();
       })
-      .then((data: KataData) => {
-        setKataSteps(data.steps);
-        setTx(data.transactions);
-        setTransactionsMappingFrom(data.transactions_mapping_from);
-        setTransactionsMappingTo(data.transactions_mapping_to);
-        setKataNotes(data.notes);
-        setKataGamba(data.Gamba);
+      .then((data: KataDetails) => {
+        setKataDetails(data);
       })
       .catch(error => {
         console.error("Error fetching kata data:", error);
@@ -322,28 +294,28 @@ export default function KataSelection() {
   const handleKataChange = (value: string) => {
       if (kataInventory) {
           setSelectedKataName(value);
-          const selectedKataId = kataInventory[value];
+          const selectedKataId = kataInventory.kata[value];
           setKataId(selectedKataId);
       }
   };
   
   const sortedKataNames = kataInventory
-    ? Object.keys(kataInventory).sort((a, b) => kataInventory[a] - kataInventory[b])
+    ? Object.keys(kataInventory.kata).sort((a, b) => kataInventory.kata[a] - kataInventory.kata[b])
     : [];
 
-  const sortedKataSteps = kataSteps 
-    ? Object.values(kataSteps).sort((a, b) => a.seq_num - b.seq_num) 
+  const sortedKataSteps = kataDetails 
+    ? Object.values(kataDetails.steps).sort((a, b) => a.seq_num - b.seq_num) 
     : [];
     
   const currentStep: KataStep | undefined = sortedKataSteps[selectedStepIndex];
   
-  const transactionToNextId = currentStep && transactionsMappingFrom ? transactionsMappingFrom[currentStep.id_sequence] : null;
-  const transactionToNext = transactionToNextId && tx ? tx[transactionToNextId] : null;
+  const transactionToNextId = currentStep && kataDetails ? kataDetails.transactions_mapping_from[currentStep.id_sequence] : null;
+  const transactionToNext = transactionToNextId && kataDetails ? kataDetails.transactions[transactionToNextId] : null;
 
-  const transactionToCurrentId = currentStep && transactionsMappingTo ? transactionsMappingTo[currentStep.id_sequence] : null;
-  const transactionToCurrent = transactionToCurrentId && tx ? tx[transactionToCurrentId] : null;
+  const transactionToCurrentId = currentStep && kataDetails ? kataDetails.transactions_mapping_to[currentStep.id_sequence] : null;
+  const transactionToCurrent = transactionToCurrentId && kataDetails ? kataDetails.transactions[transactionToCurrentId] : null;
 
-  const gambaSymbol = kataGamba ? gambaSymbolMap[kataGamba] : null;
+  const gambaSymbol = kataDetails?.Gamba ? gambaSymbolMap[kataDetails.Gamba] : null;
 
   const handleStepChange = (direction: 'next' | 'prev') => {
     if (!sortedKataSteps.length) return;
@@ -384,7 +356,7 @@ export default function KataSelection() {
                   <div className="flex items-center justify-between gap-4">
                       <TabsList>
                           <TabsTrigger value="generale">Generale</TabsTrigger>
-                          <TabsTrigger value="dettagli">Dettagli</TabsTrigger>
+                          <TabsTrigger value="dettagli" disabled={!kataDetails}>Dettagli</TabsTrigger>
                       </TabsList>
                       <div className="flex-grow">
                           <CardTitle className="flex items-center justify-end gap-2">
@@ -394,7 +366,7 @@ export default function KataSelection() {
                                           <span className="text-2xl cursor-pointer">{gambaSymbol}</span>
                                       </PopoverTrigger>
                                       <PopoverContent className="w-auto p-2">
-                                          <p>Chiusura: {kataGamba}</p>
+                                          <p>Chiusura: {kataDetails?.Gamba}</p>
                                       </PopoverContent>
                                   </Popover>
                               )}
@@ -402,19 +374,19 @@ export default function KataSelection() {
                           </CardTitle>
                       </div>
                   </div>
-                  {kataNotes && <CardDescription className="mt-2 text-left">{kataNotes}</CardDescription>}
-                  {!selectedKataName && !kataNotes && <CardDescription className="mt-2 text-right">Select a kata to see its details.</CardDescription>}
+                  {kataDetails?.notes && <CardDescription className="mt-2 text-left">{kataDetails.notes}</CardDescription>}
+                  {!selectedKataName && !kataDetails?.notes && <CardDescription className="mt-2 text-right">Select a kata to see its details.</CardDescription>}
               </CardHeader>
               <CardContent>
                   {loading && <p className="text-muted-foreground pt-4">Loading kata details...</p>}
 
-                  {kataSteps && tx && transactionsMappingFrom && transactionsMappingTo && (
+                  {kataDetails && (
                       <div className="w-full">
                           <TabsContent value="generale">
                               <div className="mt-6 flex flex-col items-center gap-2">
                                   {sortedKataSteps.map((step, index) => {
-                                      const transactionId = transactionsMappingFrom[step.id_sequence];
-                                      const transaction = transactionId ? tx[transactionId] : null;
+                                      const transactionId = kataDetails.transactions_mapping_from[step.id_sequence];
+                                      const transaction = transactionId ? kataDetails.transactions[transactionId] : null;
 
                                       return (
                                           <React.Fragment key={step.id_sequence}>
@@ -492,6 +464,16 @@ export default function KataSelection() {
                                                                   </PopoverContent>
                                                               </Popover>
                                                               <p className="text-2xl font-bold" title={transaction.direction}>{getDirectionSymbol(transaction.direction)}</p>
+                                                              {transaction.notes && (
+                                                                  <Popover>
+                                                                      <PopoverTrigger>
+                                                                          <Notebook className="h-5 w-5 text-muted-foreground cursor-pointer" />
+                                                                      </PopoverTrigger>
+                                                                      <PopoverContent>
+                                                                          <p>{transaction.notes}</p>
+                                                                      </PopoverContent>
+                                                                  </Popover>
+                                                              )}
                                                           </div>
                                                       )}
                                                   </div>
@@ -600,26 +582,28 @@ export default function KataSelection() {
                                               <CardContent>
                                                   <div className="flex flex-col gap-6">
                                                       <div>
-                                                          <h4 className="font-semibold mb-2">Techniques:</h4>
+                                                          
                                                           <ul className="space-y-2">
-                                                              {currentStep.tecniche.map(tech => (
-                                                                  <li key={tech.technic_id} className="border-l-4 pl-4 py-1 border-primary/50 bg-secondary/50 rounded-r-md relative">
+                                                              {currentStep.tecniche.map((tech, index) => (
+                                                                  <li key={index} className="border-l-4 pl-4 py-1 border-primary/50 bg-secondary/50 rounded-r-md relative">
                                                                       <div className="flex justify-between items-start">
                                                                           <div>
                                                                               <p><strong className="cursor-pointer hover:underline" onClick={() => handleTechnicClick(tech.technic_id)}>Tecnica:</strong> {tech.Tecnica}</p>
                                                                               <p><strong>Arto:</strong> {tech.arto}</p>
                                                                               <p><strong>Obiettivo:</strong> {tech.Obiettivo || 'N/A'}</p>
                                                                           </div>
-                                                                          {tech.waza_note && tech.waza_note.trim() !== '' && (
-                                                                              <Popover>
-                                                                                  <PopoverTrigger>
-                                                                                      <Notebook className="h-5 w-5 text-muted-foreground cursor-pointer" />
-                                                                                  </PopoverTrigger>
-                                                                                  <PopoverContent>
-                                                                                      <p>{tech.waza_note}</p>
-                                                                                  </PopoverContent>
-                                                                              </Popover>
-                                                                          )}
+                                                                          <div className="flex items-center">
+                                                                            {tech.waza_note && tech.waza_note.trim() !== '' && (
+                                                                                <Popover>
+                                                                                    <PopoverTrigger>
+                                                                                        <Notebook className="h-5 w-5 text-muted-foreground cursor-pointer" />
+                                                                                    </PopoverTrigger>
+                                                                                    <PopoverContent>
+                                                                                        <p>{tech.waza_note}</p>
+                                                                                    </PopoverContent>
+                                                                                </Popover>
+                                                                            )}
+                                                                          </div>
                                                                       </div>
                                                                   </li>
                                                               ))}
@@ -638,7 +622,7 @@ export default function KataSelection() {
                                                           )}
                                                       </div>
                                                       <div className="mt-4 flex justify-center">
-                                                          <EmbusenGrid embusen={currentStep.embusen} facing={currentStep.facing} />
+                                                        {currentStep.embusen && <EmbusenGrid embusen={currentStep.embusen} facing={currentStep.facing} />}
                                                       </div>
                                                   </div>
                                               </CardContent>
@@ -749,19 +733,3 @@ export default function KataSelection() {
     </>
   );
 }
-
-
-    
-
-    
-
-    
-
-    
-    
-
-    
-
-    
-
-    
