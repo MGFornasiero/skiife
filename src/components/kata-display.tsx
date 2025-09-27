@@ -2,7 +2,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { type KihonDetails, type KihonStep, type KihonTransaction, type StandInfo, type TechnicInfo } from "@/lib/data";
+import { type StandInfo, type TechnicInfo, KihonsApiResponse } from "@/lib/data";
 import {
   Select,
   SelectContent,
@@ -59,7 +59,7 @@ export default function KataDisplay() {
   const [gradeType, setGradeType] = useState<"dan" | "kyu">("kyu");
   const [grade, setGrade] = useState<number | null>(null);
   const [gradeId, setGradeId] = useState<string | null>(null);
-  const [kihonData, setKihonData] = useState<Record<string, KihonDetails> | null>(null);
+  const [kihonData, setKihonData] = useState<KihonsApiResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [showGradeSelection, setShowGradeSelection] = useState(true);
   const { toast } = useToast();
@@ -102,10 +102,10 @@ export default function KataDisplay() {
         }
         return res.json();
       })
-      .then((data) => {
-        if (data) {
-          const keys = Object.keys(data);
+      .then((data: KihonsApiResponse) => {
+        if (data && data.kihons) {
           setKihonData(data);
+          const keys = Object.keys(data.kihons);
           if (keys.length > 0) {
             const sortedKeys = keys.sort((a, b) => parseInt(a) - parseInt(b));
             setSelectedSequenzaKey(sortedKeys[0]);
@@ -124,10 +124,10 @@ export default function KataDisplay() {
       });
   }, [gradeType, grade]);
 
-  const sequenzaKeys = kihonData ? Object.keys(kihonData).sort((a, b) => parseInt(a) - parseInt(b)) : [];
+  const sequenzaKeys = kihonData?.kihons ? Object.keys(kihonData.kihons).sort((a, b) => parseInt(a) - parseInt(b)) : [];
   
-  const selectedSequenza = selectedSequenzaKey && kihonData ? kihonData[selectedSequenzaKey] : null;
-  const selectedPassaggi = selectedSequenza && selectedSequenza.tecniche ? Object.values(selectedSequenza.tecniche).sort((a,b) => a.seq_num - b.seq_num) : [];
+  const selectedSequenza = selectedSequenzaKey && kihonData?.kihons ? kihonData.kihons[selectedSequenzaKey] : null;
+  const selectedPassaggi = selectedSequenza ? Object.values(selectedSequenza).sort((a, b) => parseInt(Object.keys(a)[0]) - parseInt(Object.keys(b)[0])) : [];
   
   const handleGradeChange = (value: string) => {
     setGrade(Number(value));
@@ -303,44 +303,42 @@ export default function KataDisplay() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {selectedPassaggi.map((passaggio) => {
-                      const transactionId = selectedSequenza.transactions_mapping_from[passaggio.id_sequence];
-                      const transaction = transactionId ? selectedSequenza.transactions[transactionId] : null;
+                    {Object.entries(selectedSequenza).map(([passaggioNum, passaggio], index) => {
 
                       return (
-                        <TableRow key={passaggio.id_sequence}>
-                          <TableCell className="font-medium">{passaggio.seq_num}</TableCell>
+                        <TableRow key={index}>
+                          <TableCell className="font-medium">{passaggioNum}</TableCell>
                           <TableCell>
                             <Popover>
                               <PopoverTrigger>
-                                  <span className="text-xl cursor-pointer">{getMovementIcon(transaction?.movement || null)}</span>
+                                  <span className="text-xl cursor-pointer">{getMovementIcon(passaggio.movement || null)}</span>
                               </PopoverTrigger>
                               <PopoverContent className="w-auto p-2">
-                                <p>{transaction?.movement}</p>
+                                <p>{passaggio.movement}</p>
                               </PopoverContent>
                             </Popover>
                           </TableCell>
                           <TableCell 
                             className="cursor-pointer hover:underline"
-                            onClick={() => handleTechnicClick(passaggio.techinc)}
+                            onClick={() => handleTechnicClick(passaggio.technic_id)}
                           >
-                            {passaggio.technic_name}
+                            {passaggio.tecnica}
                           </TableCell>
                           <TableCell 
                             className="cursor-pointer hover:underline"
-                            onClick={() => handleStandClick(passaggio.stand)}
+                            onClick={() => handleStandClick(passaggio.stand_id)}
                           >
-                            {passaggio.stand_name}
+                            {passaggio.Stand}
                           </TableCell>
-                          <TableCell>{passaggio.target_hgt}</TableCell>
+                          <TableCell>{passaggio.Target}</TableCell>
                           <TableCell>
-                            {passaggio.notes && passaggio.notes.trim() !== '' && (
+                            {passaggio.Note && passaggio.Note.trim() !== '' && (
                                 <Popover>
                                     <PopoverTrigger>
                                         <Notebook className="h-5 w-5 text-muted-foreground cursor-pointer" />
                                     </PopoverTrigger>
                                     <PopoverContent>
-                                        <p>{passaggio.notes}</p>
+                                        <p>{passaggio.Note}</p>
                                     </PopoverContent>
                                 </Popover>
                             )}
@@ -457,8 +455,3 @@ export default function KataDisplay() {
     </div>
   );
 }
-
-    
-    
-
-    

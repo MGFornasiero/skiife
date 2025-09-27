@@ -194,6 +194,29 @@ export interface FinderResult {
   Striking_parts: Record<string, StrikingPartInfo>;
 }
 
+export interface KihonStepDetails {
+  movement: string | null;
+  technic_id: number;
+  gyaku: boolean;
+  tecnica: string;
+  stand_id: number;
+  Stand: string;
+  Target: string;
+  Note: string | null;
+}
+
+export interface KihonSequences {
+  [sequenzaNumber: string]: {
+    [passaggioNumber: string]: KihonStepDetails;
+  };
+}
+
+export interface KihonsApiResponse {
+  grade: string;
+  grade_id: number;
+  kihons: KihonSequences;
+}
+
 // Old types for reference, to be removed or updated
 export type Passaggio = {
   movement: string;
