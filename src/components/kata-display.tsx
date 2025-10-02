@@ -2,7 +2,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { type StandInfo, type TechnicInfo, KihonsApiResponse } from "@/lib/data";
+import { type StandInfo, type TechnicInfo, KihonsApiResponse, KihonSequences, KihonStepDetails } from "@/lib/data";
 import {
   Select,
   SelectContent,
@@ -127,7 +127,10 @@ export default function KataDisplay() {
   const sequenzaKeys = kihonData?.kihons ? Object.keys(kihonData.kihons).sort((a, b) => parseInt(a) - parseInt(b)) : [];
   
   const selectedSequenza = selectedSequenzaKey && kihonData?.kihons ? kihonData.kihons[selectedSequenzaKey] : null;
-  const selectedPassaggi = selectedSequenza ? Object.values(selectedSequenza).sort((a, b) => parseInt(Object.keys(a)[0]) - parseInt(Object.keys(b)[0])) : [];
+  
+  const selectedPassaggi = selectedSequenza 
+    ? Object.entries(selectedSequenza).sort(([a], [b]) => parseInt(a) - parseInt(b))
+    : [];
   
   const handleGradeChange = (value: string) => {
     setGrade(Number(value));
@@ -289,7 +292,7 @@ export default function KataDisplay() {
             </div>
           </div>
 
-          {selectedPassaggi.length > 0 && selectedSequenza ? (
+          {selectedPassaggi.length > 0 ? (
             <div className="overflow-hidden rounded-lg border">
                 <Table>
                   <TableHeader>
@@ -303,10 +306,9 @@ export default function KataDisplay() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {Object.entries(selectedSequenza).map(([passaggioNum, passaggio], index) => {
-
+                    {selectedPassaggi.map(([passaggioNum, passaggio]) => {
                       return (
-                        <TableRow key={index}>
+                        <TableRow key={passaggioNum}>
                           <TableCell className="font-medium">{passaggioNum}</TableCell>
                           <TableCell>
                             <Popover>

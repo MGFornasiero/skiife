@@ -104,6 +104,12 @@ export type KataTechnic = {
   waza_note:string | null;
 };
 
+export interface DetailedNote {
+  arto: string;
+  description: string | null;
+  explatation: string | null;
+  note: string | null;
+}
 
 export interface KataStep {
   id_sequence: number;
@@ -117,8 +123,8 @@ export interface KataStep {
   embusen: string;
   kiai: boolean;
   notes: string | null;
-  remarks: any; 
-  resources: any; 
+  remarks: DetailedNote[] | null;
+  resources: Record<string, any> | null;
   resource_url: string | null;
 }
 
@@ -126,9 +132,17 @@ export interface KataTransaction {
   tempo: 'Legato' | 'Fast' | 'Normal' | 'Slow' | 'Breath';
   direction: string;
   notes: string | null;
-  remarks: any; 
-  resources: any; 
+  remarks: DetailedNote[] | null;
+  resources: Record<string, any> | null;
   resource_url: string | null;
+}
+
+export interface BunkaiSummary {
+  version: number;
+  name: string;
+  description: string | null;
+  notes: string | null;
+  resources: Record<string, any> | null;
 }
 
 export interface KataDetails {
@@ -137,22 +151,24 @@ export interface KataDetails {
   serie: string;
   Gamba: string;
   notes: string | null;
-  remarks: any; 
-  resources: any; 
+  remarks: DetailedNote[] | null;
+  resources: Record<string, any> | null;
   resource_url: string | null;
   steps: Record<string, KataStep>;
   transactions: Record<string, KataTransaction>;
   transactions_mapping_from: Record<string, number>;
   transactions_mapping_to: Record<string, number>;
-  bunkai_ids: number[];
+  bunkai_ids: Record<string, BunkaiSummary>;
 }
+
+
 export interface BunkaiInfo {
   kata_id: number;
   version: number;
   name: string;
   description: string | null;
   notes: string | null;
-  resources: Record<string, any>; 
+  resources: Record<string, any> | null;
   resource_url: string | null;
 }
 
@@ -167,8 +183,8 @@ export interface BunkaiStep {
   kata_sequence_id: number;
   description: string | null;
   notes: string | null;
-  remarks: any; 
-  resources: any; 
+  remarks: DetailedNote[] | null;
+  resources: Record<string, any> | null;
   resource_url: string | null;
 }
 
@@ -216,40 +232,3 @@ export interface KihonsApiResponse {
   grade_id: number;
   kihons: KihonSequences;
 }
-
-// Old types for reference, to be removed or updated
-export type Passaggio = {
-  movement: string;
-  technic_id: number;
-  gyaku: boolean;
-  tecnica: string;
-  stand_id:number;
-  Stand: string;
-  Target: string;
-  Note: string | null;
-};
-
-export type Passaggi = {
-  [key: number]: Passaggio;
-};
-
-export type Sequenze = {
-  [key: number]: Passaggi;
-};
-
-
-export type Tecnica = TechnicInfo;
-export type Tecniche = TechnicInventory['technics_inventory'];
-
-export type Posizione = StandInfo;
-export type Posizioni = StandInventory['stands_inventory'];
-
-export type Parte = StrikingPartInfo;
-export type Parti = StrikingPartsInventory['strikingparts_inventory'];
-
-export type Obiettivo = TargetInfo;
-export type Obiettivi = TargetInventory['targets_inventory'];
-
-export type Rilevanza = Relevance;
-
-export type Rilevanze = Record<string, Rilevanza>;

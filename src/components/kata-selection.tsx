@@ -357,7 +357,7 @@ export default function KataSelection() {
                       <TabsList>
                           <TabsTrigger value="generale">Generale</TabsTrigger>
                           <TabsTrigger value="dettagli" disabled={!kataDetails}>Dettagli</TabsTrigger>
-                          <TabsTrigger value="bunkai" disabled={!kataDetails}>Bunkai</TabsTrigger>
+                          <TabsTrigger value="bunkai" disabled={!kataDetails || !kataDetails.bunkai_ids || Object.keys(kataDetails.bunkai_ids).length === 0}>Bunkai</TabsTrigger>
                       </TabsList>
                       <div className="flex-grow">
                           <CardTitle className="flex items-center justify-end gap-2">
@@ -428,7 +428,19 @@ export default function KataSelection() {
                                                       <Popover>
                                                           <PopoverTrigger asChild>
                                                               <div className="p-2 -mx-2 rounded-md hover:bg-accent/50 cursor-pointer">
-                                                                  <p className="text-sm text-muted-foreground">Techniques:</p>
+                                                                  <div className="flex justify-between items-center">
+                                                                      <p className="text-sm text-muted-foreground">Techniques:</p>
+                                                                      {step.notes && (
+                                                                          <Popover>
+                                                                              <PopoverTrigger onClick={(e) => e.stopPropagation()}>
+                                                                                  <Notebook className="h-5 w-5 text-muted-foreground cursor-pointer" />
+                                                                              </PopoverTrigger>
+                                                                              <PopoverContent onClick={(e) => e.stopPropagation()}>
+                                                                                  <p>{step.notes}</p>
+                                                                              </PopoverContent>
+                                                                          </Popover>
+                                                                      )}
+                                                                  </div>
                                                                   <ul className="list-disc pl-5 font-medium">
                                                                       {step.tecniche.map((tech) => (
                                                                           <li key={tech.technic_id} className="truncate text-sm cursor-pointer hover:underline" onClick={(e) => { e.stopPropagation(); handleTechnicClick(tech.technic_id) }}>
@@ -445,6 +457,9 @@ export default function KataSelection() {
                                                                           <p><strong>Arto:</strong> {tech.arto}</p>
                                                                           <p><strong>Tecnica:</strong> {tech.Tecnica}</p>
                                                                           <p><strong>Obiettivo:</strong> {tech.Obiettivo || 'N/A'}</p>
+                                                                           {tech.waza_note && tech.waza_note.trim() !== '' && (
+                                                                              <p><strong>Note:</strong> {tech.waza_note}</p>
+                                                                            )}
                                                                       </div>
                                                                   ))}
                                                               </div>
