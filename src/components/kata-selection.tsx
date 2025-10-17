@@ -200,7 +200,7 @@ export default function KataSelection() {
   const [selectedTechnicInfo, setSelectedTechnicInfo] = useState<TechnicInfo | null>(null);
   const [isTechnicInfoLoading, setIsTechnicInfoLoading] = useState(false);
 
-  const [viewMode, setViewMode] = useState<"generale" | "bunkai">("generale");
+  const [viewMode, setViewMode] = useState<"generale" | "dettagli" | "bunkai">("generale");
 
   const { toast } = useToast();
 
@@ -379,11 +379,12 @@ export default function KataSelection() {
         )}
       </div>
       <Card>
-          <Tabs value={viewMode} onValueChange={(value) => setViewMode(value as "generale" | "bunkai")}>
+          <Tabs value={viewMode} onValueChange={(value) => setViewMode(value as "generale" | "dettagli" | "bunkai")}>
               <CardHeader>
                   <div className="flex items-center justify-between gap-4">
                       <TabsList>
                           <TabsTrigger value="generale">Generale</TabsTrigger>
+                          <TabsTrigger value="dettagli">Dettagli</TabsTrigger>
                           <TabsTrigger value="bunkai" disabled={!kataDetails || !kataDetails.bunkai_ids || Object.keys(kataDetails.bunkai_ids).length === 0}>Bunkai</TabsTrigger>
                       </TabsList>
                       <div className="flex-grow">
@@ -415,7 +416,7 @@ export default function KataSelection() {
                                   {sortedKataSteps.map((step, index) => {
                                       const transactionId = kataDetails.transactions_mapping_from[step.id_sequence];
                                       const transaction = transactionId ? kataDetails.transactions[transactionId] : null;
-                                      const techniques = step.tecniche || step.Tecniche;
+                                      const techniques = step.Tecniche;
 
                                       return (
                                           <React.Fragment key={step.id_sequence}>
@@ -471,7 +472,7 @@ export default function KataSelection() {
                                                                   </div>
                                                                   <ul className="list-disc pl-5 font-medium">
                                                                       {techniques && techniques.map((tech) => (
-                                                                          <li key={tech.technic_id} className="truncate text-sm cursor-pointer hover:underline" onClick={(e) => { e.stopPropagation(); handleTechnicClick(tech.technic_id) }}>
+                                                                          <li key={tech.technic_id} className="truncate text-sm cursor-pointer hover:underline" onClick={(e) => { e.stopPropagation(); handleTechnicClick(tech.technic_id); }}>
                                                                               {tech.tecnica}
                                                                           </li>
                                                                       ))}
@@ -527,10 +528,109 @@ export default function KataSelection() {
                                   })}
                               </div>
                           </TabsContent>
+                          <TabsContent value="dettagli">
+                             {currentStep ? (
+                                  <div className="mt-4 flex flex-col items-center gap-4">
+                                      <div className="flex items-center gap-4">
+                                          <Button variant="outline" size="icon" onClick={() => handleStepChange('prev')}>
+                                              <ChevronLeft className="h-4 w-4" />
+                                          </Button>
+                                          <p className="text-sm font-medium tabular-nums">
+                                              Step {selectedStepIndex + 1} / {sortedKataSteps.length}
+                                          </p>
+                                          <Button variant="outline" size="icon" onClick={() => handleStepChange('next')}>
+                                              <ChevronRight className="h-4 w-4" />
+                                          </Button>
+                                      </div>
+
+                                      <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <Card className={cn("w-full flex flex-col", currentStep.kiai && "border-primary")}>
+                                          <CardContent className="p-4 flex flex-col gap-2">
+                                            <div className="flex justify-between items-start">
+                                              <div className="flex-grow">
+                                                <p
+                                                  className="font-medium cursor-pointer hover:underline"
+                                                  onClick={() => handlePosizioneClick(currentStep.stand_id)}
+                                                >
+                                                  {currentStep.posizione}
+                                                </p>
+                                              </div>
+                                              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                                                {currentStep.kiai && (
+                                                  <Popover>
+                                                    <PopoverTrigger asChild>
+                                                      <Volume2 className="h-5 w-5 text-destructive cursor-pointer" />
+                                                    </PopoverTrigger>
+                                                    <PopoverContent className="w-auto p-2">
+                                                      <p>Kiai!</p>
+                                                    </PopoverContent>
+                                                  </Popover>
+                                                )}
+                                                <Popover>
+                                                  <PopoverTrigger asChild>
+                                                    <span className="text-2xl cursor-pointer">{getGuardiaSymbol(currentStep.guardia)}</span>
+                                                  </PopoverTrigger>
+                                                  <PopoverContent className="w-auto p-2">
+                                                    <p>{currentStep.guardia}</p>
+                                                  </PopoverContent>
+                                                </Popover>
+                                                <span className="text-2xl font-bold" title={currentStep.facing ?? undefined}>{getFacingArrow(currentStep.facing)}</span>
+                                              </div>
+                                            </div>
+
+                                            <Popover>
+                                              <PopoverTrigger asChild>
+                                                <div className="p-2 -mx-2 rounded-md hover:bg-accent/50 cursor-pointer">
+                                                  <div className="flex justify-between items-center">
+                                                    <p className="text-sm text-muted-foreground">Techniques:</p>
+                                                    {currentStep.notes && (
+                                                      <Popover>
+                                                        <PopoverTrigger onClick={(e) => e.stopPropagation()}>
+                                                          <Notebook className="h-5 w-5 text-muted-foreground cursor-pointer" />
+                                                        </PopoverTrigger>
+                                                        <PopoverContent onClick={(e) => e.stopPropagation()}>
+                                                          <p>{currentStep.notes}</p>
+                                                        </PopoverContent>
+                                                      </Popover>
+                                                    )}
+                                                  </div>
+                                                  <ul className="list-disc pl-5 font-medium">
+                                                    {(currentStep.Tecniche) && (currentStep.Tecniche).map((tech) => (
+                                                      <li key={tech.technic_id} className="truncate text-sm cursor-pointer hover:underline" onClick={(e) => { e.stopPropagation(); handleTechnicClick(tech.technic_id); }}>
+                                                        {tech.tecnica}
+                                                      </li>
+                                                    ))}
+                                                  </ul>
+                                                </div>
+                                              </PopoverTrigger>
+                                              <PopoverContent side="top" align="start">
+                                                <div className="space-y-2">
+                                                  {(currentStep.Tecniche) && (currentStep.Tecniche).map((tech, techIndex) => (
+                                                    <div key={techIndex} className="mb-2 last:mb-0 text-sm">
+                                                      <p><strong>Arto:</strong> {tech.arto}</p>
+                                                      <p><strong>Tecnica:</strong> {tech.tecnica}</p>
+                                                      <p><strong>Obiettivo:</strong> {tech.obiettivo || 'N/A'}</p>
+                                                      {tech.waza_note && (
+                                                        <p><strong>Note:</strong> {formatWazaNote(tech.waza_note)}</p>
+                                                      )}
+                                                    </div>
+                                                  ))}
+                                                </div>
+                                              </PopoverContent>
+                                            </Popover>
+                                          </CardContent>
+                                        </Card>
+                                        <EmbusenGrid embusen={currentStep.embusen} facing={currentStep.facing} />
+                                      </div>
+                                  </div>
+                              ) : (
+                                  <p className="text-muted-foreground text-center">No step details available.</p>
+                              )}
+                          </TabsContent>
                           <TabsContent value="bunkai">
                                <div className="mt-6 flex flex-col items-center gap-4">
                                   {sortedKataSteps.map((step) => {
-                                      const techniques = step.tecniche || step.Tecniche;
+                                      const techniques = step.Tecniche;
                                       return (
                                           <React.Fragment key={step.id_sequence}>
                                               <Card className="w-full max-w-md">
@@ -543,7 +643,7 @@ export default function KataSelection() {
                                                       </p>
                                                       <ul className="list-disc pl-5 text-sm">
                                                           {techniques && techniques.map((tech) => (
-                                                              <li key={tech.technic_id} className="truncate cursor-pointer hover:underline" onClick={(e) => { e.stopPropagation(); handleTechnicClick(tech.technic_id)}}>
+                                                              <li key={tech.technic_id} className="truncate cursor-pointer hover:underline" onClick={(e) => { e.stopPropagation(); handleTechnicClick(tech.technic_id);}}>
                                                                   {tech.tecnica}
                                                               </li>
                                                           ))}
@@ -651,3 +751,5 @@ export default function KataSelection() {
     </>
   );
 }
+
+    
