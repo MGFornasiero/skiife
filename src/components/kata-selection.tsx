@@ -2,7 +2,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { type KataInventory, type KataDetails, type KataStep, type KataTransaction, type StandInfo, type TechnicInfo, type KataTechnic } from "@/lib/data";
+import { type KataInventory, type KataDetails, type KataStep, type KataTransaction, type StandInfo, type TechnicInfo, type KataTechnic, BunkaiSummary } from "@/lib/data";
 import {
   Select,
   SelectContent,
@@ -210,17 +210,28 @@ export default function KataSelection() {
     setSelectedStepIndex(0);
 
     fetch(`/api/kata/${kataId}`)
-      .then(res => {
+      .then(async res => {
         if (!res.ok) {
-          throw new Error('Failed to fetch kata data');
+          const errorText = await res.text();
+           try {
+            const errorJson = JSON.parse(errorText);
+            throw new Error(errorJson.error || `External API error: ${errorText}`);
+          } catch (e) {
+              throw new Error(`Failed to fetch kata data. Status: ${res.status}. Body: ${errorText}`);
+          }
         }
         return res.json();
       })
       .then((data: KataDetails) => {
         setKataDetails(data);
       })
-      .catch(error => {
+      .catch((error: any) => {
         console.error("Error fetching kata data:", error);
+        toast({
+            variant: "destructive",
+            title: "Error",
+            description: error.message || "An unexpected error occurred while fetching kata details.",
+        });
       })
       .finally(() => {
         setLoading(false);
@@ -774,3 +785,5 @@ export default function KataSelection() {
     </>
   );
 }
+
+  
