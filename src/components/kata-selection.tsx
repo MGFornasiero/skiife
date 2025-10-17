@@ -27,6 +27,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AbsoluteDirections, EmbusenPoints, Sides, Tempo } from "@/lib/type_admin_fe";
+import { KataPlayer } from "./kata-player";
 
 
 const facingArrowMap: { [key in AbsoluteDirections]: string } = {
@@ -119,69 +120,6 @@ const parseEmbusen = (embusen: EmbusenPoints | string | null): EmbusenPoints | n
     }
     return null;
 };
-
-const EmbusenGrid = ({ embusen, facing }: { embusen: EmbusenPoints | string | null; facing: AbsoluteDirections | null }) => {
-    const coords = parseEmbusen(embusen);
-
-    const gridSize = 11;
-    const cellSize = 32;
-    const centerOffset = Math.floor(gridSize / 2);
-
-    if (!coords) {
-        return <div className="text-muted-foreground">Invalid embusen format.</div>;
-    }
-
-    const gridX = coords.x + centerOffset;
-    const gridY = -coords.y + centerOffset;
-    const arrow = getFacingArrow(facing);
-
-    return (
-        <div className="flex flex-col items-center">
-            <h4 className="font-semibold mb-2">Embusen</h4>
-            <div
-                className="relative border border-border"
-                style={{
-                    width: gridSize * cellSize,
-                    height: gridSize * cellSize,
-                    backgroundImage: `
-                        linear-gradient(to right, hsl(var(--border)) 1px, transparent 1px),
-                        linear-gradient(to bottom, hsl(var(--border)) 1px, transparent 1px)
-                    `,
-                    backgroundSize: `${cellSize}px ${cellSize}px`,
-                    backgroundColor: 'hsl(var(--secondary) / 0.3)',
-                }}
-            >
-                {/* Origin Marker */}
-                <div
-                    className="absolute flex items-center justify-center text-muted-foreground"
-                    style={{
-                        width: cellSize,
-                        height: cellSize,
-                        left: centerOffset * cellSize,
-                        top: centerOffset * cellSize,
-                    }}
-                >
-                    <MapPin className="h-6 w-6" />
-                </div>
-                {/* Position Marker */}
-                <div
-                    className="absolute flex items-center justify-center text-primary-foreground text-2xl font-bold bg-primary rounded-full"
-                    style={{
-                        width: cellSize,
-                        height: cellSize,
-                        left: gridX * cellSize,
-                        top: gridY * cellSize,
-                        transition: 'top 0.3s ease, left 0.3s ease',
-                    }}
-                    title={`Position: (${coords.x}, ${coords.y}), Facing: ${facing}`}
-                >
-                    {arrow}
-                </div>
-            </div>
-        </div>
-    );
-};
-
 
 export default function KataSelection() {
   const [kataInventory, setKataInventory] = useState<KataInventory | null>(null);
@@ -595,7 +533,7 @@ export default function KataSelection() {
                                                     )}
                                                   </div>
                                                   <ul className="list-disc pl-5 font-medium">
-                                                    {(currentStep.Tecniche) && (currentStep.Tecniche).map((tech) => (
+                                                    {currentStep.Tecniche && currentStep.Tecniche.map((tech) => (
                                                       <li key={tech.technic_id} className="truncate text-sm cursor-pointer hover:underline" onClick={(e) => { e.stopPropagation(); handleTechnicClick(tech.technic_id); }}>
                                                         {tech.tecnica}
                                                       </li>
@@ -605,7 +543,7 @@ export default function KataSelection() {
                                               </PopoverTrigger>
                                               <PopoverContent side="top" align="start">
                                                 <div className="space-y-2">
-                                                  {(currentStep.Tecniche) && (currentStep.Tecniche).map((tech, techIndex) => (
+                                                  {currentStep.Tecniche && currentStep.Tecniche.map((tech, techIndex) => (
                                                     <div key={techIndex} className="mb-2 last:mb-0 text-sm">
                                                       <p><strong>Arto:</strong> {tech.arto}</p>
                                                       <p><strong>Tecnica:</strong> {tech.tecnica}</p>
@@ -620,7 +558,11 @@ export default function KataSelection() {
                                             </Popover>
                                           </CardContent>
                                         </Card>
-                                        <EmbusenGrid embusen={currentStep.embusen} facing={currentStep.facing} />
+                                        <KataPlayer 
+                                          steps={sortedKataSteps} 
+                                          currentStepIndex={selectedStepIndex}
+                                          onStepChange={setSelectedStepIndex}
+                                        />
                                       </div>
                                   </div>
                               ) : (
@@ -751,5 +693,3 @@ export default function KataSelection() {
     </>
   );
 }
-
-    
