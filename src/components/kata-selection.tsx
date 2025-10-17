@@ -2,7 +2,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { type KataInventory, type KataDetails, type KataStep, type KataTransaction, type StandInfo, type TechnicInfo, type KataTechnic, BunkaiSummary } from "@/lib/data";
+import { type KataInventory, type KataResponse, type KataSequenceStep, type KataTransaction, type StandInfo, type TechnicInfo, type KataTechnique, BunkaiSummary } from "@/lib/data";
 import {
   Select,
   SelectContent,
@@ -26,9 +26,10 @@ import {
 } from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { AbsoluteDirections, EmbusenPoints, Sides, Tempo } from "@/lib/type_admin_fe";
 
 
-const facingArrowMap: { [key: string]: string } = {
+const facingArrowMap: { [key in AbsoluteDirections]: string } = {
   'N': '↑',  // Upwards Arrow
   'NE': '↗', // North East Arrow
   'E': '→',  // Rightwards Arrow
@@ -39,14 +40,13 @@ const facingArrowMap: { [key: string]: string } = {
   'NO': '↖'  // North West Arrow
 };
 
-const directionSymbolMap: { [key: string]: string } = {
+const directionSymbolMap: { [key in Sides]: string } = {
   'sx': '↶',
   'dx': '↷',
   'frontal': '=',
-  null:'⤫'
 };
 
-const guardiaSymbolMap: { [key: string]: string } = {
+const guardiaSymbolMap: { [key in Sides]: string } = {
   'sx': '◐', // U+25D0
   'dx': '◑', // U+25D1
   'frontal': '◒', // U+25D2
@@ -58,7 +58,7 @@ const gambaSymbolMap: { [key in string]: string } = {
   'frontal': '◒',
 };
 
-const tempoIconMap: { [key: string]: React.ElementType } = {
+const tempoIconMap: { [key in Tempo]: React.ElementType } = {
     'Legato': LinkIcon,
     'Fast': Rabbit,
     'Normal': PersonStanding,
@@ -67,43 +67,51 @@ const tempoIconMap: { [key: string]: React.ElementType } = {
 };
 
 
-const getFacingArrow = (facing: string) => {
+const getFacingArrow = (facing: AbsoluteDirections | null) => {
+  if (!facing) return '';
   return facingArrowMap[facing] || facing;
 };
 
-const getDirectionSymbol = (direction: string | null | undefined) => {
+const getDirectionSymbol = (direction: Sides | null) => {
   if (!direction) return '⇓'; // Default for None or ""
   return directionSymbolMap[direction] || '⇓'; // Default for any other case
 }
 
-const getGuardiaSymbol = (guardia: string | null | undefined) => {
+const getGuardiaSymbol = (guardia: Sides | null) => {
   if (!guardia) return '';
   return guardiaSymbolMap[guardia] || guardia;
 }
 
-const getTempoIcon = (tempo: KataTransaction['tempo']) => {
+const getTempoIcon = (tempo: Tempo | null) => {
+    if (!tempo) return Hourglass;
     const Icon = tempoIconMap[tempo] || Hourglass;
     return <Icon className="h-4 w-4" />;
 };
 
 
-const parseEmbusen = (embusen: string): { x: number; y: number } | null => {
-    try {
-        const match = embusen.match(/\(([^,]+),([^)]+)\)/);
-        if (match) {
-            const x = parseFloat(match[1]);
-            const y = parseFloat(match[2]);
-            if (!isNaN(x) && !isNaN(y)) {
-                return { x, y };
-            }
-        }
-    } catch (e) {
-        console.error("Error parsing embusen:", e);
+const parseEmbusen = (embusen: EmbusenPoints | string | null): EmbusenPoints | null => {
+    if (!embusen) return null;
+    if (typeof embusen === 'object' && embusen !== null && 'x' in embusen && 'y' in embusen) {
+      return embusen;
+    }
+    if (typeof embusen === 'string') {
+      try {
+          const match = embusen.match(/\(([^,]+),([^)]+)\)/);
+          if (match) {
+              const x = parseFloat(match[1]);
+              const y = parseFloat(match[2]);
+              if (!isNaN(x) && !isNaN(y)) {
+                  return { x, y };
+              }
+          }
+      } catch (e) {
+          console.error("Error parsing embusen:", e);
+      }
     }
     return null;
 };
 
-const EmbusenGrid = ({ embusen, facing }: { embusen: string; facing: string }) => {
+const EmbusenGrid = ({ embusen, facing }: { embusen: EmbusenPoints | string | null; facing: AbsoluteDirections | null }) => {
     const coords = parseEmbusen(embusen);
 
     const gridSize = 11;
@@ -171,7 +179,7 @@ export default function KataSelection() {
   const [selectedKataName, setSelectedKataName] = useState<string | null>(null);
   const [kataId, setKataId] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
-  const [kataDetails, setKataDetails] = useState<KataDetails | null>(null);
+  const [kataDetails, setKataDetails] = useState<KataResponse | null>(null);
 
   const [selectedStepIndex, setSelectedStepIndex] = useState(0);
 
@@ -222,7 +230,7 @@ export default function KataSelection() {
         }
         return res.json();
       })
-      .then((data: KataDetails) => {
+      .then((data: KataResponse) => {
         setKataDetails(data);
       })
       .catch((error: any) => {
@@ -237,7 +245,7 @@ export default function KataSelection() {
         setLoading(false);
       });
 
-  }, [kataId]);
+  }, [kataId, toast]);
   
   const handlePosizioneClick = async (standId: number) => {
     setIsPosizioneInfoLoading(true);
@@ -314,11 +322,11 @@ export default function KataSelection() {
     ? Object.keys(kataInventory.kata).sort((a, b) => kataInventory.kata[a] - kataInventory.kata[b])
     : [];
 
-  const sortedKataSteps = kataDetails 
+  const sortedKataSteps = kataDetails && kataDetails.steps
     ? Object.values(kataDetails.steps).sort((a, b) => a.seq_num - b.seq_num) 
     : [];
     
-  const currentStep: KataStep | undefined = sortedKataSteps[selectedStepIndex];
+  const currentStep: KataSequenceStep | undefined = sortedKataSteps[selectedStepIndex];
   
   const transactionToNextId = currentStep && kataDetails ? kataDetails.transactions_mapping_from[currentStep.id_sequence] : null;
   const transactionToNext = transactionToNextId && kataDetails ? kataDetails.transactions[transactionToNextId] : null;
@@ -432,7 +440,7 @@ export default function KataSelection() {
                                                                       <p>{step.guardia}</p>
                                                                   </PopoverContent>
                                                               </Popover>
-                                                              <span className="text-2xl font-bold" title={step.facing}>{getFacingArrow(step.facing)}</span>
+                                                              <span className="text-2xl font-bold" title={step.facing ?? undefined}>{getFacingArrow(step.facing)}</span>
                                                           </div>
                                                       </div>
 
@@ -490,7 +498,7 @@ export default function KataSelection() {
                                                                       <p>{transaction.tempo}</p>
                                                                   </PopoverContent>
                                                               </Popover>
-                                                              <p className="text-2xl font-bold" title={transaction.direction}>{getDirectionSymbol(transaction.direction)}</p>
+                                                              <p className="text-2xl font-bold" title={transaction.direction ?? undefined}>{getDirectionSymbol(transaction.direction)}</p>
                                                               {transaction.notes && (
                                                                   <Popover>
                                                                       <PopoverTrigger>
@@ -600,7 +608,7 @@ export default function KataSelection() {
                                                                   <p>{currentStep.guardia}</p>
                                                               </PopoverContent>
                                                           </Popover>
-                                                          <span title={currentStep.facing}>
+                                                          <span title={currentStep.facing ?? undefined}>
                                                               {getFacingArrow(currentStep.facing)}
                                                           </span>
                                                       </div>
@@ -785,5 +793,3 @@ export default function KataSelection() {
     </>
   );
 }
-
-  

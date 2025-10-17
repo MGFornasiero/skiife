@@ -2,7 +2,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { type StandInfo, type TechnicInfo, KihonsApiResponse, KihonSequences, KihonStepDetails } from "@/lib/data";
+import { type StandInfo, type TechnicInfo, type KihonsResponse, type KihonSequences, type KihonFormattedDetails } from "@/lib/data";
 import {
   Select,
   SelectContent,
@@ -59,7 +59,7 @@ export default function KataDisplay() {
   const [gradeType, setGradeType] = useState<"dan" | "kyu">("kyu");
   const [grade, setGrade] = useState<number | null>(null);
   const [gradeId, setGradeId] = useState<string | null>(null);
-  const [kihonData, setKihonData] = useState<KihonsApiResponse | null>(null);
+  const [kihonData, setKihonData] = useState<KihonsResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [showGradeSelection, setShowGradeSelection] = useState(true);
   const { toast } = useToast();
@@ -102,7 +102,7 @@ export default function KataDisplay() {
         }
         return res.json();
       })
-      .then((data: KihonsApiResponse) => {
+      .then((data: KihonsResponse) => {
         if (data && data.kihons) {
           setKihonData(data);
           const keys = Object.keys(data.kihons);
