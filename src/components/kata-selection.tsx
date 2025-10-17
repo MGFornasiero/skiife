@@ -237,8 +237,8 @@ export default function KataSelection() {
         console.error("Error fetching kata data:", error);
         toast({
             variant: "destructive",
-            title: "Error",
-            description: error.message || "An unexpected error occurred while fetching kata details.",
+            title: "Error fetching kata data",
+            description: <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4"><code className="text-white">{error.message}</code></pre>
         });
       })
       .finally(() => {
@@ -461,7 +461,7 @@ export default function KataSelection() {
                                                                       )}
                                                                   </div>
                                                                   <ul className="list-disc pl-5 font-medium">
-                                                                      {step.tecniche.map((tech) => (
+                                                                      {step.tecniche && step.tecniche.map((tech) => (
                                                                           <li key={tech.technic_id} className="truncate text-sm cursor-pointer hover:underline" onClick={(e) => { e.stopPropagation(); handleTechnicClick(tech.technic_id) }}>
                                                                               {tech.Tecnica}
                                                                           </li>
@@ -471,7 +471,7 @@ export default function KataSelection() {
                                                           </PopoverTrigger>
                                                           <PopoverContent side="top" align="start">
                                                               <div className="space-y-2">
-                                                                  {step.tecniche.map((tech) => (
+                                                                  {step.tecniche && step.tecniche.map((tech) => (
                                                                       <div key={tech.technic_id} className="mb-2 last:mb-0 text-sm">
                                                                           <p><strong>Arto:</strong> {tech.arto}</p>
                                                                           <p><strong>Tecnica:</strong> {tech.Tecnica}</p>
@@ -631,7 +631,7 @@ export default function KataSelection() {
                                                               )}
                                                           </div>
                                                           <ul className="space-y-2">
-                                                              {currentStep.tecniche.map((tech, index) => (
+                                                              {currentStep.tecniche && currentStep.tecniche.map((tech, index) => (
                                                                   <li key={index} className="border-l-4 pl-4 py-1 border-primary/50 bg-secondary/50 rounded-r-md relative">
                                                                       <div className="flex justify-between items-start">
                                                                           <div>
@@ -685,7 +685,7 @@ export default function KataSelection() {
                                                       {step.seq_num}. {step.posizione}
                                                   </p>
                                                   <ul className="list-disc pl-5 text-sm">
-                                                      {step.tecniche.map((tech) => (
+                                                      {step.tecniche && step.tecniche.map((tech) => (
                                                           <li key={tech.technic_id} className="truncate cursor-pointer hover:underline" onClick={(e) => { e.stopPropagation(); handleTechnicClick(tech.technic_id)}}>
                                                               {tech.Tecnica}
                                                           </li>
