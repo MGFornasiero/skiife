@@ -2,7 +2,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { type KataInventory, type KataResponse, type KataSequenceStep, type StandInfo, type TechnicInfo, type BunkaiSummary } from "@/lib/data";
+import { type KataInventory, type KataResponse, type KataSequenceStep, type StandInfo, type TechnicInfo, type BunkaiSummary, type KataTechnique } from "@/lib/data";
 import {
   Select,
   SelectContent,
@@ -87,6 +87,15 @@ const getTempoIcon = (tempo: Tempo | null) => {
     const Icon = tempoIconMap[tempo] || Hourglass;
     return <Icon className="h-4 w-4" />;
 };
+
+const formatWazaNote = (note: any): string | null => {
+    if (!note) return null;
+    if (typeof note === 'string') return note;
+    if (typeof note === 'object' && note.limb && note.side) {
+        return `Limb: ${note.limb}, Side: ${note.side}`;
+    }
+    return null;
+}
 
 
 const parseEmbusen = (embusen: EmbusenPoints | string | null): EmbusenPoints | null => {
@@ -298,7 +307,7 @@ export default function KataSelection() {
       setSelectedTechnicInfo(data.info_technic);
     } catch (error: any) {
       console.error("Error fetching technic info:", error);
-      setIsPosizioneInfoDialogOpen(false); // Close dialog on error
+      setIsTechnicInfoDialogOpen(false); // Close dialog on error
       toast({
         variant: "destructive",
         title: "Error",
@@ -464,7 +473,7 @@ export default function KataSelection() {
                                                                   <ul className="list-disc pl-5 font-medium">
                                                                       {techniques && techniques.map((tech) => (
                                                                           <li key={tech.technic_id} className="truncate text-sm cursor-pointer hover:underline" onClick={(e) => { e.stopPropagation(); handleTechnicClick(tech.technic_id) }}>
-                                                                              {tech.tecnica || tech.Tecnica}
+                                                                              {tech.tecnica}
                                                                           </li>
                                                                       ))}
                                                                   </ul>
@@ -475,10 +484,10 @@ export default function KataSelection() {
                                                                   {techniques && techniques.map((tech, techIndex) => (
                                                                       <div key={techIndex} className="mb-2 last:mb-0 text-sm">
                                                                           <p><strong>Arto:</strong> {tech.arto}</p>
-                                                                          <p><strong>Tecnica:</strong> {tech.tecnica || tech.Tecnica}</p>
-                                                                          <p><strong>Obiettivo:</strong> {tech.obiettivo || tech.Obiettivo || 'N/A'}</p>
-                                                                           {tech.waza_note && tech.waza_note.trim() !== '' && (
-                                                                              <p><strong>Note:</strong> {tech.waza_note}</p>
+                                                                          <p><strong>Tecnica:</strong> {tech.tecnica}</p>
+                                                                          <p><strong>Obiettivo:</strong> {tech.obiettivo || 'N/A'}</p>
+                                                                           {tech.waza_note && (
+                                                                              <p><strong>Note:</strong> {formatWazaNote(tech.waza_note)}</p>
                                                                             )}
                                                                       </div>
                                                                   ))}
@@ -636,18 +645,18 @@ export default function KataSelection() {
                                                                   <li key={index} className="border-l-4 pl-4 py-1 border-primary/50 bg-secondary/50 rounded-r-md relative">
                                                                       <div className="flex justify-between items-start">
                                                                           <div>
-                                                                              <p><strong className="cursor-pointer hover:underline" onClick={() => handleTechnicClick(tech.technic_id)}>Tecnica:</strong> {tech.tecnica || tech.Tecnica}</p>
+                                                                              <p><strong className="cursor-pointer hover:underline" onClick={() => handleTechnicClick(tech.technic_id)}>Tecnica:</strong> {tech.tecnica}</p>
                                                                               <p><strong>Arto:</strong> {tech.arto}</p>
-                                                                              <p><strong>Obiettivo:</strong> {tech.obiettivo || tech.Obiettivo || 'N/A'}</p>
+                                                                              <p><strong>Obiettivo:</strong> {tech.obiettivo || 'N/A'}</p>
                                                                           </div>
                                                                           <div className="flex items-center">
-                                                                            {tech.waza_note && tech.waza_note.trim() !== '' && (
+                                                                            {tech.waza_note && (
                                                                                 <Popover>
                                                                                     <PopoverTrigger>
                                                                                         <Notebook className="h-5 w-5 text-muted-foreground cursor-pointer" />
                                                                                     </PopoverTrigger>
                                                                                     <PopoverContent>
-                                                                                        <p>{tech.waza_note}</p>
+                                                                                        <p>{formatWazaNote(tech.waza_note)}</p>
                                                                                     </PopoverContent>
                                                                                 </Popover>
                                                                             )}
@@ -675,7 +684,7 @@ export default function KataSelection() {
                           </TabsContent>
                           <TabsContent value="bunkai">
                                <div className="mt-6 flex flex-col items-center gap-4">
-                                  {sortedKataSteps.map((step, index) => {
+                                  {sortedKataSteps.map((step) => {
                                       const techniques = step.tecniche || step.Tecniche;
                                       return (
                                           <React.Fragment key={step.id_sequence}>
@@ -690,7 +699,7 @@ export default function KataSelection() {
                                                       <ul className="list-disc pl-5 text-sm">
                                                           {techniques && techniques.map((tech) => (
                                                               <li key={tech.technic_id} className="truncate cursor-pointer hover:underline" onClick={(e) => { e.stopPropagation(); handleTechnicClick(tech.technic_id)}}>
-                                                                  {tech.tecnica || tech.Tecnica}
+                                                                  {tech.tecnica}
                                                               </li>
                                                           ))}
                                                       </ul>
@@ -797,3 +806,5 @@ export default function KataSelection() {
     </>
   );
 }
+
+    
