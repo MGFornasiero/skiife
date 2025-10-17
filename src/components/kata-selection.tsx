@@ -2,7 +2,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { type KataInventory, type KataResponse, type KataSequenceStep, type KataTransaction, type StandInfo, type TechnicInfo, type KataTechnique, BunkaiSummary } from "@/lib/data";
+import { type KataInventory, type KataResponse, type KataSequenceStep, type StandInfo, type TechnicInfo, type BunkaiSummary } from "@/lib/data";
 import {
   Select,
   SelectContent,
@@ -407,6 +407,7 @@ export default function KataSelection() {
                                   {sortedKataSteps.map((step, index) => {
                                       const transactionId = kataDetails.transactions_mapping_from[step.id_sequence];
                                       const transaction = transactionId ? kataDetails.transactions[transactionId] : null;
+                                      const techniques = step.tecniche || step.Tecniche;
 
                                       return (
                                           <React.Fragment key={step.id_sequence}>
@@ -461,9 +462,9 @@ export default function KataSelection() {
                                                                       )}
                                                                   </div>
                                                                   <ul className="list-disc pl-5 font-medium">
-                                                                      {step.tecniche && step.tecniche.map((tech) => (
+                                                                      {techniques && techniques.map((tech) => (
                                                                           <li key={tech.technic_id} className="truncate text-sm cursor-pointer hover:underline" onClick={(e) => { e.stopPropagation(); handleTechnicClick(tech.technic_id) }}>
-                                                                              {tech.Tecnica}
+                                                                              {tech.tecnica || tech.Tecnica}
                                                                           </li>
                                                                       ))}
                                                                   </ul>
@@ -471,11 +472,11 @@ export default function KataSelection() {
                                                           </PopoverTrigger>
                                                           <PopoverContent side="top" align="start">
                                                               <div className="space-y-2">
-                                                                  {step.tecniche && step.tecniche.map((tech) => (
-                                                                      <div key={tech.technic_id} className="mb-2 last:mb-0 text-sm">
+                                                                  {techniques && techniques.map((tech, techIndex) => (
+                                                                      <div key={techIndex} className="mb-2 last:mb-0 text-sm">
                                                                           <p><strong>Arto:</strong> {tech.arto}</p>
-                                                                          <p><strong>Tecnica:</strong> {tech.Tecnica}</p>
-                                                                          <p><strong>Obiettivo:</strong> {tech.Obiettivo || 'N/A'}</p>
+                                                                          <p><strong>Tecnica:</strong> {tech.tecnica || tech.Tecnica}</p>
+                                                                          <p><strong>Obiettivo:</strong> {tech.obiettivo || tech.Obiettivo || 'N/A'}</p>
                                                                            {tech.waza_note && tech.waza_note.trim() !== '' && (
                                                                               <p><strong>Note:</strong> {tech.waza_note}</p>
                                                                             )}
@@ -631,13 +632,13 @@ export default function KataSelection() {
                                                               )}
                                                           </div>
                                                           <ul className="space-y-2">
-                                                              {currentStep.tecniche && currentStep.tecniche.map((tech, index) => (
+                                                              {(currentStep.tecniche || currentStep.Tecniche) && (currentStep.tecniche || currentStep.Tecniche).map((tech, index) => (
                                                                   <li key={index} className="border-l-4 pl-4 py-1 border-primary/50 bg-secondary/50 rounded-r-md relative">
                                                                       <div className="flex justify-between items-start">
                                                                           <div>
-                                                                              <p><strong className="cursor-pointer hover:underline" onClick={() => handleTechnicClick(tech.technic_id)}>Tecnica:</strong> {tech.Tecnica}</p>
+                                                                              <p><strong className="cursor-pointer hover:underline" onClick={() => handleTechnicClick(tech.technic_id)}>Tecnica:</strong> {tech.tecnica || tech.Tecnica}</p>
                                                                               <p><strong>Arto:</strong> {tech.arto}</p>
-                                                                              <p><strong>Obiettivo:</strong> {tech.Obiettivo || 'N/A'}</p>
+                                                                              <p><strong>Obiettivo:</strong> {tech.obiettivo || tech.Obiettivo || 'N/A'}</p>
                                                                           </div>
                                                                           <div className="flex items-center">
                                                                             {tech.waza_note && tech.waza_note.trim() !== '' && (
@@ -674,27 +675,30 @@ export default function KataSelection() {
                           </TabsContent>
                           <TabsContent value="bunkai">
                                <div className="mt-6 flex flex-col items-center gap-4">
-                                  {sortedKataSteps.map((step, index) => (
-                                      <React.Fragment key={step.id_sequence}>
-                                          <Card className="w-full max-w-md">
-                                              <CardContent className="p-4 flex flex-col gap-2">
-                                                  <p 
-                                                    className="font-medium cursor-pointer hover:underline"
-                                                    onClick={() => handlePosizioneClick(step.stand_id)}
-                                                  >
-                                                      {step.seq_num}. {step.posizione}
-                                                  </p>
-                                                  <ul className="list-disc pl-5 text-sm">
-                                                      {step.tecniche && step.tecniche.map((tech) => (
-                                                          <li key={tech.technic_id} className="truncate cursor-pointer hover:underline" onClick={(e) => { e.stopPropagation(); handleTechnicClick(tech.technic_id)}}>
-                                                              {tech.Tecnica}
-                                                          </li>
-                                                      ))}
-                                                  </ul>
-                                              </CardContent>
-                                          </Card>
-                                      </React.Fragment>
-                                  ))}
+                                  {sortedKataSteps.map((step, index) => {
+                                      const techniques = step.tecniche || step.Tecniche;
+                                      return (
+                                          <React.Fragment key={step.id_sequence}>
+                                              <Card className="w-full max-w-md">
+                                                  <CardContent className="p-4 flex flex-col gap-2">
+                                                      <p 
+                                                        className="font-medium cursor-pointer hover:underline"
+                                                        onClick={() => handlePosizioneClick(step.stand_id)}
+                                                      >
+                                                          {step.seq_num}. {step.posizione}
+                                                      </p>
+                                                      <ul className="list-disc pl-5 text-sm">
+                                                          {techniques && techniques.map((tech) => (
+                                                              <li key={tech.technic_id} className="truncate cursor-pointer hover:underline" onClick={(e) => { e.stopPropagation(); handleTechnicClick(tech.technic_id)}}>
+                                                                  {tech.tecnica || tech.Tecnica}
+                                                              </li>
+                                                          ))}
+                                                      </ul>
+                                                  </CardContent>
+                                              </Card>
+                                          </React.Fragment>
+                                      )
+                                  })}
                               </div>
                           </TabsContent>
                       </div>
@@ -793,5 +797,3 @@ export default function KataSelection() {
     </>
   );
 }
-
-    

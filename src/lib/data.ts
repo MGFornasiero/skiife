@@ -1,6 +1,6 @@
 import { 
     AbsoluteDirections, BodyPart, DetailedNotes, EmbusenPoints, Hips, KataSeries, 
-    Movements, Sides, TargetHgt, Tempo, WazaType 
+    Movements, Sides, TargetHgt, Tempo
 } from "./type_admin_fe";
 
 // For /grade_id/{gradetype}/{grade}
@@ -94,9 +94,13 @@ export interface KihonStepInfo {
   technic_name: string | null;
 }
 export interface KihonTransaction {
-  movement: string;
-  tempo: string;
+  id_tx: number;
+  from_sequence: number;
+  to_sequence: number;
+  movement: Movements | null;
+  resources: Record<string, any> | null;
   notes: string | null;
+  tempo: Tempo | null;
   resource_url: string | null;
 }
 
@@ -106,7 +110,7 @@ export interface KihonListResponse {
   note: string | null;
   sequenza_n: number;
   tecniche: Record<string, KihonStepInfo>;
-  transactions: Record<string, KihonTransaction>; // This is a subset of the KihonTx model
+  transactions: Record<string, KihonTransaction>;
   transactions_mapping_from: Record<string, number>;
   transactions_mapping_to: Record<string, number>;
 }
@@ -116,13 +120,15 @@ export interface KataTechnique {
     sequence_id: number;
     arto: BodyPart;
     technic_id: number;
-    Tecnica: string | null;
+    tecnica: string | null; // Alias for Tecnica
+    Tecnica: string | null; // from API
     strikingpart_id: number | null;
     strikingpart_name: string | null;
     technic_target_id: number | null;
-    Obiettivo: string | null;
+    obiettivo: string | null; // Alias for Obiettivo
+    Obiettivo: string | null; // from API
     waza_note: string | null;
-    waza_resources: Record<string, any> | null;
+    waza_resources: Record<string, any>[] | null;
 }
 
 export interface KataSequenceStep {
@@ -135,7 +141,8 @@ export interface KataSequenceStep {
   guardia: Sides | null;
   hips: Hips | null;
   facing: AbsoluteDirections | null;
-  tecniche: KataTechnique[];
+  Tecniche: KataTechnique[]; // Alias for tecniche from API
+  tecniche: KataTechnique[]; // from API
   embusen: EmbusenPoints | null;
   kiai: boolean;
   notes: string | null;
@@ -160,8 +167,12 @@ export interface KataResponse {
 }
 
 export interface KataTransaction {
+  id_tx: number;
+  from_sequence: number;
+  to_sequence: number;
   tempo: Tempo | null;
   direction: Sides | null;
+  intermediate_stand_id: number | null;
   notes: string | null;
   remarks: DetailedNotes[] | null;
   resources: Record<string, any> | null;
@@ -178,6 +189,7 @@ export interface BunkaiSummary {
 }
 // For /bunkai_inventory/{kata_id}
 export interface BunkaiInfo {
+  id_bunkai: number;
   kata_id: number;
   version: number;
   name: string;
@@ -227,6 +239,61 @@ export interface FinderResult {
   Stands: Record<string, StandInfo>;
   Striking_parts: Record<string, StrikingPartInfo>;
 }
+
+// For /info_technic/{item_id}
+export interface InfoTechnicResponse {
+    id: number;
+    info_technic: TechnicInfo | {
+        id_technic: null;
+        waza: null;
+        name: null;
+        description: null;
+        notes: null;
+        resource_url: null;
+    };
+}
+
+// For /technics_decomposition/{item_id}
+export interface TechnicDecompositionStep {
+    step_num: number;
+    stand_id: number;
+    technic_id: number;
+    gyaku: boolean;
+    target_hgt: TargetHgt;
+    notes: string | null;
+    resource_url: string | null;
+}
+
+export interface TechnicDecompositionResponse {
+    id: number;
+    technic_decomposition: Record<string, TechnicDecompositionStep> | [];
+}
+
+// For /info_stand/{item_id}
+export interface InfoStandResponse {
+    id: number;
+    info_stand: StandInfo | {
+        id_stand: null;
+        name: null;
+        description: null;
+        illustration_url: null;
+        notes: null;
+    };
+}
+
+// For /info_strikingparts/{item_id}
+export interface InfoStrikingPartsResponse {
+    id: number;
+    info_strikingparts: StrikingPartInfo | {
+        id_part: null;
+        name: null;
+        translation: null;
+        description: null;
+        notes: null;
+        resource_url: null;
+    };
+}
+
 // For /kihons/{grade_id}
 export interface KihonsResponse {
   grade: string;
@@ -249,4 +316,14 @@ export interface KihonFormattedDetails {
   Stand: string | null;
   Target: TargetHgt | null;
   Note: string | null;
+}
+
+// For /utils/present_kata/{kata_id}
+export interface PresentKataResponse {
+    info: Record<string, KataSequenceStep>;
+}
+
+// For /secure/
+export interface SecureDataResponse {
+    data: string;
 }
