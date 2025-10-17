@@ -91,10 +91,10 @@ const getTempoIcon = (tempo: Tempo | null) => {
 const formatWazaNote = (note: any): string | null => {
     if (!note) return null;
     if (typeof note === 'string') return note;
-    if (typeof note === 'object' && note.limb && note.side) {
+    if (typeof note === 'object' && note !== null && 'limb' in note && 'side' in note) {
         return `Limb: ${note.limb}, Side: ${note.side}`;
     }
-    return null;
+    return JSON.stringify(note);
 }
 
 
