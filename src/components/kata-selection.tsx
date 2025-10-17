@@ -254,8 +254,8 @@ export default function KataSelection() {
 
     try {
       const res = await fetch(`/api/info_stand/${standId}`);
-      const errorText = await res.text();
       if (!res.ok) {
+        const errorText = await res.text();
         try {
             const errorJson = JSON.parse(errorText);
             throw new Error(errorJson.error || `External API error: ${errorText}`);
@@ -263,7 +263,7 @@ export default function KataSelection() {
             throw new Error(errorText || `External API error with status: ${res.status}`);
         }
       }
-      const data = JSON.parse(errorText);
+      const data = await res.json();
       setSelectedPosizioneInfo(data.info_stand);
     } catch (error: any) {
       console.error("Error fetching stand info:", error);
@@ -793,3 +793,5 @@ export default function KataSelection() {
     </>
   );
 }
+
+    
