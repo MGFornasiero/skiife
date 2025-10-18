@@ -529,7 +529,7 @@ export default function KataSelection() {
                                                   className="font-medium cursor-pointer hover:underline"
                                                   onClick={() => handlePosizioneClick(currentStep.stand_id)}
                                                 >
-                                                  {currentStep.posizione}
+                                                  {currentStep.posizione} {currentStep.hips && `(${currentStep.hips})`}
                                                 </p>
                                               </div>
                                               <div className="flex items-center gap-2 text-sm text-muted-foreground">
