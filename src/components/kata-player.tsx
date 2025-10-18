@@ -94,6 +94,9 @@ export const KataPlayer: React.FC<KataPlayerProps> = ({
       </CardHeader>
       <CardContent className="flex flex-col items-center">
         <svg viewBox="0 0 400 400" className="border rounded-md bg-secondary/30 h-80 w-80">
+          {/* Mark origin (0,0) */}
+          <circle cx={200} cy={200} r={3} className="fill-muted-foreground/50" />
+          
           {/* Draw faint previous steps */}
           {steps.slice(0, currentStepIndex).map((s, idx) => (
             s.embusen ? (
