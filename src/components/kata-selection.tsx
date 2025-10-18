@@ -195,7 +195,6 @@ export default function KataSelection() {
             return {
                 ...step,
                 Tecniche: processedTechniques,
-                tecniche: processedTechniques
             };
         });
 
@@ -524,14 +523,24 @@ export default function KataSelection() {
                                         <Card className={cn("w-full flex flex-col", currentStep.kiai && "border-primary")}>
                                           <CardContent className="p-4 flex flex-col gap-2">
                                             <div className="flex justify-between items-start">
-                                              <div className="flex-grow">
-                                                <p
-                                                  className="font-medium cursor-pointer hover:underline"
-                                                  onClick={() => handlePosizioneClick(currentStep.stand_id)}
-                                                >
-                                                  {currentStep.posizione} {currentStep.hips && `(${currentStep.hips})`}
-                                                </p>
-                                              </div>
+                                                <div className="flex-grow flex items-center gap-2">
+                                                    <p
+                                                        className="font-medium cursor-pointer hover:underline"
+                                                        onClick={() => handlePosizioneClick(currentStep.stand_id)}
+                                                    >
+                                                        {currentStep.posizione} {currentStep.hips && `(${currentStep.hips})`}
+                                                    </p>
+                                                    {currentStep.notes && (
+                                                        <Popover>
+                                                            <PopoverTrigger>
+                                                                <Notebook className="h-5 w-5 text-muted-foreground cursor-pointer" />
+                                                            </PopoverTrigger>
+                                                            <PopoverContent>
+                                                                <p>{currentStep.notes}</p>
+                                                            </PopoverContent>
+                                                        </Popover>
+                                                    )}
+                                                </div>
                                               <div className="flex items-center gap-2 text-sm text-muted-foreground">
                                                 {currentStep.speed && (
                                                     <Popover>
@@ -572,16 +581,6 @@ export default function KataSelection() {
                                                 <div className="p-2 -mx-2 rounded-md hover:bg-accent/50 cursor-pointer">
                                                   <div className="flex justify-between items-center">
                                                     <p className="text-sm text-muted-foreground">Techniques:</p>
-                                                    {currentStep.notes && (
-                                                      <Popover>
-                                                        <PopoverTrigger onClick={(e) => e.stopPropagation()}>
-                                                          <Notebook className="h-5 w-5 text-muted-foreground cursor-pointer" />
-                                                        </PopoverTrigger>
-                                                        <PopoverContent onClick={(e) => e.stopPropagation()}>
-                                                          <p>{currentStep.notes}</p>
-                                                        </PopoverContent>
-                                                      </Popover>
-                                                    )}
                                                   </div>
                                                   <ul className="list-disc pl-5 font-medium">
                                                     {currentStep.Tecniche && currentStep.Tecniche.map((tech) => (
