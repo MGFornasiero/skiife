@@ -186,11 +186,11 @@ export default function KataSelection() {
       })
       .then((data: KataResponse) => {
         const processedSteps = Object.values(data.steps).map(step => {
-            const techniques = step.tecniche || step.Tecniche;
+            const techniques = step.Tecniche || [];
             const processedTechniques = techniques.map(tech => ({
                 ...tech,
-                tecnica: tech.tecnica || tech.Tecnica,
-                obiettivo: tech.obiettivo || tech.Obiettivo
+                tecnica: tech.tecnica,
+                obiettivo: tech.obiettivo
             }));
             return {
                 ...step,
@@ -272,7 +272,7 @@ export default function KataSelection() {
       setSelectedTechnicInfo(data.info_technic);
     } catch (error: any) {
       console.error("Error fetching technic info:", error);
-      setIsTechnicInfoDialogOpen(false); // Close dialog on error
+      setIsTechnicInfoDialogOpen(false);
       toast({
         variant: "destructive",
         title: "Error",
@@ -533,6 +533,18 @@ export default function KataSelection() {
                                                 </p>
                                               </div>
                                               <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                                                {currentStep.speed && (
+                                                    <Popover>
+                                                        <PopoverTrigger asChild>
+                                                          <div className="cursor-pointer">
+                                                            {getStepTempoIcon(currentStep.speed)}
+                                                            </div>
+                                                        </PopoverTrigger>
+                                                        <PopoverContent className="w-auto p-2">
+                                                            <p>{currentStep.speed}</p>
+                                                        </PopoverContent>
+                                                    </Popover>
+                                                )}
                                                 {currentStep.kiai && (
                                                   <Popover>
                                                     <PopoverTrigger asChild>
@@ -732,5 +744,3 @@ export default function KataSelection() {
     </>
   );
 }
-
-    
