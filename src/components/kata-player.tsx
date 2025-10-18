@@ -136,9 +136,6 @@ export const KataPlayer: React.FC<KataPlayerProps> = ({
         </svg>
 
         <div className="mt-4 w-full text-center">
-             <p className="text-sm text-muted-foreground">
-                Guardia: {currentStep.guardia}, Hips: {currentStep.hips || "-"}
-            </p>
             {currentStep.kiai && <p className="text-sm font-bold text-destructive">Kiai!</p>}
         </div>
       </CardContent>
