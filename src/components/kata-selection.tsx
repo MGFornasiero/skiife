@@ -89,6 +89,13 @@ const getTempoIcon = (tempo: Tempo | null) => {
     return <Icon className="h-4 w-4" />;
 };
 
+const getStepTempoIcon = (tempo: Tempo | null) => {
+    if (!tempo) return null;
+    const Icon = tempoIconMap[tempo];
+    if (!Icon) return null;
+    return <Icon className="h-5 w-5" />;
+};
+
 const formatWazaNote = (note: any): string | null => {
     if (!note) return null;
     if (typeof note === 'string') return note;
@@ -178,7 +185,27 @@ export default function KataSelection() {
         return res.json();
       })
       .then((data: KataResponse) => {
-        setKataDetails(data);
+        const processedSteps = Object.values(data.steps).map(step => {
+            const techniques = step.tecniche || step.Tecniche;
+            const processedTechniques = techniques.map(tech => ({
+                ...tech,
+                tecnica: tech.tecnica || tech.Tecnica,
+                obiettivo: tech.obiettivo || tech.Obiettivo
+            }));
+            return {
+                ...step,
+                Tecniche: processedTechniques,
+                tecniche: processedTechniques
+            };
+        });
+
+        const stepsObject = processedSteps.reduce((acc, step) => {
+            acc[step.id_sequence] = step;
+            return acc;
+        }, {} as Record<string, KataSequenceStep>);
+
+
+        setKataDetails({...data, steps: stepsObject});
       })
       .catch((error: any) => {
         console.error("Error fetching kata data:", error);
@@ -370,6 +397,18 @@ export default function KataSelection() {
                                                               </p>
                                                           </div>
                                                           <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                                                              {step.speed && (
+                                                                  <Popover>
+                                                                      <PopoverTrigger asChild>
+                                                                        <div className="cursor-pointer">
+                                                                          {getStepTempoIcon(step.speed)}
+                                                                          </div>
+                                                                      </PopoverTrigger>
+                                                                      <PopoverContent className="w-auto p-2">
+                                                                          <p>{step.speed}</p>
+                                                                      </PopoverContent>
+                                                                  </Popover>
+                                                              )}
                                                               {step.kiai && (
                                                                   <Popover>
                                                                       <PopoverTrigger asChild>
@@ -693,3 +732,5 @@ export default function KataSelection() {
     </>
   );
 }
+
+    
