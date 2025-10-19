@@ -96,28 +96,6 @@ const getStepTempoIcon = (tempo: Tempo | null) => {
     return <Icon className="h-5 w-5" />;
 };
 
-const parseEmbusen = (embusen: EmbusenPoints | string | null): EmbusenPoints | null => {
-    if (!embusen) return null;
-    if (typeof embusen === 'object' && embusen !== null && 'x' in embusen && 'y' in embusen) {
-      return embusen;
-    }
-    if (typeof embusen === 'string') {
-      try {
-          const match = embusen.match(/\(([^,]+),([^)]+)\)/);
-          if (match) {
-              const x = parseFloat(match[1]);
-              const y = parseFloat(match[2]);
-              if (!isNaN(x) && !isNaN(y)) {
-                  return { x, y };
-              }
-          }
-      } catch (e) {
-          console.error("Error parsing embusen:", e);
-      }
-    }
-    return null;
-};
-
 export default function KataSelection() {
   const [kataInventory, setKataInventory] = useState<KataInventory | null>(null);
   const [selectedKataName, setSelectedKataName] = useState<string | null>(null);
@@ -540,6 +518,18 @@ export default function KataSelection() {
                                                         </ul>
                                                     </CardContent>
                                                 </Card>
+                                            )}
+
+                                            {/* Notes Section */}
+                                            {currentStep.notes && (
+                                              <Card>
+                                                <CardHeader className="p-4">
+                                                  <CardTitle className="text-lg">Notes</CardTitle>
+                                                </CardHeader>
+                                                <CardContent className="p-4 pt-0">
+                                                  <p className="text-sm text-muted-foreground">{currentStep.notes}</p>
+                                                </CardContent>
+                                              </Card>
                                             )}
                                         </div>
                                         
