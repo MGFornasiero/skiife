@@ -509,27 +509,11 @@ export default function KataSelection() {
                                                             {currentStep.Tecniche.map((tech, index) => (
                                                                 <li key={index} className="text-sm border-b pb-2 last:border-b-0">
                                                                     <strong className="cursor-pointer hover:underline" onClick={() => handleTechnicClick(tech.technic_id)}>{tech.tecnica}</strong>
-                                                                    <div className="text-xs text-muted-foreground pl-2">
-                                                                        <p>Arto: {tech.arto}</p>
-                                                                        <p>Obiettivo: {tech.obiettivo || 'N/A'}</p>
-                                                                    </div>
                                                                 </li>
                                                             ))}
                                                         </ul>
                                                     </CardContent>
                                                 </Card>
-                                            )}
-
-                                            {/* Notes Section */}
-                                            {currentStep.notes && (
-                                              <Card>
-                                                <CardHeader className="p-4">
-                                                  <CardTitle className="text-lg">Notes</CardTitle>
-                                                </CardHeader>
-                                                <CardContent className="p-4 pt-0">
-                                                  <p className="text-sm text-muted-foreground">{currentStep.notes}</p>
-                                                </CardContent>
-                                              </Card>
                                             )}
                                         </div>
                                         
