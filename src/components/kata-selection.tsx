@@ -449,16 +449,6 @@ export default function KataSelection() {
                                                                   </li>
                                                               ))}
                                                           </ul>
-                                                          {step.notes && (
-                                                            <Popover>
-                                                                <PopoverTrigger onClick={(e) => e.stopPropagation()}>
-                                                                    <Notebook className="h-5 w-5 text-muted-foreground cursor-pointer mt-2" />
-                                                                </PopoverTrigger>
-                                                                <PopoverContent onClick={(e) => e.stopPropagation()}>
-                                                                    <p>{step.notes}</p>
-                                                                </PopoverContent>
-                                                            </Popover>
-                                                          )}
                                                       </div>
                                                   </CardContent>
                                               </Card>
@@ -475,16 +465,6 @@ export default function KataSelection() {
                                                                   </PopoverContent>
                                                               </Popover>
                                                               <p className="text-2xl font-bold" title={transaction.direction ?? undefined}>{getDirectionSymbol(transaction.direction)}</p>
-                                                              {transaction.notes && (
-                                                                  <Popover>
-                                                                      <PopoverTrigger>
-                                                                          <Notebook className="h-5 w-5 text-muted-foreground cursor-pointer" />
-                                                                      </PopoverTrigger>
-                                                                      <PopoverContent>
-                                                                          <p>{transaction.notes}</p>
-                                                                      </PopoverContent>
-                                                                  </Popover>
-                                                              )}
                                                           </div>
                                                       )}
                                                   </div>
@@ -569,14 +549,12 @@ export default function KataSelection() {
                                                     <CardContent className="p-4 pt-0">
                                                         <ul className="space-y-2">
                                                             {currentStep.Tecniche.map((tech, index) => {
-                                                                const noteText = formatWazaNote(tech.waza_note);
                                                                 return (
                                                                     <li key={index} className="text-sm border-b pb-2 last:border-b-0">
                                                                         <strong className="cursor-pointer hover:underline" onClick={() => handleTechnicClick(tech.technic_id)}>{tech.tecnica}</strong>
                                                                         <div className="text-xs text-muted-foreground pl-2">
                                                                             <p>Arto: {tech.arto}</p>
                                                                             <p>Obiettivo: {tech.obiettivo || 'N/A'}</p>
-                                                                            {noteText && <p>Note: {noteText}</p>}
                                                                         </div>
                                                                     </li>
                                                                 );
@@ -584,20 +562,6 @@ export default function KataSelection() {
                                                         </ul>
                                                     </CardContent>
                                                 </Card>
-                                            )}
-                                            
-                                            {/* Notes Section */}
-                                            {currentStep.notes && (
-                                              <Card>
-                                                <CardHeader className="p-4">
-                                                  <CardTitle className="text-lg flex items-center gap-2">
-                                                      <Notebook className="h-5 w-5" /> Notes
-                                                  </CardTitle>
-                                                </CardHeader>
-                                                <CardContent className="p-4 pt-0">
-                                                  <p className="text-sm text-muted-foreground">{currentStep.notes}</p>
-                                                </CardContent>
-                                              </Card>
                                             )}
                                         </div>
                                         
