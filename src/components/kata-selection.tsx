@@ -96,26 +96,6 @@ const getStepTempoIcon = (tempo: Tempo | null) => {
     return <Icon className="h-5 w-5" />;
 };
 
-export const formatWazaNote = (note: any): string | null => {
-    if (!note) return null;
-    if (typeof note === 'string') {
-        return note.trim() === '' ? null : note;
-    }
-    if (typeof note === 'object' && note !== null && 'limb' in note && 'side' in note) {
-        return `Limb: ${note.limb}, Side: ${note.side}`;
-    }
-    try {
-        const parsed = JSON.stringify(note);
-        if (parsed !== '{}' && parsed !== '[]') {
-            return parsed;
-        }
-    } catch (e) {
-        return null;
-    }
-    return null;
-}
-
-
 const parseEmbusen = (embusen: EmbusenPoints | string | null): EmbusenPoints | null => {
     if (!embusen) return null;
     if (typeof embusen === 'object' && embusen !== null && 'x' in embusen && 'y' in embusen) {
@@ -548,18 +528,26 @@ export default function KataSelection() {
                                                     </CardHeader>
                                                     <CardContent className="p-4 pt-0">
                                                         <ul className="space-y-2">
-                                                            {currentStep.Tecniche.map((tech, index) => {
-                                                                return (
-                                                                    <li key={index} className="text-sm border-b pb-2 last:border-b-0">
-                                                                        <strong className="cursor-pointer hover:underline" onClick={() => handleTechnicClick(tech.technic_id)}>{tech.tecnica}</strong>
-                                                                        <div className="text-xs text-muted-foreground pl-2">
-                                                                            <p>Arto: {tech.arto}</p>
-                                                                            <p>Obiettivo: {tech.obiettivo || 'N/A'}</p>
-                                                                        </div>
-                                                                    </li>
-                                                                );
-                                                            })}
+                                                            {currentStep.Tecniche.map((tech, index) => (
+                                                                <li key={index} className="text-sm border-b pb-2 last:border-b-0">
+                                                                    <strong className="cursor-pointer hover:underline" onClick={() => handleTechnicClick(tech.technic_id)}>{tech.tecnica}</strong>
+                                                                    <div className="text-xs text-muted-foreground pl-2">
+                                                                        <p>Arto: {tech.arto}</p>
+                                                                        <p>Obiettivo: {tech.obiettivo || 'N/A'}</p>
+                                                                    </div>
+                                                                </li>
+                                                            ))}
                                                         </ul>
+                                                    </CardContent>
+                                                </Card>
+                                            )}
+                                            {currentStep.notes && currentStep.notes.trim() !== '' && (
+                                                <Card>
+                                                    <CardHeader className="p-4">
+                                                        <CardTitle className="text-lg">Notes</CardTitle>
+                                                    </CardHeader>
+                                                    <CardContent className="p-4 pt-0">
+                                                        <p className="text-sm text-muted-foreground">{currentStep.notes}</p>
                                                     </CardContent>
                                                 </Card>
                                             )}
@@ -711,3 +699,5 @@ export default function KataSelection() {
     </>
   );
 }
+
+    
