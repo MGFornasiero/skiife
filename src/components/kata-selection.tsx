@@ -747,6 +747,3 @@ export default function KataSelection() {
     </>
   );
 }
-
-    
-    
