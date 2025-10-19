@@ -28,8 +28,6 @@ import { useToast } from "@/hooks/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AbsoluteDirections, EmbusenPoints, Sides, Tempo } from "@/lib/type_admin_fe";
 import { KataPlayer } from "./kata-player";
-import { ScrollArea, ScrollBar } from "./ui/scroll-area";
-import { Separator } from "./ui/separator";
 
 
 const facingArrowMap: { [key in AbsoluteDirections]: string } = {
@@ -104,7 +102,15 @@ export const formatWazaNote = (note: any): string | null => {
     if (typeof note === 'object' && note !== null && 'limb' in note && 'side' in note) {
         return `Limb: ${note.limb}, Side: ${note.side}`;
     }
-    return JSON.stringify(note);
+    try {
+        const parsed = JSON.stringify(note);
+        if (parsed !== '{}' && parsed !== '[]') {
+            return parsed;
+        }
+    } catch (e) {
+        return null;
+    }
+    return null;
 }
 
 
@@ -432,20 +438,8 @@ export default function KataSelection() {
                                                           </div>
                                                       </div>
 
-                                                      <div className="p-2 -mx-2 rounded-md hover:bg-accent/50">
-                                                          <div className="flex justify-between items-center">
-                                                              <p className="text-sm text-muted-foreground">Techniques:</p>
-                                                              {step.notes && (
-                                                                  <Popover>
-                                                                      <PopoverTrigger onClick={(e) => e.stopPropagation()}>
-                                                                          <Notebook className="h-5 w-5 text-muted-foreground cursor-pointer" />
-                                                                      </PopoverTrigger>
-                                                                      <PopoverContent onClick={(e) => e.stopPropagation()}>
-                                                                          <p>{step.notes}</p>
-                                                                      </PopoverContent>
-                                                                  </Popover>
-                                                              )}
-                                                          </div>
+                                                      <div>
+                                                          <p className="text-sm text-muted-foreground">Techniques:</p>
                                                           <ul className="list-disc pl-5 font-medium">
                                                               {techniques && techniques.map((tech) => (
                                                                   <li key={tech.technic_id} className="truncate text-sm cursor-pointer hover:underline" onClick={(e) => { e.stopPropagation(); handleTechnicClick(tech.technic_id); }}>
@@ -453,6 +447,16 @@ export default function KataSelection() {
                                                                   </li>
                                                               ))}
                                                           </ul>
+                                                          {step.notes && (
+                                                            <Popover>
+                                                                <PopoverTrigger onClick={(e) => e.stopPropagation()}>
+                                                                    <Notebook className="h-5 w-5 text-muted-foreground cursor-pointer mt-2" />
+                                                                </PopoverTrigger>
+                                                                <PopoverContent onClick={(e) => e.stopPropagation()}>
+                                                                    <p>{step.notes}</p>
+                                                                </PopoverContent>
+                                                            </Popover>
+                                                          )}
                                                       </div>
                                                   </CardContent>
                                               </Card>
@@ -562,16 +566,19 @@ export default function KataSelection() {
                                                     </CardHeader>
                                                     <CardContent className="p-4 pt-0">
                                                         <ul className="space-y-2">
-                                                            {currentStep.Tecniche.map((tech, index) => (
-                                                                <li key={index} className="text-sm border-b pb-2 last:border-b-0">
-                                                                    <strong className="cursor-pointer hover:underline" onClick={() => handleTechnicClick(tech.technic_id)}>{tech.tecnica}</strong>
-                                                                    <div className="text-xs text-muted-foreground pl-2">
-                                                                        <p>Arto: {tech.arto}</p>
-                                                                        <p>Obiettivo: {tech.obiettivo || 'N/A'}</p>
-                                                                        {formatWazaNote(tech.waza_note) && <p>Note: {formatWazaNote(tech.waza_note)}</p>}
-                                                                    </div>
-                                                                </li>
-                                                            ))}
+                                                            {currentStep.Tecniche.map((tech, index) => {
+                                                                const noteText = formatWazaNote(tech.waza_note);
+                                                                return (
+                                                                    <li key={index} className="text-sm border-b pb-2 last:border-b-0">
+                                                                        <strong className="cursor-pointer hover:underline" onClick={() => handleTechnicClick(tech.technic_id)}>{tech.tecnica}</strong>
+                                                                        <div className="text-xs text-muted-foreground pl-2">
+                                                                            <p>Arto: {tech.arto}</p>
+                                                                            <p>Obiettivo: {tech.obiettivo || 'N/A'}</p>
+                                                                            {noteText && <p>Note: {noteText}</p>}
+                                                                        </div>
+                                                                    </li>
+                                                                );
+                                                            })}
                                                         </ul>
                                                     </CardContent>
                                                 </Card>
@@ -738,5 +745,7 @@ export default function KataSelection() {
     </>
   );
 }
+
+    
 
     
