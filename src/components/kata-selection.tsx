@@ -98,7 +98,9 @@ const getStepTempoIcon = (tempo: Tempo | null) => {
 
 export const formatWazaNote = (note: any): string | null => {
     if (!note) return null;
-    if (typeof note === 'string') return note;
+    if (typeof note === 'string') {
+        return note.trim() === '' ? null : note;
+    }
     if (typeof note === 'object' && note !== null && 'limb' in note && 'side' in note) {
         return `Limb: ${note.limb}, Side: ${note.side}`;
     }
@@ -746,4 +748,5 @@ export default function KataSelection() {
   );
 }
 
+    
     
