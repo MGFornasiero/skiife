@@ -541,16 +541,6 @@ export default function KataSelection() {
                                                     </CardContent>
                                                 </Card>
                                             )}
-                                            {currentStep.notes && currentStep.notes.trim() !== '' && (
-                                                <Card>
-                                                    <CardHeader className="p-4">
-                                                        <CardTitle className="text-lg">Notes</CardTitle>
-                                                    </CardHeader>
-                                                    <CardContent className="p-4 pt-0">
-                                                        <p className="text-sm text-muted-foreground">{currentStep.notes}</p>
-                                                    </CardContent>
-                                                </Card>
-                                            )}
                                         </div>
                                         
                                         {/* Embusen Section */}
