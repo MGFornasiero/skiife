@@ -157,7 +157,6 @@ export default function KataSelection() {
         const processedSteps = Object.values(data.steps).map(step => {
             const techniques = step.Tecniche || [];
             const processedTechniques = techniques.map(tech => {
-                // Ensure `tecnica` and `obiettivo` are consistently named
                 const tecnica = tech.tecnica || tech.Tecnica;
                 const obiettivo = tech.obiettivo || tech.Obiettivo;
                 return {
@@ -390,6 +389,16 @@ export default function KataSelection() {
                                                                       </PopoverContent>
                                                                   </Popover>
                                                               )}
+                                                              {step.notes && (
+                                                                <Popover>
+                                                                    <PopoverTrigger>
+                                                                        <Notebook className="h-5 w-5 text-muted-foreground cursor-pointer" />
+                                                                    </PopoverTrigger>
+                                                                    <PopoverContent>
+                                                                        <p>{step.notes}</p>
+                                                                    </PopoverContent>
+                                                                </Popover>
+                                                              )}
                                                               <Popover>
                                                                   <PopoverTrigger asChild>
                                                                       <span className="text-2xl cursor-pointer">{getGuardiaSymbol(step.guardia)}</span>
@@ -454,11 +463,8 @@ export default function KataSelection() {
                                       <div className="w-full flex flex-col gap-6 items-center">
                                         <div className="w-full max-w-md flex flex-col gap-6">
 
-                                            {/* Step Details Section */}
                                             <div className="space-y-2">
-                                                <h3 className="font-semibold text-lg">Step Details</h3>
                                                 <div className={cn("flex items-center justify-between text-sm rounded-lg border p-4", currentStep.kiai && "border-primary")}>
-                                                    <span>Status</span>
                                                     <div className="flex items-center gap-3">
                                                         {currentStep.speed && (
                                                             <Popover>
@@ -485,9 +491,7 @@ export default function KataSelection() {
                                             </div>
                                             <Separator/>
 
-                                            {/* Position Section */}
                                             <div className="space-y-2">
-                                              <h3 className="font-semibold text-lg">Position</h3>
                                                <p 
                                                  className="font-medium text-base cursor-pointer hover:underline"
                                                  onClick={() => handlePosizioneClick(currentStep.stand_id)}
@@ -497,16 +501,13 @@ export default function KataSelection() {
                                             </div>
                                             <Separator/>
 
-                                            {/* Techniques Section */}
                                             {currentStep.Tecniche && currentStep.Tecniche.length > 0 && (
                                                 <div className="space-y-2">
-                                                    <h3 className="font-semibold text-lg">Techniques</h3>
                                                     <div className="space-y-4">
                                                         {currentStep.Tecniche.map((tech, index) => (
                                                             <Card key={index}>
                                                               <CardContent className="p-4 space-y-2">
                                                                 <strong className="cursor-pointer hover:underline" onClick={() => handleTechnicClick(tech.technic_id)}>{tech.tecnica}</strong>
-                                                                <p className="text-sm text-muted-foreground">{tech.waza_note}</p>
                                                               </CardContent>
                                                             </Card>
                                                         ))}
@@ -515,9 +516,7 @@ export default function KataSelection() {
                                             )}
                                             <Separator/>
                                         
-                                            {/* Embusen Section */}
                                             <div className="space-y-2 flex flex-col items-center">
-                                                <h3 className="font-semibold text-lg self-start">Embusen</h3>
                                                 <KataPlayer 
                                                   steps={sortedKataSteps} 
                                                   currentStepIndex={selectedStepIndex}
@@ -656,5 +655,3 @@ export default function KataSelection() {
     </>
   );
 }
-
-    
