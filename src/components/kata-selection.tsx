@@ -28,6 +28,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AbsoluteDirections, EmbusenPoints, Sides, Tempo } from "@/lib/type_admin_fe";
 import { KataPlayer } from "./kata-player";
+import { Separator } from "./ui/separator";
 
 
 const facingArrowMap: { [key in AbsoluteDirections]: string } = {
@@ -155,11 +156,16 @@ export default function KataSelection() {
       .then((data: KataResponse) => {
         const processedSteps = Object.values(data.steps).map(step => {
             const techniques = step.Tecniche || [];
-            const processedTechniques = techniques.map(tech => ({
-                ...tech,
-                tecnica: tech.tecnica,
-                obiettivo: tech.obiettivo
-            }));
+            const processedTechniques = techniques.map(tech => {
+                // Ensure `tecnica` and `obiettivo` are consistently named
+                const tecnica = tech.tecnica || tech.Tecnica;
+                const obiettivo = tech.obiettivo || tech.Obiettivo;
+                return {
+                    ...tech,
+                    tecnica: tecnica,
+                    obiettivo: obiettivo,
+                };
+            });
             return {
                 ...step,
                 Tecniche: processedTechniques,
@@ -335,8 +341,6 @@ export default function KataSelection() {
                           </CardTitle>
                       </div>
                   </div>
-                  {kataDetails?.notes && <CardDescription className="mt-2 text-left">{kataDetails.notes}</CardDescription>}
-                  {!selectedKataName && !kataDetails?.notes && <CardDescription className="mt-2 text-right">Select a kata to see its details.</CardDescription>}
               </CardHeader>
               <CardContent>
                   {loading && <p className="text-muted-foreground pt-4">Loading kata details...</p>}
@@ -447,90 +451,79 @@ export default function KataSelection() {
                                           </Button>
                                       </div>
 
-                                      <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
-                                        <div className="flex flex-col gap-4">
+                                      <div className="w-full flex flex-col gap-6 items-center">
+                                        <div className="w-full max-w-md flex flex-col gap-6">
+
                                             {/* Step Details Section */}
-                                            <Card className={cn("w-full", currentStep.kiai && "border-primary")}>
-                                                <CardHeader className="p-4">
-                                                  <CardTitle className="text-lg">Step Details</CardTitle>
-                                                </CardHeader>
-                                                <CardContent className="p-4 pt-0">
-                                                    <div className="flex items-center justify-between text-sm text-muted-foreground">
-                                                        <span>Status</span>
-                                                        <div className="flex items-center gap-3">
-                                                            {currentStep.speed && (
-                                                                <Popover>
-                                                                    <PopoverTrigger className="cursor-pointer">{getStepTempoIcon(currentStep.speed)}</PopoverTrigger>
-                                                                    <PopoverContent className="w-auto p-2"><p>{currentStep.speed}</p></PopoverContent>
-                                                                </Popover>
-                                                            )}
-                                                            {currentStep.kiai && (
-                                                                <Popover>
-                                                                    <PopoverTrigger className="cursor-pointer"><Volume2 className="h-5 w-5 text-destructive" /></PopoverTrigger>
-                                                                    <PopoverContent className="w-auto p-2"><p>Kiai!</p></PopoverContent>
-                                                                </Popover>
-                                                            )}
+                                            <div className="space-y-2">
+                                                <h3 className="font-semibold text-lg">Step Details</h3>
+                                                <div className={cn("flex items-center justify-between text-sm rounded-lg border p-4", currentStep.kiai && "border-primary")}>
+                                                    <span>Status</span>
+                                                    <div className="flex items-center gap-3">
+                                                        {currentStep.speed && (
                                                             <Popover>
-                                                                <PopoverTrigger className="cursor-pointer text-2xl">{getGuardiaSymbol(currentStep.guardia)}</PopoverTrigger>
-                                                                <PopoverContent className="w-auto p-2"><p>Guardia: {currentStep.guardia}</p></PopoverContent>
+                                                                <PopoverTrigger className="cursor-pointer">{getStepTempoIcon(currentStep.speed)}</PopoverTrigger>
+                                                                <PopoverContent className="w-auto p-2"><p>{currentStep.speed}</p></PopoverContent>
                                                             </Popover>
+                                                        )}
+                                                        {currentStep.kiai && (
                                                             <Popover>
-                                                                <PopoverTrigger className="cursor-pointer text-2xl font-bold">{getFacingArrow(currentStep.facing)}</PopoverTrigger>
-                                                                <PopoverContent className="w-auto p-2"><p>Facing: {currentStep.facing}</p></PopoverContent>
+                                                                <PopoverTrigger className="cursor-pointer"><Volume2 className="h-5 w-5 text-destructive" /></PopoverTrigger>
+                                                                <PopoverContent className="w-auto p-2"><p>Kiai!</p></PopoverContent>
                                                             </Popover>
-                                                        </div>
+                                                        )}
+                                                        <Popover>
+                                                            <PopoverTrigger className="cursor-pointer text-2xl">{getGuardiaSymbol(currentStep.guardia)}</PopoverTrigger>
+                                                            <PopoverContent className="w-auto p-2"><p>Guardia: {currentStep.guardia}</p></PopoverContent>
+                                                        </Popover>
+                                                        <Popover>
+                                                            <PopoverTrigger className="cursor-pointer text-2xl font-bold">{getFacingArrow(currentStep.facing)}</PopoverTrigger>
+                                                            <PopoverContent className="w-auto p-2"><p>Facing: {currentStep.facing}</p></PopoverContent>
+                                                        </Popover>
                                                     </div>
-                                                </CardContent>
-                                            </Card>
+                                                </div>
+                                            </div>
+                                            <Separator/>
 
                                             {/* Position Section */}
-                                            <Card>
-                                              <CardHeader className="p-4">
-                                                <CardTitle className="text-lg">Position</CardTitle>
-                                              </CardHeader>
-                                              <CardContent className="p-4 pt-0">
-                                                 <p 
-                                                   className="font-medium text-base cursor-pointer hover:underline"
-                                                   onClick={() => handlePosizioneClick(currentStep.stand_id)}
-                                                 >
-                                                    {currentStep.posizione} {currentStep.hips && `(${currentStep.hips})`}
-                                                 </p>
-                                              </CardContent>
-                                            </Card>
+                                            <div className="space-y-2">
+                                              <h3 className="font-semibold text-lg">Position</h3>
+                                               <p 
+                                                 className="font-medium text-base cursor-pointer hover:underline"
+                                                 onClick={() => handlePosizioneClick(currentStep.stand_id)}
+                                               >
+                                                  {currentStep.posizione} {currentStep.hips && `(${currentStep.hips})`}
+                                               </p>
+                                            </div>
+                                            <Separator/>
 
                                             {/* Techniques Section */}
                                             {currentStep.Tecniche && currentStep.Tecniche.length > 0 && (
-                                                <Card>
-                                                    <CardHeader className="p-4">
-                                                        <CardTitle className="text-lg">Techniques</CardTitle>
-                                                    </CardHeader>
-                                                    <CardContent className="p-4 pt-0">
-                                                        <ul className="space-y-2">
-                                                            {currentStep.Tecniche.map((tech, index) => (
-                                                                <li key={index} className="text-sm border-b pb-2 last:border-b-0">
-                                                                    <strong className="cursor-pointer hover:underline" onClick={() => handleTechnicClick(tech.technic_id)}>{tech.tecnica}</strong>
-                                                                </li>
-                                                            ))}
-                                                        </ul>
-                                                    </CardContent>
-                                                </Card>
+                                                <div className="space-y-2">
+                                                    <h3 className="font-semibold text-lg">Techniques</h3>
+                                                    <div className="space-y-4">
+                                                        {currentStep.Tecniche.map((tech, index) => (
+                                                            <Card key={index}>
+                                                              <CardContent className="p-4 space-y-2">
+                                                                <strong className="cursor-pointer hover:underline" onClick={() => handleTechnicClick(tech.technic_id)}>{tech.tecnica}</strong>
+                                                                <p className="text-sm text-muted-foreground">{tech.waza_note}</p>
+                                                              </CardContent>
+                                                            </Card>
+                                                        ))}
+                                                    </div>
+                                                </div>
                                             )}
-                                        </div>
+                                            <Separator/>
                                         
-                                        {/* Embusen Section */}
-                                        <div className="flex flex-col gap-4">
-                                            <Card>
-                                                <CardHeader className="p-4">
-                                                    <CardTitle className="text-lg">Embusen</CardTitle>
-                                                </CardHeader>
-                                                <CardContent className="p-4 pt-0">
-                                                  <KataPlayer 
-                                                    steps={sortedKataSteps} 
-                                                    currentStepIndex={selectedStepIndex}
-                                                    onStepChange={setSelectedStepIndex}
-                                                  />
-                                                </CardContent>
-                                            </Card>
+                                            {/* Embusen Section */}
+                                            <div className="space-y-2 flex flex-col items-center">
+                                                <h3 className="font-semibold text-lg self-start">Embusen</h3>
+                                                <KataPlayer 
+                                                  steps={sortedKataSteps} 
+                                                  currentStepIndex={selectedStepIndex}
+                                                  onStepChange={setSelectedStepIndex}
+                                                />
+                                            </div>
                                         </div>
 
                                       </div>
