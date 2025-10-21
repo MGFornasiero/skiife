@@ -154,30 +154,7 @@ export default function KataSelection() {
         return res.json();
       })
       .then((data: KataResponse) => {
-        const processedSteps = Object.values(data.steps).map(step => {
-            const techniques = step.Tecniche || [];
-            const processedTechniques = techniques.map(tech => {
-                const tecnica = tech.tecnica || tech.Tecnica;
-                const obiettivo = tech.obiettivo || tech.Obiettivo;
-                return {
-                    ...tech,
-                    tecnica: tecnica,
-                    obiettivo: obiettivo,
-                };
-            });
-            return {
-                ...step,
-                Tecniche: processedTechniques,
-            };
-        });
-
-        const stepsObject = processedSteps.reduce((acc, step) => {
-            acc[step.id_sequence] = step;
-            return acc;
-        }, {} as Record<string, KataSequenceStep>);
-
-
-        setKataDetails({...data, steps: stepsObject});
+        setKataDetails(data);
       })
       .catch((error: any) => {
         console.error("Error fetching kata data:", error);
@@ -462,7 +439,6 @@ export default function KataSelection() {
 
                                       <div className="w-full flex flex-col gap-6 items-center">
                                         <div className="w-full max-w-md flex flex-col gap-6">
-
                                             <div className="space-y-2">
                                                 <div className={cn("flex items-center justify-between text-sm rounded-lg border p-4", currentStep.kiai && "border-primary")}>
                                                     <div className="flex items-center gap-3">
@@ -501,21 +477,6 @@ export default function KataSelection() {
                                             </div>
                                             <Separator/>
 
-                                            {currentStep.Tecniche && currentStep.Tecniche.length > 0 && (
-                                                <div className="space-y-2">
-                                                    <div className="space-y-4">
-                                                        {currentStep.Tecniche.map((tech, index) => (
-                                                            <Card key={index}>
-                                                              <CardContent className="p-4 space-y-2">
-                                                                <strong className="cursor-pointer hover:underline" onClick={() => handleTechnicClick(tech.technic_id)}>{tech.tecnica}</strong>
-                                                              </CardContent>
-                                                            </Card>
-                                                        ))}
-                                                    </div>
-                                                </div>
-                                            )}
-                                            <Separator/>
-                                        
                                             <div className="space-y-2 flex flex-col items-center">
                                                 <KataPlayer 
                                                   steps={sortedKataSteps} 

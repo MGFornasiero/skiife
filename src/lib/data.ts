@@ -1,6 +1,6 @@
 import { 
-    AbsoluteDirections, BodyPart, DetailedNotes, EmbusenPoints, Hips, KataSeries, 
-    Movements, Sides, TargetHgt, Tempo
+    AbsoluteDirections, BodyPart, DetailedNotes, EmbusenPoints, Hips, KataSeries, Limbs, 
+    Movements, Sides, TargetHgt, Tempo, WazaType 
 } from "./type_admin_fe";
 
 // For /grade_id/{gradetype}/{grade}
@@ -118,17 +118,15 @@ export interface KihonListResponse {
 // For /kata/{kata_id}
 export interface KataTechnique {
     sequence_id: number;
-    arto: BodyPart;
+    arto: BodyPart | null;               // from models: arto can be nullable
     technic_id: number;
-    tecnica: string | null; // Alias for Tecnica
-    Tecnica: string | null; // from API
+    tecnica: string | null;              // model attribute name is 'tecnica' (alias "Tecnica")
     strikingpart_id: number | null;
     strikingpart_name: string | null;
     technic_target_id: number | null;
-    obiettivo: string | null; // Alias for Obiettivo
-    Obiettivo: string | null; // from API
+    obiettivo: string | null;            // model attribute name is 'obiettivo' (alias "Obiettivo")
     waza_note: string | null;
-    waza_resources: Record<string, any>[] | null;
+    waza_resources: Record<string, any>[] | null; // list of resource objects or null
 }
 
 export interface KataSequenceStep {
@@ -141,10 +139,9 @@ export interface KataSequenceStep {
   guardia: Sides | null;
   hips: Hips | null;
   facing: AbsoluteDirections | null;
-  Tecniche: KataTechnique[]; // Alias for tecniche from API
-  tecniche: KataTechnique[]; // from API
+  Tecniche: KataTechnique[];           // model field name is 'Tecniche' (capital T)
   embusen: EmbusenPoints | null;
-  kiai: boolean;
+  kiai: boolean | null;                // can be null according to models
   notes: string | null;
   remarks: DetailedNotes[] | null;
   resources: Record<string, any> | null;
@@ -155,7 +152,7 @@ export interface KataResponse {
   kata_id: number;
   kata_name: string;
   serie: KataSeries | null;
-  Gamba: string;
+  Gamba: Sides;                         // starting_leg is a Sides enum in models
   notes: string | null;
   resources: Record<string, any> | null;
   resource_url: string | null;
