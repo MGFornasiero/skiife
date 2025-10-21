@@ -2,7 +2,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { type KataInventory, type KataResponse, type KataSequenceStep, type StandInfo, type TechnicInfo, type BunkaiSummary, type KataTechnique, type BodyPart } from "@/lib/data";
+import { type KataInventory, type KataResponse, type KataSequenceStep, type StandInfo, type TechnicInfo, type BunkaiSummary, type KataTechnique, type BodyPart, DetailedNotes } from "@/lib/data";
 import {
   Select,
   SelectContent,
@@ -484,17 +484,36 @@ export default function KataSelection() {
                                         </div>
                                         <Separator/>
                                         
+                                        <div className="space-y-2"></div>
+                                        <Separator/>
+                                        
                                         <div className="space-y-4">
-                                          {currentStep.Tecniche && currentStep.Tecniche.length > 0 && (
-                                              currentStep.Tecniche.map((tech, index) => (
+                                          {currentStep.remarks && currentStep.remarks.length > 0 && (
+                                              currentStep.remarks.map((remark, index) => (
                                                   <Card key={index}>
-                                                      <CardContent className="p-4 space-y-2">
-                                                          <p 
-                                                              className="font-medium cursor-pointer hover:underline"
-                                                              onClick={() => handleTechnicClick(tech.technic_id)}
-                                                          >
-                                                              {tech.tecnica}
-                                                          </p>
+                                                      <CardContent className="p-4 space-y-3">
+                                                          <div className="flex items-center gap-2 font-medium capitalize">
+                                                              <span className="text-sm text-muted-foreground">Part:</span>
+                                                              {formatBodyPart(remark.arto)}
+                                                          </div>
+                                                          {remark.description && (
+                                                              <div>
+                                                                  <span className="text-sm text-muted-foreground">Description:</span>
+                                                                  <p className="text-sm">{remark.description}</p>
+                                                              </div>
+                                                          )}
+                                                          {remark.explanation && (
+                                                              <div>
+                                                                  <span className="text-sm text-muted-foreground">Explanation:</span>
+                                                                  <p className="text-sm">{remark.explanation}</p>
+                                                              </div>
+                                                          )}
+                                                          {remark.note && (
+                                                              <div>
+                                                                  <span className="text-sm text-muted-foreground">Note:</span>
+                                                                  <p className="text-sm">{remark.note}</p>
+                                                              </div>
+                                                          )}
                                                       </CardContent>
                                                   </Card>
                                               ))
@@ -503,52 +522,31 @@ export default function KataSelection() {
                                         <Separator/>
 
                                         <div className="space-y-2">
-                                            {currentStep.remarks && currentStep.remarks.length > 0 && (
-                                                <div className="space-y-4">
-                                                {currentStep.remarks.map((remark, index) => (
-                                                    <Card key={index}>
-                                                        <CardContent className="p-4 space-y-3">
-                                                            <div className="flex items-center gap-2 font-medium capitalize">
-                                                                <span className="text-sm text-muted-foreground">Part:</span>
-                                                                {formatBodyPart(remark.arto)}
-                                                            </div>
-                                                            {remark.description && (
-                                                                <div>
-                                                                    <span className="text-sm text-muted-foreground">Description:</span>
-                                                                    <p className="text-sm">{remark.description}</p>
-                                                                </div>
-                                                            )}
-                                                            {remark.explanation && (
-                                                                <div>
-                                                                    <span className="text-sm text-muted-foreground">Explanation:</span>
-                                                                    <p className="text-sm">{remark.explanation}</p>
-                                                                </div>
-                                                            )}
-                                                            {remark.note && (
-                                                                <div>
-                                                                    <span className="text-sm text-muted-foreground">Note:</span>
-                                                                    <p className="text-sm">{remark.note}</p>
-                                                                </div>
-                                                            )}
-                                                        </CardContent>
-                                                    </Card>
-                                                ))}
-                                                </div>
-                                            )}
+                                          {currentStep.resources && (
+                                            <div className="space-y-4">
+                                              {(Array.isArray(currentStep.resources) ? currentStep.resources : [currentStep.resources]).map((resource, index) => (
+                                                <Card key={index}>
+                                                  <CardContent className="p-4 space-y-2">
+                                                    {Object.entries(resource).map(([key, value]) => (
+                                                      <div key={key}>
+                                                        <span className="text-sm text-muted-foreground">{key}:</span>
+                                                        <p className="text-sm">{typeof value === 'object' ? JSON.stringify(value) : String(value)}</p>
+                                                      </div>
+                                                    ))}
+                                                  </CardContent>
+                                                </Card>
+                                              ))}
+                                            </div>
+                                          )}
                                         </div>
                                         <Separator/>
-
-                                        <div className="space-y-2">
-                                          {/* Resources section */}
-                                        </div>
-                                        <Separator/>
-
+                                        
                                         <div className="space-y-2 flex flex-col items-center">
-                                            <KataPlayer 
-                                              steps={sortedKataSteps} 
-                                              currentStepIndex={selectedStepIndex}
-                                              onStepChange={setSelectedStepIndex}
-                                            />
+                                          <KataPlayer 
+                                            steps={sortedKataSteps} 
+                                            currentStepIndex={selectedStepIndex}
+                                            onStepChange={setSelectedStepIndex}
+                                          />
                                         </div>
                                       </div>
                                   </div>
