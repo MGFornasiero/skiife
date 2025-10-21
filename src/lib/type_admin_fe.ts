@@ -1,4 +1,8 @@
-export type BodyPart = 'sx' | 'dx' | 'both';
+
+export type BodyPart = {
+    limb: Limbs;
+    side: Sides;
+};
 export type Limbs = 'arms' | 'legs' | 'both';
 export type Sides = 'sx' | 'dx' | 'frontal';
 export type Hips = 'hanmi' | 'gyaku-hanmi' | 'shomen';

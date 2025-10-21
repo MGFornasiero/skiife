@@ -2,7 +2,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { type KataInventory, type KataResponse, type KataSequenceStep, type StandInfo, type TechnicInfo, type BunkaiSummary, type KataTechnique } from "@/lib/data";
+import { type KataInventory, type KataResponse, type KataSequenceStep, type StandInfo, type TechnicInfo, type BunkaiSummary, type KataTechnique, type BodyPart } from "@/lib/data";
 import {
   Select,
   SelectContent,
@@ -95,6 +95,12 @@ const getStepTempoIcon = (tempo: Tempo | null) => {
     const Icon = tempoIconMap[tempo];
     if (!Icon) return null;
     return <Icon className="h-5 w-5" />;
+};
+
+const formatBodyPart = (arto: BodyPart) => {
+  if (!arto) return null;
+  const sideSymbol = guardiaSymbolMap[arto.side] || '';
+  return <>{arto.limb} {sideSymbol}</>;
 };
 
 export default function KataSelection() {
@@ -389,14 +395,18 @@ export default function KataSelection() {
                                                       </div>
 
                                                       <div>
-                                                          <p className="text-sm text-muted-foreground">Techniques:</p>
-                                                          <ul className="list-disc pl-5 font-medium">
-                                                              {techniques && techniques.map((tech) => (
-                                                                  <li key={tech.technic_id} className="truncate text-sm cursor-pointer hover:underline" onClick={(e) => { e.stopPropagation(); handleTechnicClick(tech.technic_id); }}>
-                                                                      {tech.tecnica}
-                                                                  </li>
-                                                              ))}
-                                                          </ul>
+                                                          {techniques && techniques.length > 0 && (
+                                                            <>
+                                                              <p className="text-sm text-muted-foreground">Techniques:</p>
+                                                              <ul className="list-disc pl-5 font-medium">
+                                                                  {techniques.map((tech) => (
+                                                                      <li key={tech.technic_id} className="truncate text-sm cursor-pointer hover:underline" onClick={(e) => { e.stopPropagation(); handleTechnicClick(tech.technic_id); }}>
+                                                                          {tech.tecnica}
+                                                                      </li>
+                                                                  ))}
+                                                              </ul>
+                                                            </>
+                                                          )}
                                                       </div>
                                                   </CardContent>
                                               </Card>
@@ -438,7 +448,7 @@ export default function KataSelection() {
                                       </div>
 
                                       <div className="w-full max-w-md flex flex-col gap-6">
-                                        <div className="flex items-center justify-between text-sm rounded-lg border p-4">
+                                        <div className="flex items-center justify-between text-sm rounded-lg p-4">
                                             <div className="flex items-center gap-3">
                                                 {currentStep.speed && (
                                                     <Popover>
@@ -475,12 +485,56 @@ export default function KataSelection() {
                                         <Separator/>
                                         
                                         <div className="space-y-4">
-                                          {/* Tecniche section */}
+                                          {currentStep.Tecniche && currentStep.Tecniche.length > 0 && (
+                                              currentStep.Tecniche.map((tech, index) => (
+                                                  <Card key={index}>
+                                                      <CardContent className="p-4 space-y-2">
+                                                          <p 
+                                                              className="font-medium cursor-pointer hover:underline"
+                                                              onClick={() => handleTechnicClick(tech.technic_id)}
+                                                          >
+                                                              {tech.tecnica}
+                                                          </p>
+                                                      </CardContent>
+                                                  </Card>
+                                              ))
+                                          )}
                                         </div>
                                         <Separator/>
-                                        
+
                                         <div className="space-y-2">
-                                          {/* Remarks section */}
+                                            {currentStep.remarks && currentStep.remarks.length > 0 && (
+                                                <div className="space-y-4">
+                                                {currentStep.remarks.map((remark, index) => (
+                                                    <Card key={index}>
+                                                        <CardContent className="p-4 space-y-3">
+                                                            <div className="flex items-center gap-2 font-medium capitalize">
+                                                                <span className="text-sm text-muted-foreground">Part:</span>
+                                                                {formatBodyPart(remark.arto)}
+                                                            </div>
+                                                            {remark.description && (
+                                                                <div>
+                                                                    <span className="text-sm text-muted-foreground">Description:</span>
+                                                                    <p className="text-sm">{remark.description}</p>
+                                                                </div>
+                                                            )}
+                                                            {remark.explanation && (
+                                                                <div>
+                                                                    <span className="text-sm text-muted-foreground">Explanation:</span>
+                                                                    <p className="text-sm">{remark.explanation}</p>
+                                                                </div>
+                                                            )}
+                                                            {remark.note && (
+                                                                <div>
+                                                                    <span className="text-sm text-muted-foreground">Note:</span>
+                                                                    <p className="text-sm">{remark.note}</p>
+                                                                </div>
+                                                            )}
+                                                        </CardContent>
+                                                    </Card>
+                                                ))}
+                                                </div>
+                                            )}
                                         </div>
                                         <Separator/>
 

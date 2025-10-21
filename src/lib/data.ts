@@ -1,3 +1,4 @@
+
 import { 
     AbsoluteDirections, BodyPart, DetailedNotes, EmbusenPoints, Hips, KataSeries, Limbs, 
     Movements, Sides, TargetHgt, Tempo, WazaType 
@@ -118,15 +119,15 @@ export interface KihonListResponse {
 // For /kata/{kata_id}
 export interface KataTechnique {
     sequence_id: number;
-    arto: BodyPart | null;               // from models: arto can be nullable
+    arto: BodyPart | null;
     technic_id: number;
-    tecnica: string | null;              // model attribute name is 'tecnica' (alias "Tecnica")
+    tecnica: string | null;
     strikingpart_id: number | null;
     strikingpart_name: string | null;
     technic_target_id: number | null;
-    obiettivo: string | null;            // model attribute name is 'obiettivo' (alias "Obiettivo")
+    obiettivo: string | null;
     waza_note: string | null;
-    waza_resources: Record<string, any>[] | null; // list of resource objects or null
+    waza_resources: Record<string, any>[] | null;
 }
 
 export interface KataSequenceStep {
@@ -139,9 +140,9 @@ export interface KataSequenceStep {
   guardia: Sides | null;
   hips: Hips | null;
   facing: AbsoluteDirections | null;
-  Tecniche: KataTechnique[];           // model field name is 'Tecniche' (capital T)
+  Tecniche: KataTechnique[];
   embusen: EmbusenPoints | null;
-  kiai: boolean | null;                // can be null according to models
+  kiai: boolean | null;
   notes: string | null;
   remarks: DetailedNotes[] | null;
   resources: Record<string, any> | null;
@@ -152,7 +153,7 @@ export interface KataResponse {
   kata_id: number;
   kata_name: string;
   serie: KataSeries | null;
-  Gamba: Sides;                         // starting_leg is a Sides enum in models
+  Gamba: Sides;
   notes: string | null;
   resources: Record<string, any> | null;
   resource_url: string | null;
@@ -181,7 +182,7 @@ export interface BunkaiSummary {
   name: string;
   description: string | null;
   notes: string | null;
-  resources: Record<string, any> | null; // This is from BunkaiInventory model
+  resources: Record<string, any> | null;
   resource_url: string | null;
 }
 // For /bunkai_inventory/{kata_id}
