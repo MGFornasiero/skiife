@@ -437,55 +437,64 @@ export default function KataSelection() {
                                           </Button>
                                       </div>
 
-                                      <div className="w-full flex flex-col gap-6 items-center">
-                                        <div className="w-full max-w-md flex flex-col gap-6">
-                                            <div className="space-y-2">
-                                                <div className={cn("flex items-center justify-between text-sm rounded-lg border p-4", currentStep.kiai && "border-primary")}>
-                                                    <div className="flex items-center gap-3">
-                                                        {currentStep.speed && (
-                                                            <Popover>
-                                                                <PopoverTrigger className="cursor-pointer">{getStepTempoIcon(currentStep.speed)}</PopoverTrigger>
-                                                                <PopoverContent className="w-auto p-2"><p>{currentStep.speed}</p></PopoverContent>
-                                                            </Popover>
-                                                        )}
-                                                        {currentStep.kiai && (
-                                                            <Popover>
-                                                                <PopoverTrigger className="cursor-pointer"><Volume2 className="h-5 w-5 text-destructive" /></PopoverTrigger>
-                                                                <PopoverContent className="w-auto p-2"><p>Kiai!</p></PopoverContent>
-                                                            </Popover>
-                                                        )}
+                                      <div className="w-full max-w-md flex flex-col gap-6">
+                                        <div className="space-y-2">
+                                            <div className="flex items-center justify-between text-sm rounded-lg border p-4">
+                                                <div className="flex items-center gap-3">
+                                                    {currentStep.speed && (
                                                         <Popover>
-                                                            <PopoverTrigger className="cursor-pointer text-2xl">{getGuardiaSymbol(currentStep.guardia)}</PopoverTrigger>
-                                                            <PopoverContent className="w-auto p-2"><p>Guardia: {currentStep.guardia}</p></PopoverContent>
+                                                            <PopoverTrigger className="cursor-pointer">{getStepTempoIcon(currentStep.speed)}</PopoverTrigger>
+                                                            <PopoverContent className="w-auto p-2"><p>{currentStep.speed}</p></PopoverContent>
                                                         </Popover>
+                                                    )}
+                                                    {currentStep.kiai && (
                                                         <Popover>
-                                                            <PopoverTrigger className="cursor-pointer text-2xl font-bold">{getFacingArrow(currentStep.facing)}</PopoverTrigger>
-                                                            <PopoverContent className="w-auto p-2"><p>Facing: {currentStep.facing}</p></PopoverContent>
+                                                            <PopoverTrigger className="cursor-pointer"><Volume2 className="h-5 w-5 text-destructive" /></PopoverTrigger>
+                                                            <PopoverContent className="w-auto p-2"><p>Kiai!</p></PopoverContent>
                                                         </Popover>
-                                                    </div>
+                                                    )}
+                                                    <Popover>
+                                                        <PopoverTrigger className="cursor-pointer text-2xl">{getGuardiaSymbol(currentStep.guardia)}</PopoverTrigger>
+                                                        <PopoverContent className="w-auto p-2"><p>Guardia: {currentStep.guardia}</p></PopoverContent>
+                                                    </Popover>
+                                                    <Popover>
+                                                        <PopoverTrigger className="cursor-pointer text-2xl font-bold">{getFacingArrow(currentStep.facing)}</PopoverTrigger>
+                                                        <PopoverContent className="w-auto p-2"><p>Facing: {currentStep.facing}</p></PopoverContent>
+                                                    </Popover>
                                                 </div>
                                             </div>
-                                            <Separator/>
-
-                                            <div className="space-y-2">
-                                               <p 
-                                                 className="font-medium text-base cursor-pointer hover:underline"
-                                                 onClick={() => handlePosizioneClick(currentStep.stand_id)}
-                                               >
-                                                  {currentStep.posizione} {currentStep.hips && `(${currentStep.hips})`}
-                                               </p>
-                                            </div>
-                                            <Separator/>
-
-                                            <div className="space-y-2 flex flex-col items-center">
-                                                <KataPlayer 
-                                                  steps={sortedKataSteps} 
-                                                  currentStepIndex={selectedStepIndex}
-                                                  onStepChange={setSelectedStepIndex}
-                                                />
-                                            </div>
                                         </div>
+                                        <Separator/>
 
+                                        <div className="space-y-2">
+                                          <p 
+                                            className="font-medium text-base cursor-pointer hover:underline"
+                                            onClick={() => handlePosizioneClick(currentStep.stand_id)}
+                                          >
+                                            {currentStep.posizione} {currentStep.hips && `(${currentStep.hips})`}
+                                          </p>
+                                        </div>
+                                        <Separator/>
+
+                                        <div className="space-y-2 flex flex-col items-center">
+                                            <KataPlayer 
+                                              steps={sortedKataSteps} 
+                                              currentStepIndex={selectedStepIndex}
+                                              onStepChange={setSelectedStepIndex}
+                                            />
+                                        </div>
+                                        <Separator/>
+                                        <div className="space-y-2">
+                                          {/* Tecniche section */}
+                                        </div>
+                                        <Separator/>
+                                        <div className="space-y-2">
+                                          {/* Remarks section */}
+                                        </div>
+                                        <Separator/>
+                                        <div className="space-y-2">
+                                          {/* Resources section */}
+                                        </div>
                                       </div>
                                   </div>
                               ) : (
