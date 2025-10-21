@@ -97,7 +97,7 @@ const getStepTempoIcon = (tempo: Tempo | null) => {
     return <Icon className="h-5 w-5" />;
 };
 
-const formatBodyPart = (arto: BodyPart) => {
+const formatBodyPart = (arto: BodyPart | null) => {
   if (!arto) return null;
   const sideSymbol = guardiaSymbolMap[arto.side] || '';
   return <>{arto.limb} {sideSymbol}</>;
@@ -304,7 +304,7 @@ export default function KataSelection() {
                   <div className="flex items-center justify-between gap-4">
                       <TabsList>
                           <TabsTrigger value="generale">Generale</TabsTrigger>
-                          <TabsTrigger value="dettagli">Dettagli</TabsTrigger>
+                          <TabsTrigger value="dettagli" disabled={!kataDetails}>Dettagli</TabsTrigger>
                           <TabsTrigger value="bunkai" disabled={!kataDetails || !kataDetails.bunkai_ids || Object.keys(kataDetails.bunkai_ids).length === 0}>Bunkai</TabsTrigger>
                       </TabsList>
                       <div className="flex-grow">
@@ -484,7 +484,65 @@ export default function KataSelection() {
                                         </div>
                                         <Separator/>
                                         
-                                        <div className="space-y-2"></div>
+                                        <div className="space-y-4">
+                                            {currentStep.Tecniche && currentStep.Tecniche.length > 0 && (
+                                              currentStep.Tecniche.map((tech, index) => (
+                                                <Card key={index}>
+                                                  <CardContent className="p-4 space-y-3">
+                                                    <div
+                                                      className="font-medium cursor-pointer hover:underline"
+                                                      onClick={() => handleTechnicClick(tech.technic_id)}
+                                                    >
+                                                      {tech.tecnica}
+                                                    </div>
+                                                    {tech.arto && (
+                                                      <div className="flex items-center gap-2 font-medium capitalize">
+                                                        <span className="text-sm text-muted-foreground">Arto:</span>
+                                                        {formatBodyPart(tech.arto)}
+                                                      </div>
+                                                    )}
+                                                    {tech.strikingpart_name && (
+                                                      <div>
+                                                        <span className="text-sm text-muted-foreground">Striking Part:</span>
+                                                        <p className="text-sm">{tech.strikingpart_name}</p>
+                                                      </div>
+                                                    )}
+                                                    {tech.obiettivo && (
+                                                      <div>
+                                                        <span className="text-sm text-muted-foreground">Obiettivo:</span>
+                                                        <p className="text-sm">{tech.obiettivo}</p>
+                                                      </div>
+                                                    )}
+                                                    {tech.waza_note && (
+                                                      <div>
+                                                        <span className="text-sm text-muted-foreground">Waza Note:</span>
+                                                        <p className="text-sm">{tech.waza_note}</p>
+                                                      </div>
+                                                    )}
+                                                    {tech.waza_resources && (
+                                                      <div>
+                                                        <span className="text-sm text-muted-foreground">Waza Resources:</span>
+                                                        <div className="space-y-2 mt-1">
+                                                          {(Array.isArray(tech.waza_resources) ? tech.waza_resources : [tech.waza_resources]).map((resource, idx) => (
+                                                            <Card key={idx} className="bg-muted/50">
+                                                              <CardContent className="p-3 space-y-1">
+                                                                {Object.entries(resource).map(([key, value]) => (
+                                                                  <div key={key} className="text-xs">
+                                                                    <span className="font-semibold capitalize">{key}: </span>
+                                                                    <span>{typeof value === 'object' ? JSON.stringify(value) : String(value)}</span>
+                                                                  </div>
+                                                                ))}
+                                                              </CardContent>
+                                                            </Card>
+                                                          ))}
+                                                        </div>
+                                                      </div>
+                                                    )}
+                                                  </CardContent>
+                                                </Card>
+                                              ))
+                                            )}
+                                        </div>
                                         <Separator/>
                                         
                                         <div className="space-y-4">
@@ -678,3 +736,5 @@ export default function KataSelection() {
     </>
   );
 }
+
+    
