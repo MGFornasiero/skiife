@@ -120,7 +120,7 @@ export default function KataSelection() {
   const [selectedTechnicInfo, setSelectedTechnicInfo] = useState<TechnicInfo | null>(null);
   const [isTechnicInfoLoading, setIsTechnicInfoLoading] = useState(false);
 
-  const [viewMode, setViewMode] = useState<"generale" | "dettagli" | "bunkai">("generale");
+  const [viewMode, setViewMode] = useState<"generale" | "dettagli" | "info" | "bunkai">("generale");
 
   const { toast } = useToast();
 
@@ -299,12 +299,13 @@ export default function KataSelection() {
         )}
       </div>
       <Card>
-          <Tabs value={viewMode} onValueChange={(value) => setViewMode(value as "generale" | "dettagli" | "bunkai")}>
+          <Tabs value={viewMode} onValueChange={(value) => setViewMode(value as "generale" | "dettagli" | "info" | "bunkai")}>
               <CardHeader>
                   <div className="flex items-center justify-between gap-4">
                       <TabsList>
                           <TabsTrigger value="generale">Generale</TabsTrigger>
                           <TabsTrigger value="dettagli" disabled={!kataDetails}>Dettagli</TabsTrigger>
+                          <TabsTrigger value="info" disabled={!kataDetails || !kataDetails.resources}>Info</TabsTrigger>
                           <TabsTrigger value="bunkai" disabled={!kataDetails || !kataDetails.bunkai_ids || Object.keys(kataDetails.bunkai_ids).length === 0}>Bunkai</TabsTrigger>
                       </TabsList>
                       <div className="flex-grow">
@@ -472,8 +473,7 @@ export default function KataSelection() {
                                                 </Popover>
                                             </div>
                                         </div>
-                                        <Separator/>
-
+                                        
                                         <div className="space-y-2">
                                           <p 
                                             className="font-medium text-base cursor-pointer hover:underline"
@@ -482,94 +482,97 @@ export default function KataSelection() {
                                             {currentStep.posizione} {currentStep.hips && `(${currentStep.hips})`}
                                           </p>
                                         </div>
-                                        <Separator/>
                                         
                                         <div className="space-y-4">
                                             {currentStep.Tecniche && currentStep.Tecniche.length > 0 && (
-                                              currentStep.Tecniche.map((tech, index) => (
-                                                <Card key={index}>
-                                                  <CardContent className="p-4 space-y-3">
-                                                    <div
-                                                      className="font-medium cursor-pointer hover:underline"
-                                                      onClick={() => handleTechnicClick(tech.technic_id)}
-                                                    >
-                                                      {tech.tecnica}
-                                                    </div>
-                                                    {tech.arto && (
-                                                      <div className="flex items-center gap-2 font-medium capitalize">
-                                                        <span className="text-sm text-muted-foreground">Arto:</span>
-                                                        {formatBodyPart(tech.arto)}
+                                              currentStep.Tecniche.map((tech, index) => {
+                                                const wazaResources = tech.waza_resources ? (Array.isArray(tech.waza_resources) ? tech.waza_resources : [tech.waza_resources]) : [];
+                                                return (
+                                                  <Card key={index}>
+                                                    <CardContent className="p-4 space-y-3">
+                                                      <div
+                                                        className="font-medium cursor-pointer hover:underline"
+                                                        onClick={() => handleTechnicClick(tech.technic_id)}
+                                                      >
+                                                        {tech.tecnica}
                                                       </div>
-                                                    )}
-                                                    {tech.strikingpart_name && (
-                                                      <div>
-                                                        <span className="text-sm text-muted-foreground">Striking Part:</span>
-                                                        <p className="text-sm">{tech.strikingpart_name}</p>
+                                                      <div className="space-y-2">
+                                                        {tech.arto && (
+                                                          <div className="flex items-center gap-2 font-medium capitalize text-sm">
+                                                            <span className="text-muted-foreground">Arto:</span>
+                                                            {formatBodyPart(tech.arto)}
+                                                          </div>
+                                                        )}
+                                                        {tech.strikingpart_name && (
+                                                          <div className="text-sm">
+                                                            <span className="text-muted-foreground">Striking Part:</span>
+                                                            <p>{tech.strikingpart_name}</p>
+                                                          </div>
+                                                        )}
+                                                        {tech.obiettivo && (
+                                                          <div className="text-sm">
+                                                            <span className="text-muted-foreground">Obiettivo:</span>
+                                                            <p>{tech.obiettivo}</p>
+                                                          </div>
+                                                        )}
+                                                        {tech.waza_note && (
+                                                          <div className="text-sm">
+                                                            <span className="text-muted-foreground">Waza Note:</span>
+                                                            <p>{tech.waza_note}</p>
+                                                          </div>
+                                                        )}
+                                                        {wazaResources.length > 0 && (
+                                                          <div className="text-sm">
+                                                            <span className="text-muted-foreground">Waza Resources:</span>
+                                                            <div className="space-y-2 mt-1">
+                                                              {wazaResources.map((resource, idx) => (
+                                                                <Card key={idx} className="bg-muted/50">
+                                                                  <CardContent className="p-3 space-y-1">
+                                                                    {Object.entries(resource).map(([key, value]) => (
+                                                                      <div key={key} className="text-xs">
+                                                                        <span className="font-semibold capitalize">{key}: </span>
+                                                                        <span>{typeof value === 'object' ? JSON.stringify(value) : String(value)}</span>
+                                                                      </div>
+                                                                    ))}
+                                                                  </CardContent>
+                                                                </Card>
+                                                              ))}
+                                                            </div>
+                                                          </div>
+                                                        )}
                                                       </div>
-                                                    )}
-                                                    {tech.obiettivo && (
-                                                      <div>
-                                                        <span className="text-sm text-muted-foreground">Obiettivo:</span>
-                                                        <p className="text-sm">{tech.obiettivo}</p>
-                                                      </div>
-                                                    )}
-                                                    {tech.waza_note && (
-                                                      <div>
-                                                        <span className="text-sm text-muted-foreground">Waza Note:</span>
-                                                        <p className="text-sm">{tech.waza_note}</p>
-                                                      </div>
-                                                    )}
-                                                    {tech.waza_resources && (
-                                                      <div>
-                                                        <span className="text-sm text-muted-foreground">Waza Resources:</span>
-                                                        <div className="space-y-2 mt-1">
-                                                          {(Array.isArray(tech.waza_resources) ? tech.waza_resources : [tech.waza_resources]).map((resource, idx) => (
-                                                            <Card key={idx} className="bg-muted/50">
-                                                              <CardContent className="p-3 space-y-1">
-                                                                {Object.entries(resource).map(([key, value]) => (
-                                                                  <div key={key} className="text-xs">
-                                                                    <span className="font-semibold capitalize">{key}: </span>
-                                                                    <span>{typeof value === 'object' ? JSON.stringify(value) : String(value)}</span>
-                                                                  </div>
-                                                                ))}
-                                                              </CardContent>
-                                                            </Card>
-                                                          ))}
-                                                        </div>
-                                                      </div>
-                                                    )}
-                                                  </CardContent>
-                                                </Card>
-                                              ))
+                                                    </CardContent>
+                                                  </Card>
+                                                )
+                                              })
                                             )}
                                         </div>
-                                        <Separator/>
                                         
                                         <div className="space-y-4">
                                           {currentStep.remarks && currentStep.remarks.length > 0 && (
                                               currentStep.remarks.map((remark, index) => (
                                                   <Card key={index}>
                                                       <CardContent className="p-4 space-y-3">
-                                                          <div className="flex items-center gap-2 font-medium capitalize">
-                                                              <span className="text-sm text-muted-foreground">Part:</span>
+                                                          <div className="flex items-center gap-2 font-medium capitalize text-sm">
+                                                              <span className="text-muted-foreground">Part:</span>
                                                               {formatBodyPart(remark.arto)}
                                                           </div>
                                                           {remark.description && (
-                                                              <div>
-                                                                  <span className="text-sm text-muted-foreground">Description:</span>
-                                                                  <p className="text-sm">{remark.description}</p>
+                                                              <div className="text-sm">
+                                                                  <span className="text-muted-foreground">Description:</span>
+                                                                  <p>{remark.description}</p>
                                                               </div>
                                                           )}
                                                           {remark.explanation && (
-                                                              <div>
-                                                                  <span className="text-sm text-muted-foreground">Explanation:</span>
-                                                                  <p className="text-sm">{remark.explanation}</p>
+                                                              <div className="text-sm">
+                                                                  <span className="text-muted-foreground">Explanation:</span>
+                                                                  <p>{remark.explanation}</p>
                                                               </div>
                                                           )}
                                                           {remark.note && (
-                                                              <div>
-                                                                  <span className="text-sm text-muted-foreground">Note:</span>
-                                                                  <p className="text-sm">{remark.note}</p>
+                                                              <div className="text-sm">
+                                                                  <span className="text-muted-foreground">Note:</span>
+                                                                  <p>{remark.note}</p>
                                                               </div>
                                                           )}
                                                       </CardContent>
@@ -577,7 +580,6 @@ export default function KataSelection() {
                                               ))
                                           )}
                                         </div>
-                                        <Separator/>
 
                                         <div className="space-y-2">
                                           {currentStep.resources && (
@@ -587,7 +589,7 @@ export default function KataSelection() {
                                                   <CardContent className="p-4 space-y-2">
                                                     {Object.entries(resource).map(([key, value]) => (
                                                       <div key={key}>
-                                                        <span className="text-sm text-muted-foreground">{key}:</span>
+                                                        <span className="text-sm text-muted-foreground capitalize">{key}:</span>
                                                         <p className="text-sm">{typeof value === 'object' ? JSON.stringify(value) : String(value)}</p>
                                                       </div>
                                                     ))}
@@ -597,7 +599,6 @@ export default function KataSelection() {
                                             </div>
                                           )}
                                         </div>
-                                        <Separator/>
                                         
                                         <div className="space-y-2 flex flex-col items-center">
                                           <KataPlayer 
@@ -611,6 +612,26 @@ export default function KataSelection() {
                               ) : (
                                   <p className="text-muted-foreground text-center">No step details available.</p>
                               )}
+                          </TabsContent>
+                          <TabsContent value="info">
+                            <div className="mt-6 space-y-4">
+                              {kataDetails.resources ? (
+                                (Array.isArray(kataDetails.resources) ? kataDetails.resources : [kataDetails.resources]).map((resource, index) => (
+                                  <Card key={index}>
+                                    <CardContent className="p-4 space-y-2">
+                                      {Object.entries(resource).map(([key, value]) => (
+                                        <div key={key}>
+                                          <span className="text-sm text-muted-foreground capitalize">{key}:</span>
+                                          <p className="text-sm">{typeof value === 'object' ? JSON.stringify(value) : String(value)}</p>
+                                        </div>
+                                      ))}
+                                    </CardContent>
+                                  </Card>
+                                ))
+                              ) : (
+                                <p className="text-muted-foreground text-center">No general resources available for this kata.</p>
+                              )}
+                            </div>
                           </TabsContent>
                           <TabsContent value="bunkai">
                                <div className="mt-6 flex flex-col items-center gap-4">
@@ -736,5 +757,3 @@ export default function KataSelection() {
     </>
   );
 }
-
-    
