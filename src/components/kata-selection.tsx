@@ -435,142 +435,141 @@ export default function KataSelection() {
                               </div>
                           </TabsContent>
                            <TabsContent value="dettagli">
-                             {currentStep ? (
-                                  <div className="mt-4 flex flex-col items-center gap-4">
-                                      <div className="flex items-center gap-4 w-full justify-center">
-                                          <Button variant="outline" size="icon" onClick={() => handleStepChange('prev')}>
-                                              <ChevronLeft className="h-4 w-4" />
-                                          </Button>
-                                          <p className="text-sm font-medium tabular-nums text-center">
-                                              Step {selectedStepIndex + 1} / {sortedKataSteps.length}
-                                          </p>
-                                          <Button variant="outline" size="icon" onClick={() => handleStepChange('next')}>
-                                              <ChevronRight className="h-4 w-4" />
-                                          </Button>
-                                      </div>
-
-                                      <div className="w-full max-w-xl mx-auto flex flex-col gap-6 items-center">
-                                        <div className="flex items-center justify-center gap-3 text-sm p-4">
-                                            {currentStep.speed && (
-                                                <Popover>
-                                                    <PopoverTrigger className="cursor-pointer">{getStepTempoIcon(currentStep.speed)}</PopoverTrigger>
-                                                    <PopoverContent className="w-auto p-2"><p>{currentStep.speed}</p></PopoverContent>
-                                                </Popover>
-                                            )}
-                                            {currentStep.kiai && (
-                                                <Popover>
-                                                    <PopoverTrigger className="cursor-pointer"><Volume2 className="h-5 w-5 text-destructive" /></PopoverTrigger>
-                                                    <PopoverContent className="w-auto p-2"><p>Kiai!</p></PopoverContent>
-                                                </Popover>
-                                            )}
+                           {currentStep ? (
+                                <div className="mt-4 flex flex-col items-center gap-4">
+                                  <div className="w-full max-w-xl mx-auto flex flex-col gap-6 items-center">
+                                    <div className="flex items-center gap-4 w-full justify-center">
+                                        <Button variant="outline" size="icon" onClick={() => handleStepChange('prev')}>
+                                            <ChevronLeft className="h-4 w-4" />
+                                        </Button>
+                                        <p className="text-sm font-medium tabular-nums text-center">
+                                            Step {selectedStepIndex + 1} / {sortedKataSteps.length}
+                                        </p>
+                                        <Button variant="outline" size="icon" onClick={() => handleStepChange('next')}>
+                                            <ChevronRight className="h-4 w-4" />
+                                        </Button>
+                                    </div>
+                                    
+                                    <div className="flex items-center justify-center gap-3 text-sm p-4">
+                                        {currentStep.speed && (
                                             <Popover>
-                                                <PopoverTrigger className="cursor-pointer text-2xl">{getGuardiaSymbol(currentStep.guardia)}</PopoverTrigger>
-                                                <PopoverContent className="w-auto p-2"><p>Guardia: {currentStep.guardia}</p></PopoverContent>
+                                                <PopoverTrigger className="cursor-pointer">{getStepTempoIcon(currentStep.speed)}</PopoverTrigger>
+                                                <PopoverContent className="w-auto p-2"><p>{currentStep.speed}</p></PopoverContent>
                                             </Popover>
+                                        )}
+                                        {currentStep.kiai && (
                                             <Popover>
-                                                <PopoverTrigger className="cursor-pointer text-2xl font-bold">{getFacingArrow(currentStep.facing)}</PopoverTrigger>
-                                                <PopoverContent className="w-auto p-2"><p>Facing: {currentStep.facing}</p></PopoverContent>
+                                                <PopoverTrigger className="cursor-pointer"><Volume2 className="h-5 w-5 text-destructive" /></PopoverTrigger>
+                                                <PopoverContent className="w-auto p-2"><p>Kiai!</p></PopoverContent>
                                             </Popover>
-                                        </div>
-                                        
-                                        <div className="w-full text-center space-y-2">
-                                          <p 
-                                            className="font-medium text-base cursor-pointer hover:underline"
-                                            onClick={() => handlePosizioneClick(currentStep.stand_id)}
-                                          >
-                                            {currentStep.posizione} {currentStep.hips && `(${currentStep.hips})`}
-                                          </p>
-                                        </div>
+                                        )}
+                                        <Popover>
+                                            <PopoverTrigger className="cursor-pointer text-2xl">{getGuardiaSymbol(currentStep.guardia)}</PopoverTrigger>
+                                            <PopoverContent className="w-auto p-2"><p>Guardia: {currentStep.guardia}</p></PopoverContent>
+                                        </Popover>
+                                        <Popover>
+                                            <PopoverTrigger className="cursor-pointer text-2xl font-bold">{getFacingArrow(currentStep.facing)}</PopoverTrigger>
+                                            <PopoverContent className="w-auto p-2"><p>Facing: {currentStep.facing}</p></PopoverContent>
+                                        </Popover>
+                                    </div>
+                                    
+                                    <div className="w-full text-center space-y-2">
+                                        <p 
+                                        className="font-medium text-base cursor-pointer hover:underline"
+                                        onClick={() => handlePosizioneClick(currentStep.stand_id)}
+                                        >
+                                        {currentStep.posizione} {currentStep.hips && `(${currentStep.hips})`}
+                                        </p>
+                                    </div>
 
-                                        <div className="w-full space-y-4">
-                                          <h3>Tecniche</h3>
-                                            {currentStep.Tecniche && currentStep.Tecniche.length > 0 && (
-                                                <div className="space-y-2">
-                                                    {currentStep.Tecniche.map((tech, index) => (
-                                                        <Card key={index}>
-                                                            <CardContent className="p-4 space-y-2">
-                                                                <p className="font-medium cursor-pointer hover:underline" onClick={() => handleTechnicClick(tech.technic_id)}>{tech.tecnica}</p>
-                                                                <div className="text-sm text-muted-foreground space-y-1">
-                                                                    {tech.arto && <p><span className="font-semibold text-foreground">Arto:</span> {formatBodyPartDisplay(tech.arto)}</p>}
-                                                                    {tech.strikingpart_name && <p><span className="font-semibold text-foreground">Striking Part:</span> {tech.strikingpart_name}</p>}
-                                                                    {tech.obiettivo && <p><span className="font-semibold text-foreground">Obiettivo:</span> {tech.obiettivo}</p>}
-                                                                    {tech.waza_note && <p><span className="font-semibold text-foreground">Waza Note:</span> {tech.waza_note}</p>}
-                                                                    {tech.waza_resources && (
-                                                                        <div>
-                                                                            <h4 className="font-semibold text-foreground mt-2 mb-1">Waza Resources</h4>
-                                                                            {(Array.isArray(tech.waza_resources) ? tech.waza_resources : [tech.waza_resources]).map((res, i) => (
-                                                                                <Card key={i} className="mt-1">
-                                                                                    <CardContent className="p-2 space-y-1 text-xs">
-                                                                                        {Object.entries(res).map(([key, value]) => (
-                                                                                            <div key={key}>
-                                                                                                <span className="font-semibold capitalize text-foreground">{key}:</span>
-                                                                                                <span> {typeof value === 'object' ? JSON.stringify(value, null, 2) : String(value)}</span>
-                                                                                            </div>
-                                                                                        ))}
-                                                                                    </CardContent>
-                                                                                </Card>
-                                                                            ))}
-                                                                        </div>
-                                                                    )}
-                                                                </div>
-                                                            </CardContent>
-                                                        </Card>
-                                                    ))}
-                                                </div>
-                                            )}
-                                        </div>
-
-                                        <div className="w-full space-y-4">
-                                            <h3>Remarks</h3>
-                                            {currentStep.remarks && currentStep.remarks.length > 0 && (
-                                                <div className="space-y-2">
-                                                    {currentStep.remarks.map((remark, index) => (
-                                                        <Card key={index}>
-                                                            <CardContent className="p-4 space-y-2 text-sm">
-                                                                <p><span className="font-semibold">Arto:</span> {formatBodyPartDisplay(remark.arto)}</p>
-                                                                {remark.description && <p><span className="font-semibold">Description:</span> {remark.description}</p>}
-                                                                {remark.explanation && <p><span className="font-semibold">Explanation:</span> {remark.explanation}</p>}
-                                                                {remark.note && <p><span className="font-semibold">Note:</span> {remark.note}</p>}
-                                                            </CardContent>
-                                                        </Card>
-                                                    ))}
-                                                </div>
-                                            )}
-                                        </div>
-
-                                        <div className="w-full space-y-4">
-                                            <h3>Resources</h3>
-                                            {currentStep.resources && (
-                                                <div className="space-y-2">
-                                                    {(Array.isArray(currentStep.resources) ? currentStep.resources : [currentStep.resources]).map((res, index) => (
-                                                        <Card key={index}>
-                                                            <CardContent className="p-4 space-y-1 text-sm">
-                                                                {Object.entries(res).map(([key, value]) => (
-                                                                    <div key={key}>
-                                                                        <span className="font-semibold capitalize text-foreground">{key}:</span>
-                                                                        <span> {typeof value === 'object' ? JSON.stringify(value) : String(value)}</span>
+                                    <div className="w-full space-y-4">
+                                      <h3>Tecniche</h3>
+                                        {currentStep.Tecniche && currentStep.Tecniche.length > 0 && (
+                                            <div className="space-y-2">
+                                                {currentStep.Tecniche.map((tech, index) => (
+                                                    <Card key={index}>
+                                                        <CardContent className="p-4 space-y-2">
+                                                            <p className="font-medium cursor-pointer hover:underline" onClick={() => handleTechnicClick(tech.technic_id)}>{tech.tecnica}</p>
+                                                            <div className="text-sm text-muted-foreground space-y-1">
+                                                                {tech.arto && <p><span className="font-semibold text-foreground">Arto:</span> {formatBodyPartDisplay(tech.arto)}</p>}
+                                                                {tech.strikingpart_name && <p><span className="font-semibold text-foreground">Striking Part:</span> {tech.strikingpart_name}</p>}
+                                                                {tech.obiettivo && <p><span className="font-semibold text-foreground">Obiettivo:</span> {tech.obiettivo}</p>}
+                                                                {tech.waza_note && <p><span className="font-semibold text-foreground">Waza Note:</span> {tech.waza_note}</p>}
+                                                                {tech.waza_resources && (
+                                                                    <div>
+                                                                        <h4 className="font-semibold text-foreground mt-2 mb-1">Waza Resources</h4>
+                                                                        {(Array.isArray(tech.waza_resources) ? tech.waza_resources : [tech.waza_resources]).map((res, i) => (
+                                                                            <Card key={i} className="mt-1">
+                                                                                <CardContent className="p-2 space-y-1 text-xs">
+                                                                                    {Object.entries(res).map(([key, value]) => (
+                                                                                        <div key={key}>
+                                                                                            <span className="font-semibold capitalize text-foreground">{key}:</span>
+                                                                                            <span> {typeof value === 'object' ? JSON.stringify(value, null, 2) : String(value)}</span>
+                                                                                        </div>
+                                                                                    ))}
+                                                                                </CardContent>
+                                                                            </Card>
+                                                                        ))}
                                                                     </div>
-                                                                ))}
-                                                            </CardContent>
-                                                        </Card>
-                                                    ))}
-                                                </div>
-                                            )}
-                                        </div>
-                                        
-                                        <div className="w-full space-y-2 flex flex-col items-center">
-                                            <KataPlayer 
-                                              steps={sortedKataSteps} 
-                                              currentStepIndex={selectedStepIndex}
-                                              onStepChange={setSelectedStepIndex}
-                                            />
-                                        </div>
+                                                                )}
+                                                            </div>
+                                                        </CardContent>
+                                                    </Card>
+                                                ))}
+                                            </div>
+                                        )}
+                                    </div>
 
-                                      </div>
+                                    <div className="w-full space-y-4">
+                                      <h3>Remarks</h3>
+                                        {currentStep.remarks && currentStep.remarks.length > 0 && (
+                                            <div className="space-y-2">
+                                                {currentStep.remarks.map((remark, index) => (
+                                                    <Card key={index}>
+                                                        <CardContent className="p-4 space-y-2 text-sm">
+                                                            <p><span className="font-semibold">Arto:</span> {formatBodyPartDisplay(remark.arto)}</p>
+                                                            {remark.description && <p><span className="font-semibold">Description:</span> {remark.description}</p>}
+                                                            {remark.explanation && <p><span className="font-semibold">Explanation:</span> {remark.explanation}</p>}
+                                                            {remark.note && <p><span className="font-semibold">Note:</span> {remark.note}</p>}
+                                                        </CardContent>
+                                                    </Card>
+                                                ))}
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    <div className="w-full space-y-4">
+                                      <h3>Resources</h3>
+                                      {currentStep.resources && (
+                                        <div className="space-y-2">
+                                          {(Array.isArray(currentStep.resources) ? currentStep.resources : [currentStep.resources]).map((res, index) => (
+                                            <Card key={index}>
+                                              <CardContent className="p-4 space-y-1 text-sm">
+                                                {Object.entries(res).map(([key, value]) => (
+                                                  <div key={key}>
+                                                    <span className="font-semibold capitalize text-foreground">{key}:</span>
+                                                    <span> {typeof value === 'object' ? JSON.stringify(value) : String(value)}</span>
+                                                  </div>
+                                                ))}
+                                              </CardContent>
+                                            </Card>
+                                          ))}
+                                        </div>
+                                      )}
+                                    </div>
+
+                                    <div className="w-full space-y-2 flex flex-col items-center">
+                                      <KataPlayer 
+                                        steps={sortedKataSteps} 
+                                        currentStepIndex={selectedStepIndex}
+                                        onStepChange={setSelectedStepIndex}
+                                      />
+                                    </div>
                                   </div>
-                              ) : (
-                                  <p className="text-muted-foreground text-center">No step details available.</p>
-                              )}
+                                </div>
+                            ) : (
+                                <p className="text-muted-foreground text-center">No step details available.</p>
+                            )}
                           </TabsContent>
                           <TabsContent value="info">
                             <div className="mt-6 space-y-4">
@@ -618,7 +617,7 @@ export default function KataSelection() {
                                                       </p>
                                                       <ul className="list-disc pl-5 text-sm">
                                                           {techniques && techniques.map((tech) => (
-                                                              <li key={tech.technic_.id} className="truncate cursor-pointer hover:underline" onClick={(e) => { e.stopPropagation(); handleTechnicClick(tech.technic_id);}}>
+                                                              <li key={tech.technic_id} className="truncate cursor-pointer hover:underline" onClick={(e) => { e.stopPropagation(); handleTechnicClick(tech.technic_id);}}>
                                                                   {tech.tecnica}
                                                               </li>
                                                           ))}
@@ -726,3 +725,5 @@ export default function KataSelection() {
     </div>
   );
 }
+
+    
