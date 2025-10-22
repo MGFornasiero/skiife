@@ -224,7 +224,7 @@ export default function KataDisplay() {
   const gradeNumbers = Array.from({ length: 9 }, (_, i) => i + 1);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 w-full">
       <Card>
         <div className="flex justify-between items-center p-4 cursor-pointer" onClick={() => setShowGradeSelection(!showGradeSelection)}>
             <div className="flex flex-col">

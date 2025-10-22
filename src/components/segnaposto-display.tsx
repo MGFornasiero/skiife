@@ -103,7 +103,7 @@ export default function SegnapostoDisplay() {
   );
 
   return (
-    <Card>
+    <Card className="w-full">
       <CardHeader>
         <CardTitle>Glossario</CardTitle>
       </CardHeader>

@@ -156,7 +156,7 @@ export default function SearchDisplay() {
   };
 
   return (
-    <Card>
+    <Card className="w-full">
       <CardHeader>
         <CardTitle>Ricerca</CardTitle>
       </CardHeader>
