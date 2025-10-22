@@ -450,7 +450,6 @@ export default function KataSelection() {
                                       </div>
 
                                       <div className="w-full max-w-xl mx-auto flex flex-col gap-6 items-center">
-                                        
                                         <div className="flex items-center justify-center gap-3 text-sm p-4">
                                             {currentStep.speed && (
                                                 <Popover>
@@ -484,6 +483,7 @@ export default function KataSelection() {
                                         </div>
 
                                         <div className="w-full space-y-4">
+                                          <h3>Tecniche</h3>
                                             {currentStep.Tecniche && currentStep.Tecniche.length > 0 && (
                                                 <div className="space-y-2">
                                                     {currentStep.Tecniche.map((tech, index) => (
@@ -521,6 +521,7 @@ export default function KataSelection() {
                                         </div>
 
                                         <div className="w-full space-y-4">
+                                            <h3>Remarks</h3>
                                             {currentStep.remarks && currentStep.remarks.length > 0 && (
                                                 <div className="space-y-2">
                                                     {currentStep.remarks.map((remark, index) => (
@@ -538,6 +539,7 @@ export default function KataSelection() {
                                         </div>
 
                                         <div className="w-full space-y-4">
+                                            <h3>Resources</h3>
                                             {currentStep.resources && (
                                                 <div className="space-y-2">
                                                     {(Array.isArray(currentStep.resources) ? currentStep.resources : [currentStep.resources]).map((res, index) => (
@@ -572,6 +574,16 @@ export default function KataSelection() {
                           </TabsContent>
                           <TabsContent value="info">
                             <div className="mt-6 space-y-4">
+                              {kataDetails.notes && (
+                                <Card>
+                                  <CardHeader>
+                                    <CardTitle>Notes</CardTitle>
+                                  </CardHeader>
+                                  <CardContent>
+                                    <p className="text-sm">{kataDetails.notes}</p>
+                                  </CardContent>
+                                </Card>
+                              )}
                               {kataDetails.resources ? (
                                 (Array.isArray(kataDetails.resources) ? kataDetails.resources : [kataDetails.resources]).map((resource, index) => (
                                   <Card key={index}>
@@ -606,7 +618,7 @@ export default function KataSelection() {
                                                       </p>
                                                       <ul className="list-disc pl-5 text-sm">
                                                           {techniques && techniques.map((tech) => (
-                                                              <li key={tech.technic_id} className="truncate cursor-pointer hover:underline" onClick={(e) => { e.stopPropagation(); handleTechnicClick(tech.technic_id);}}>
+                                                              <li key={tech.technic_.id} className="truncate cursor-pointer hover:underline" onClick={(e) => { e.stopPropagation(); handleTechnicClick(tech.technic_id);}}>
                                                                   {tech.tecnica}
                                                               </li>
                                                           ))}

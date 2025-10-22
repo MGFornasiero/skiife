@@ -338,5 +338,3 @@ export interface BodyPart {
     limb: Limbs;
     side: Sides;
 }
-
-    
