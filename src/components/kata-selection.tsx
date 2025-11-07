@@ -103,6 +103,11 @@ const getStepTempoIcon = (tempo: Tempo | null) => {
     return <Icon className="h-5 w-5" />;
 };
 
+const formatBodyPart = (arto: BodyPart) => {
+    const sideSymbol = guardiaSymbolMap[arto.side] || '';
+    return `${arto.limb} ${sideSymbol}`;
+};
+
 
 export default function KataSelection() {
   const [kataInventory, setKataInventory] = useState<KataInventory | null>(null);
@@ -150,13 +155,16 @@ export default function KataSelection() {
     fetch(`/api/kata/${kataId}`)
       .then(async res => {
         if (!res.ok) {
-          const errorText = await res.text();
-           try {
+          let errorText = await res.text();
+          try {
             const errorJson = JSON.parse(errorText);
-            throw new Error(errorJson.error || `External API error: ${errorText}`);
+            if (errorJson.error) {
+              errorText = errorJson.error;
+            }
           } catch (e) {
-              throw new Error(`Failed to fetch kata data. Status: ${res.status}. Body: ${errorText}`);
+            // Not a JSON error, use the raw text
           }
+          throw new Error(`Failed to fetch kata data. Status: ${res.status}. Body: ${errorText}`);
         }
         return res.json();
       })
@@ -184,8 +192,8 @@ export default function KataSelection() {
 
     try {
       const res = await fetch(`/api/info_stand/${standId}`);
+      const errorText = await res.text();
       if (!res.ok) {
-        const errorText = await res.text();
         try {
             const errorJson = JSON.parse(errorText);
             throw new Error(errorJson.error || `External API error: ${errorText}`);
@@ -193,7 +201,7 @@ export default function KataSelection() {
             throw new Error(errorText || `External API error with status: ${res.status}`);
         }
       }
-      const data = await res.json();
+      const data = JSON.parse(errorText);
       setSelectedPosizioneInfo(data.info_stand);
     } catch (error: any) {
       console.error("Error fetching stand info:", error);
@@ -430,7 +438,7 @@ export default function KataSelection() {
                                                                           <Eye className="h-4 w-4 cursor-pointer" />
                                                                       </PopoverTrigger>
                                                                       <PopoverContent className="w-auto p-2">
-                                                                          <p className="text-2xl font-bold">{getFacingArrow(transaction.looking_direction)}</p>
+                                                                          <p className="flex items-center gap-2">Sguardo: <span className="text-2xl font-bold">{getFacingArrow(transaction.looking_direction)}</span></p>
                                                                       </PopoverContent>
                                                                   </Popover>
                                                               )}
@@ -445,9 +453,9 @@ export default function KataSelection() {
                               </div>
                           </TabsContent>
                            <TabsContent value="dettagli">
-                           {currentStep ? (
-                                <div className="mt-4 flex flex-col items-center gap-4">
-                                  <div className="w-full max-w-xl mx-auto flex flex-col gap-6 items-center">
+                            <div className="w-full flex flex-col items-center">
+                              {currentStep ? (
+                                  <div className="mt-4 flex flex-col items-center gap-4 w-full max-w-xl">
                                     <div className="flex items-center gap-4 w-full justify-center">
                                         <Button variant="outline" size="icon" onClick={() => handleStepChange('prev')}>
                                             <ChevronLeft className="h-4 w-4" />
@@ -474,12 +482,12 @@ export default function KataSelection() {
                                             </Popover>
                                         )}
                                         {currentStep.looking_direction && (
-                                          <Popover>
-                                            <PopoverTrigger className="cursor-pointer"><Eye className="h-5 w-5" /></PopoverTrigger>
-                                            <PopoverContent className="w-auto p-2">
-                                              <p className="flex items-center gap-2">Sguardo: <span className="text-2xl font-bold">{getFacingArrow(currentStep.looking_direction)}</span></p>
-                                            </PopoverContent>
-                                          </Popover>
+                                            <Popover>
+                                                <PopoverTrigger asChild><button className="cursor-pointer"><Eye className="h-5 w-5" /></button></PopoverTrigger>
+                                                <PopoverContent className="w-auto p-2">
+                                                <p className="flex items-center gap-2">Sguardo: <span className="text-2xl font-bold">{getFacingArrow(currentStep.looking_direction)}</span></p>
+                                                </PopoverContent>
+                                            </Popover>
                                         )}
                                         <Popover>
                                             <PopoverTrigger className="cursor-pointer text-2xl">{getGuardiaSymbol(currentStep.guardia)}</PopoverTrigger>
@@ -502,41 +510,41 @@ export default function KataSelection() {
 
                                     <div className="w-full space-y-4">
                                       <h3>Tecniche</h3>
-                                        {currentStep.Tecniche && currentStep.Tecniche.length > 0 && (
-                                            <div className="space-y-2">
-                                                {currentStep.Tecniche.map((tech, index) => (
-                                                    <Card key={index}>
-                                                        <CardContent className="p-4 space-y-2">
-                                                            <p className="font-medium cursor-pointer hover:underline" onClick={() => handleTechnicClick(tech.technic_id)}>{tech.tecnica}</p>
-                                                            <div className="text-sm text-muted-foreground space-y-1">
-                                                                {tech.arto && <p><span className="font-semibold text-foreground">Arto:</span> {formatBodyPartDisplay(tech.arto)}</p>}
-                                                                {tech.strikingpart_name && <p><span className="font-semibold text-foreground">Striking Part:</span> {tech.strikingpart_name}</p>}
-                                                                {tech.obiettivo && <p><span className="font-semibold text-foreground">Obiettivo:</span> {tech.obiettivo}</p>}
-                                                                {tech.target_direction && <p><span className="font-semibold text-foreground">Direzione Obiettivo:</span> <span className="font-bold">{getFacingArrow(tech.target_direction)}</span></p>}
-                                                                {tech.waza_note && <p><span className="font-semibold text-foreground">Waza Note:</span> {tech.waza_note}</p>}
-                                                                {tech.waza_resources && (
-                                                                    <div>
-                                                                        <h4 className="font-semibold text-foreground mt-2 mb-1">Waza Resources</h4>
-                                                                        {(Array.isArray(tech.waza_resources) ? tech.waza_resources : [tech.waza_resources]).map((res, i) => (
-                                                                            <Card key={i} className="mt-1">
-                                                                                <CardContent className="p-2 space-y-1 text-xs">
-                                                                                    {Object.entries(res).map(([key, value]) => (
-                                                                                        <div key={key}>
-                                                                                            <span className="font-semibold capitalize text-foreground">{key}:</span>
-                                                                                            <span> {typeof value === 'object' ? JSON.stringify(value, null, 2) : String(value)}</span>
-                                                                                        </div>
-                                                                                    ))}
-                                                                                </CardContent>
-                                                                            </Card>
-                                                                        ))}
-                                                                    </div>
-                                                                )}
-                                                            </div>
-                                                        </CardContent>
-                                                    </Card>
-                                                ))}
-                                            </div>
-                                        )}
+                                      {currentStep.Tecniche && currentStep.Tecniche.length > 0 && (
+                                          <div className="space-y-2">
+                                              {currentStep.Tecniche.map((tech, index) => (
+                                                  <Card key={index}>
+                                                      <CardContent className="p-4 space-y-2">
+                                                          <p className="font-medium cursor-pointer hover:underline" onClick={() => handleTechnicClick(tech.technic_id)}>{tech.tecnica}</p>
+                                                          <div className="text-sm text-muted-foreground space-y-1">
+                                                              {tech.arto && <p><span className="font-semibold text-foreground">Arto:</span> {formatBodyPartDisplay(tech.arto)}</p>}
+                                                              {tech.strikingpart_name && <p><span className="font-semibold text-foreground">Striking Part:</span> {tech.strikingpart_name}</p>}
+                                                              {tech.obiettivo && <p><span className="font-semibold text-foreground">Obiettivo:</span> {tech.obiettivo}</p>}
+                                                              {tech.target_direction && <p><span className="font-semibold text-foreground">Direzione Obiettivo:</span> <span className="font-bold">{getFacingArrow(tech.target_direction)}</span></p>}
+                                                              {tech.waza_note && <p><span className="font-semibold text-foreground">Waza Note:</span> {tech.waza_note}</p>}
+                                                              {tech.waza_resources && (
+                                                                  <div>
+                                                                      <h4 className="font-semibold text-foreground mt-2 mb-1">Waza Resources</h4>
+                                                                      {(Array.isArray(tech.waza_resources) ? tech.waza_resources : [tech.waza_resources]).map((res, i) => (
+                                                                          <Card key={i} className="mt-1">
+                                                                              <CardContent className="p-2 space-y-1 text-xs">
+                                                                                  {Object.entries(res).map(([key, value]) => (
+                                                                                      <div key={key}>
+                                                                                          <span className="font-semibold capitalize text-foreground">{key}:</span>
+                                                                                          <span> {typeof value === 'object' ? JSON.stringify(value, null, 2) : String(value)}</span>
+                                                                                      </div>
+                                                                                  ))}
+                                                                              </CardContent>
+                                                                          </Card>
+                                                                      ))}
+                                                                  </div>
+                                                              )}
+                                                          </div>
+                                                      </CardContent>
+                                                  </Card>
+                                              ))}
+                                          </div>
+                                      )}
                                     </div>
 
                                     <div className="w-full space-y-4">
@@ -546,7 +554,7 @@ export default function KataSelection() {
                                                 {currentStep.remarks.map((remark, index) => (
                                                     <Card key={index}>
                                                         <CardContent className="p-4 space-y-2 text-sm">
-                                                          <p><span className="font-semibold">Arto:</span> {formatBodyPartDisplay(remark.arto)}</p>
+                                                            {remark.arto && <p><span className="font-semibold">Arto:</span> {formatBodyPart(remark.arto)}</p>}
                                                             {remark.description && <p><span className="font-semibold">Description:</span> {remark.description}</p>}
                                                             {remark.explanation && <p><span className="font-semibold">Explanation:</span> {remark.explanation}</p>}
                                                             {remark.note && <p><span className="font-semibold">Note:</span> {remark.note}</p>}
@@ -585,10 +593,10 @@ export default function KataSelection() {
                                       />
                                     </div>
                                   </div>
-                                </div>
-                            ) : (
-                                <p className="text-muted-foreground text-center">No step details available.</p>
-                            )}
+                                ) : (
+                                  <p className="text-muted-foreground text-center">No step details available.</p>
+                                )}
+                              </div>
                           </TabsContent>
                           <TabsContent value="info">
                             <div className="mt-6 space-y-4">
@@ -744,5 +752,7 @@ export default function KataSelection() {
     </div>
   );
 }
+
+    
 
     
