@@ -3,7 +3,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { type KataInventory, type KataResponse, type KataSequenceStep, type StandInfo, type TechnicInfo, type BunkaiSummary, type KataTechnique, type BodyPart, DetailedNotes, Limbs, Sides } from "@/lib/data";
+import { type KataInventory, type KataResponse, type KataSequenceStep, type StandInfo, type TechnicInfo, type BunkaiSummary, type KataTechnique, BodyPart, DetailedNotes, Limbs, Sides, BunkaiDetailsResponse } from "@/lib/data";
 import {
   Select,
   SelectContent,
@@ -128,6 +128,10 @@ export default function KataSelection() {
 
   const [viewMode, setViewMode] = useState<"generale" | "dettagli" | "info" | "bunkai">("generale");
 
+  const [selectedBunkaiId, setSelectedBunkaiId] = useState<string | null>(null);
+  const [bunkaiDetails, setBunkaiDetails] = useState<BunkaiDetailsResponse | null>(null);
+  const [loadingBunkai, setLoadingBunkai] = useState(false);
+
   const { toast } = useToast();
 
   useEffect(() => {
@@ -146,23 +150,28 @@ export default function KataSelection() {
       if (kataId === null) {
         setKataDetails(null);
         setSelectedStepIndex(0);
+        setSelectedBunkaiId(null);
+        setBunkaiDetails(null);
         return;
       }
 
       setLoading(true);
       setKataDetails(null);
       setSelectedStepIndex(0);
+      setSelectedBunkaiId(null);
+      setBunkaiDetails(null);
 
       try {
         const res = await fetch(`/api/kata/${kataId}`);
         if (!res.ok) {
-          let errorPayload;
-          try {
-            errorPayload = await res.json();
-          } catch (e) {
-            errorPayload = { error: await res.text() };
-          }
-          throw new Error(errorPayload.error || `HTTP error! status: ${res.status}`);
+            let errorPayload;
+            try {
+                errorPayload = await res.json();
+            } catch (e) {
+                // If parsing JSON fails, use the raw text
+                errorPayload = { error: await res.text() };
+            }
+            throw new Error(errorPayload.error || `HTTP error! status: ${res.status}`);
         }
         const data: KataResponse = await res.json();
         setKataDetails(data);
@@ -180,6 +189,44 @@ export default function KataSelection() {
 
     fetchKataData();
   }, [kataId, toast]);
+
+  useEffect(() => {
+    const fetchBunkaiDetails = async () => {
+      if (!selectedBunkaiId) {
+        setBunkaiDetails(null);
+        return;
+      }
+      setLoadingBunkai(true);
+      try {
+        const res = await fetch(`/api/bunkai_dtls/${selectedBunkaiId}`);
+         if (!res.ok) {
+            const errorPayload = await res.json();
+            throw new Error(errorPayload.error || `HTTP error! status: ${res.status}`);
+        }
+        const data: BunkaiDetailsResponse = await res.json();
+        setBunkaiDetails(data);
+      } catch (error: any) {
+         console.error("Error fetching bunkai details:", error);
+         toast({
+            variant: "destructive",
+            title: "Error fetching bunkai details",
+            description: error.message,
+         });
+      } finally {
+        setLoadingBunkai(false);
+      }
+    };
+    fetchBunkaiDetails();
+  }, [selectedBunkaiId, toast]);
+
+  useEffect(() => {
+    if (kataDetails && kataDetails.bunkai_ids && Object.keys(kataDetails.bunkai_ids).length > 0) {
+      const firstBunkaiId = Object.keys(kataDetails.bunkai_ids)[0];
+      setSelectedBunkaiId(firstBunkaiId);
+    } else {
+        setSelectedBunkaiId(null);
+    }
+  }, [kataDetails]);
   
   const handlePosizioneClick = async (standId: number) => {
     setIsPosizioneInfoLoading(true);
@@ -304,7 +351,7 @@ export default function KataSelection() {
         )}
       </div>
       <Card>
-          <Tabs value={viewMode} onValueChange={(value) => setViewMode(value as "generale" | "dettagli" | "info" | "bunkai")}>
+          <Tabs value={viewMode} onValueChange={(value) => setViewMode(value as "generale" | "dettagli" | "info" | "bunkai")} className="w-full">
               <CardHeader>
                   <div className="flex items-center justify-between gap-4">
                       <TabsList>
@@ -506,7 +553,7 @@ export default function KataSelection() {
 
                                     <div className="w-full space-y-4">
                                       <h3>Tecniche</h3>
-                                      {currentStep.Tecniche && currentStep.Tecniche.length > 0 && (
+                                      {currentStep.Tecniche && currentStep.Tecniche.length > 0 ? (
                                           <div className="space-y-2">
                                               {currentStep.Tecniche.map((tech, index) => (
                                                   <Card key={index}>
@@ -540,12 +587,12 @@ export default function KataSelection() {
                                                   </Card>
                                               ))}
                                           </div>
-                                      )}
+                                      ) : <p className="text-sm text-muted-foreground">No techniques for this step.</p>}
                                     </div>
-
+                                    
                                     <div className="w-full space-y-4">
-                                      <h3>Remarks</h3>
-                                        {currentStep.remarks && currentStep.remarks.length > 0 && (
+                                        <h3>Remarks</h3>
+                                        {currentStep.remarks && currentStep.remarks.length > 0 ? (
                                             <div className="space-y-2">
                                                 {currentStep.remarks.map((remark, index) => (
                                                     <Card key={index}>
@@ -558,12 +605,12 @@ export default function KataSelection() {
                                                     </Card>
                                                 ))}
                                             </div>
-                                        )}
+                                        ) : <p className="text-sm text-muted-foreground">No remarks for this step.</p>}
                                     </div>
 
                                     <div className="w-full space-y-4">
                                       <h3>Resources</h3>
-                                      {currentStep.resources && (
+                                      {currentStep.resources ? (
                                         <div className="space-y-2">
                                           {(Array.isArray(currentStep.resources) ? currentStep.resources : [currentStep.resources]).map((res, index) => (
                                             <Card key={index}>
@@ -578,9 +625,9 @@ export default function KataSelection() {
                                             </Card>
                                           ))}
                                         </div>
-                                      )}
+                                      ) : <p className="text-sm text-muted-foreground">No resources for this step.</p>}
                                     </div>
-
+                                    
                                     <div className="w-full space-y-2 flex flex-col items-center">
                                       <KataPlayer 
                                         steps={sortedKataSteps} 
@@ -609,7 +656,10 @@ export default function KataSelection() {
                               {kataDetails.resources ? (
                                 (Array.isArray(kataDetails.resources) ? kataDetails.resources : [kataDetails.resources]).map((resource, index) => (
                                   <Card key={index}>
-                                    <CardContent className="p-4 space-y-2">
+                                    <CardHeader>
+                                      <CardTitle>Resource</CardTitle>
+                                    </CardHeader>
+                                    <CardContent className="space-y-2">
                                       {Object.entries(resource).map(([key, value]) => (
                                         <div key={key}>
                                           <span className="text-sm text-muted-foreground capitalize">{key}:</span>
@@ -626,30 +676,79 @@ export default function KataSelection() {
                           </TabsContent>
                           <TabsContent value="bunkai">
                                <div className="mt-6 flex flex-col items-center gap-4">
-                                  {sortedKataSteps.map((step) => {
-                                      const techniques = step.Tecniche;
-                                      return (
-                                          <React.Fragment key={step.id_sequence}>
-                                              <Card className="w-full">
-                                                  <CardContent className="p-4 flex flex-col gap-2">
-                                                      <p 
-                                                        className="font-medium cursor-pointer hover:underline"
-                                                        onClick={() => handlePosizioneClick(step.stand_id)}
-                                                      >
-                                                          {step.seq_num}. {step.posizione}
-                                                      </p>
-                                                      <ul className="list-disc pl-5 text-sm">
-                                                          {techniques && techniques.map((tech) => (
-                                                              <li key={tech.technic_id} className="truncate cursor-pointer hover:underline" onClick={(e) => { e.stopPropagation(); handleTechnicClick(tech.technic_id);}}>
-                                                                  {tech.tecnica}
-                                                              </li>
-                                                          ))}
-                                                      </ul>
-                                                  </CardContent>
-                                              </Card>
-                                          </React.Fragment>
-                                      )
-                                  })}
+                                {kataDetails && kataDetails.bunkai_ids && Object.keys(kataDetails.bunkai_ids).length > 0 && (
+                                  <div className="w-full sm:w-[280px] self-start">
+                                    <Select onValueChange={setSelectedBunkaiId} value={selectedBunkaiId || ''}>
+                                      <SelectTrigger>
+                                        <SelectValue placeholder="Select a Bunkai..." />
+                                      </SelectTrigger>
+                                      <SelectContent>
+                                        {Object.entries(kataDetails.bunkai_ids).map(([id, summary]) => (
+                                          <SelectItem key={id} value={id}>
+                                            {summary.name} (v{summary.version})
+                                          </SelectItem>
+                                        ))}
+                                      </SelectContent>
+                                    </Select>
+                                  </div>
+                                )}
+                                {loadingBunkai && <Loader2 className="h-6 w-6 animate-spin" />}
+                                {bunkaiDetails && bunkaiDetails.bunkai_steps ? (
+                                  sortedKataSteps.map((step) => {
+                                    const bunkaiStep = Object.values(bunkaiDetails.bunkai_steps).find(bs => bs.kata_sequence_id === step.id_sequence);
+                                    
+                                    return (
+                                        <Card key={step.id_sequence} className="w-full">
+                                          <CardHeader>
+                                              <CardTitle className="text-base flex justify-between">
+                                                <span>Step {step.seq_num}: {step.posizione}</span>
+                                                <span className="text-2xl font-bold" title={step.facing ?? undefined}>{getFacingArrow(step.facing)}</span>
+                                              </CardTitle>
+                                          </CardHeader>
+                                          <CardContent>
+                                            {bunkaiStep ? (
+                                              <div className="space-y-4">
+                                                  {bunkaiStep.description && (
+                                                      <div>
+                                                          <h4 className="font-semibold mb-1">Description</h4>
+                                                          <p className="text-sm text-muted-foreground">{bunkaiStep.description}</p>
+                                                      </div>
+                                                  )}
+                                                  {bunkaiStep.notes && (
+                                                      <div>
+                                                          <h4 className="font-semibold mb-1">Notes</h4>
+                                                          <p className="text-sm text-muted-foreground">{bunkaiStep.notes}</p>
+                                                      </div>
+                                                  )}
+                                                  {bunkaiStep.remarks && bunkaiStep.remarks.length > 0 && (
+                                                      <div>
+                                                          <h4 className="font-semibold mb-1">Remarks</h4>
+                                                           <div className="space-y-2">
+                                                              {bunkaiStep.remarks.map((remark, index) => (
+                                                                  <Card key={index} className="bg-secondary">
+                                                                      <CardContent className="p-3 text-sm">
+                                                                          {remark.arto && <p><span className="font-semibold">Arto:</span> {formatBodyPart(remark.arto)}</p>}
+                                                                          {remark.description && <p><span className="font-semibold">Description:</span> {remark.description}</p>}
+                                                                          {remark.explanation && <p><span className="font-semibold">Explanation:</span> {remark.explanation}</p>}
+                                                                          {remark.note && <p><span className="font-semibold">Note:</span> {remark.note}</p>}
+                                                                      </CardContent>
+                                                                  </Card>
+                                                              ))}
+                                                          </div>
+                                                      </div>
+                                                  )}
+
+                                              </div>
+                                            ) : (
+                                              <p className="text-sm text-muted-foreground">No bunkai details for this step.</p>
+                                            )}
+                                          </CardContent>
+                                        </Card>
+                                    );
+                                  })
+                                ) : (
+                                  !loadingBunkai && <p className="text-muted-foreground">Select a bunkai to see details.</p>
+                                )}
                               </div>
                           </TabsContent>
                       </div>

@@ -200,7 +200,6 @@ export interface BunkaiInfo {
   resource_url: string | null;
 }
 
-
 export interface BunkaiStep {
   id_bunkaisequence: number;
   bunkai_id: number;
@@ -210,6 +209,12 @@ export interface BunkaiStep {
   remarks: DetailedNotes[] | null;
   resources: Record<string, any> | Record<string, any>[] | null;
   resource_url: string | null;
+}
+
+// For /bunkai_dtls/{bunkai_id}
+export interface BunkaiDetailsResponse {
+  bunkai_id: number;
+  bunkai_steps: Record<string, BunkaiStep>;
 }
 
 
