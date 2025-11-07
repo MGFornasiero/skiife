@@ -128,7 +128,8 @@ export default function KataSelection() {
 
   const [viewMode, setViewMode] = useState<"generale" | "dettagli" | "info" | "bunkai">("generale");
 
-  const [selectedBunkaiId, setSelectedBunkaiId] = useState<string | null>(null);
+  const [bunkaiIds, setBunkaiIds] = useState<string[]>([]);
+  const [selectedBunkaiIndex, setSelectedBunkaiIndex] = useState<number>(0);
   const [bunkaiDetails, setBunkaiDetails] = useState<BunkaiDetailsResponse | null>(null);
   const [loadingBunkai, setLoadingBunkai] = useState(false);
 
@@ -150,7 +151,8 @@ export default function KataSelection() {
       if (kataId === null) {
         setKataDetails(null);
         setSelectedStepIndex(0);
-        setSelectedBunkaiId(null);
+        setBunkaiIds([]);
+        setSelectedBunkaiIndex(0);
         setBunkaiDetails(null);
         return;
       }
@@ -158,29 +160,39 @@ export default function KataSelection() {
       setLoading(true);
       setKataDetails(null);
       setSelectedStepIndex(0);
-      setSelectedBunkaiId(null);
+      setBunkaiIds([]);
+      setSelectedBunkaiIndex(0);
       setBunkaiDetails(null);
 
       try {
         const res = await fetch(`/api/kata/${kataId}`);
         if (!res.ok) {
-            let errorPayload;
-            try {
-                errorPayload = await res.json();
-            } catch (e) {
-                // If parsing JSON fails, use the raw text
-                errorPayload = { error: await res.text() };
-            }
-            throw new Error(errorPayload.error || `HTTP error! status: ${res.status}`);
+          let errorPayload = { error: `HTTP error! status: ${res.status}` };
+          try {
+            errorPayload = await res.json();
+          } catch (e) {
+            // Not a JSON error, use the raw text
+          }
+          throw new Error(errorPayload.error);
         }
         const data: KataResponse = await res.json();
         setKataDetails(data);
+        if (data.bunkai_ids) {
+            const sortedIds = Object.keys(data.bunkai_ids).sort((a, b) => 
+                data.bunkai_ids[a].version - data.bunkai_ids[b].version
+            );
+            setBunkaiIds(sortedIds);
+            if (sortedIds.length > 0) {
+              setSelectedBunkaiIndex(0);
+            }
+        }
+
       } catch (error: any) {
         console.error("Error fetching kata data:", error);
         toast({
           variant: "destructive",
           title: "Error fetching kata data",
-          description: <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4"><code className="text-white">{error.message}</code></pre>
+          description: <pre className="mt-2 w-full rounded-md bg-slate-950 p-4"><code className="text-white">{error.message}</code></pre>
         });
       } finally {
         setLoading(false);
@@ -192,6 +204,7 @@ export default function KataSelection() {
 
   useEffect(() => {
     const fetchBunkaiDetails = async () => {
+      const selectedBunkaiId = bunkaiIds[selectedBunkaiIndex];
       if (!selectedBunkaiId) {
         setBunkaiDetails(null);
         return;
@@ -217,17 +230,19 @@ export default function KataSelection() {
       }
     };
     fetchBunkaiDetails();
-  }, [selectedBunkaiId, toast]);
+  }, [bunkaiIds, selectedBunkaiIndex, toast]);
 
-  useEffect(() => {
-    if (kataDetails && kataDetails.bunkai_ids && Object.keys(kataDetails.bunkai_ids).length > 0) {
-      const firstBunkaiId = Object.keys(kataDetails.bunkai_ids)[0];
-      setSelectedBunkaiId(firstBunkaiId);
-    } else {
-        setSelectedBunkaiId(null);
-    }
-  }, [kataDetails]);
-  
+  const handleBunkaiVersionChange = (direction: 'next' | 'prev') => {
+    if (!bunkaiIds.length) return;
+    setSelectedBunkaiIndex(prevIndex => {
+        if (direction === 'next') {
+            return (prevIndex + 1) % bunkaiIds.length;
+        } else {
+            return (prevIndex - 1 + bunkaiIds.length) % bunkaiIds.length;
+        }
+    });
+  };
+
   const handlePosizioneClick = async (standId: number) => {
     setIsPosizioneInfoLoading(true);
     setIsPosizioneInfoDialogOpen(true);
@@ -327,6 +342,8 @@ export default function KataSelection() {
     }
   };
 
+  const selectedBunkaiId = bunkaiIds[selectedBunkaiIndex];
+  const selectedBunkaiSummary = kataDetails && selectedBunkaiId ? kataDetails.bunkai_ids[selectedBunkaiId] : null;
 
   return (
     <div className="w-full space-y-4">
@@ -358,7 +375,7 @@ export default function KataSelection() {
                           <TabsTrigger value="generale">Generale</TabsTrigger>
                           <TabsTrigger value="dettagli" disabled={!kataDetails}>Dettagli</TabsTrigger>
                           <TabsTrigger value="info" disabled={!kataDetails}>Info</TabsTrigger>
-                          <TabsTrigger value="bunkai" disabled={!kataDetails || !kataDetails.bunkai_ids || Object.keys(kataDetails.bunkai_ids).length === 0}>Bunkai</TabsTrigger>
+                          <TabsTrigger value="bunkai" disabled={!bunkaiIds.length}>Bunkai</TabsTrigger>
                       </TabsList>
                       <div className="flex-grow">
                           <CardTitle className="flex items-center justify-end gap-2">
@@ -676,21 +693,51 @@ export default function KataSelection() {
                           </TabsContent>
                            <TabsContent value="bunkai">
                                <div className="mt-6 flex flex-col items-center gap-4">
-                                {kataDetails && kataDetails.bunkai_ids && Object.keys(kataDetails.bunkai_ids).length > 0 && (
-                                  <div className="w-full sm:w-[280px] self-start">
-                                    <Select onValueChange={setSelectedBunkaiId} value={selectedBunkaiId || ''}>
-                                      <SelectTrigger>
-                                        <SelectValue placeholder="Select a Bunkai..." />
-                                      </SelectTrigger>
-                                      <SelectContent>
-                                        {Object.entries(kataDetails.bunkai_ids).map(([id, summary]) => (
-                                          <SelectItem key={id} value={id}>
-                                            {summary.name} (v{summary.version})
-                                          </SelectItem>
-                                        ))}
-                                      </SelectContent>
-                                    </Select>
-                                  </div>
+                                {bunkaiIds.length > 0 && selectedBunkaiSummary && (
+                                    <div className="w-full space-y-4">
+                                        <div className="flex items-center gap-4 justify-center">
+                                            <Button variant="outline" size="icon" onClick={() => handleBunkaiVersionChange('prev')} disabled={bunkaiIds.length < 2}>
+                                                <ChevronLeft className="h-4 w-4" />
+                                            </Button>
+                                            <div className="w-48 h-10 flex items-center justify-center rounded-md border border-input bg-background px-3 py-2 text-sm text-center">
+                                                {selectedBunkaiSummary.name} (v{selectedBunkaiSummary.version})
+                                            </div>
+                                            <Button variant="outline" size="icon" onClick={() => handleBunkaiVersionChange('next')} disabled={bunkaiIds.length < 2}>
+                                                <ChevronRight className="h-4 w-4" />
+                                            </Button>
+                                        </div>
+                                        <Card>
+                                            <CardContent className="p-6 space-y-4">
+                                                {selectedBunkaiSummary.description && (
+                                                    <div>
+                                                        <h4 className="font-semibold mb-1">Description</h4>
+                                                        <p className="text-sm text-muted-foreground">{selectedBunkaiSummary.description}</p>
+                                                    </div>
+                                                )}
+                                                {selectedBunkaiSummary.notes && (
+                                                    <div>
+                                                        <h4 className="font-semibold mb-1">Notes</h4>
+                                                        <p className="text-sm text-muted-foreground">{selectedBunkaiSummary.notes}</p>
+                                                    </div>
+                                                )}
+                                                {selectedBunkaiSummary.resources && (
+                                                    <div>
+                                                        <h4 className="font-semibold text-foreground mt-2 mb-1">Resources</h4>
+                                                        {(Array.isArray(selectedBunkaiSummary.resources) ? selectedBunkaiSummary.resources : [selectedBunkaiSummary.resources]).map((res, i) => (
+                                                            <Card key={i} className="mt-1 bg-secondary"><CardContent className="p-2 space-y-1 text-xs">
+                                                                {Object.entries(res).map(([key, value]) => (
+                                                                    <div key={key}>
+                                                                        <span className="font-semibold capitalize text-foreground">{key}:</span>
+                                                                        <span> {typeof value === 'object' ? JSON.stringify(value, null, 2) : String(value)}</span>
+                                                                    </div>
+                                                                ))}
+                                                            </CardContent></Card>
+                                                        ))}
+                                                    </div>
+                                                )}
+                                            </CardContent>
+                                        </Card>
+                                    </div>
                                 )}
                                 {loadingBunkai && <Loader2 className="h-6 w-6 animate-spin" />}
                                 {bunkaiDetails && bunkaiDetails.bunkai_steps ? (
@@ -740,10 +787,7 @@ export default function KataSelection() {
 
                                             {/* Right Column: Bunkai Details */}
                                             <Card>
-                                                <CardHeader>
-                                                    <CardTitle className="text-base">Bunkai Application</CardTitle>
-                                                </CardHeader>
-                                                <CardContent>
+                                                <CardContent className="p-4">
                                                 {bunkaiStep ? (
                                                     <div className="space-y-4">
                                                     {bunkaiStep.description && (<div><h4 className="font-semibold mb-1">Description</h4><p className="text-sm text-muted-foreground">{bunkaiStep.description}</p></div>)}
@@ -801,7 +845,7 @@ export default function KataSelection() {
                                     })}
                                     </div>
                                 ) : (
-                                  !loadingBunkai && <p className="text-muted-foreground">Select a bunkai to see details.</p>
+                                  !loadingBunkai && bunkaiIds.length > 0 && <p className="text-muted-foreground">Select a bunkai to see details.</p>
                                 )}
                               </div>
                           </TabsContent>
@@ -901,3 +945,4 @@ export default function KataSelection() {
     </div>
   );
 }
+
