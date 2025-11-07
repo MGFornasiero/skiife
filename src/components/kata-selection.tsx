@@ -451,7 +451,7 @@ export default function KataSelection() {
                            <TabsContent value="dettagli">
                             <div className="w-full flex flex-col items-center">
                               {currentStep ? (
-                                  <div className="mt-4 flex flex-col items-center gap-4 w-full max-w-xl">
+                                  <div className="mt-4 flex flex-col items-center gap-4 w-full">
                                     <div className="flex items-center gap-4 w-full justify-center">
                                         <Button variant="outline" size="icon" onClick={() => handleStepChange('prev')}>
                                             <ChevronLeft className="h-4 w-4" />
