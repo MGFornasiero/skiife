@@ -142,47 +142,43 @@ export default function KataSelection() {
   }, []);
 
   useEffect(() => {
-    if (kataId === null) {
+    const fetchKataData = async () => {
+      if (kataId === null) {
+        setKataDetails(null);
+        setSelectedStepIndex(0);
+        return;
+      }
+
+      setLoading(true);
       setKataDetails(null);
       setSelectedStepIndex(0);
-      return;
-    }
 
-    setLoading(true);
-    setKataDetails(null);
-    setSelectedStepIndex(0);
-
-    fetch(`/api/kata/${kataId}`)
-      .then(async res => {
+      try {
+        const res = await fetch(`/api/kata/${kataId}`);
         if (!res.ok) {
-          let errorText = await res.text();
+          let errorPayload;
           try {
-            const errorJson = JSON.parse(errorText);
-            if (errorJson.error) {
-              errorText = errorJson.error;
-            }
+            errorPayload = await res.json();
           } catch (e) {
-            // Not a JSON error, use the raw text
+            errorPayload = { error: await res.text() };
           }
-          throw new Error(`Failed to fetch kata data. Status: ${res.status}. Body: ${errorText}`);
+          throw new Error(errorPayload.error || `HTTP error! status: ${res.status}`);
         }
-        return res.json();
-      })
-      .then((data: KataResponse) => {
+        const data: KataResponse = await res.json();
         setKataDetails(data);
-      })
-      .catch((error: any) => {
+      } catch (error: any) {
         console.error("Error fetching kata data:", error);
         toast({
-            variant: "destructive",
-            title: "Error fetching kata data",
-            description: <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4"><code className="text-white">{error.message}</code></pre>
+          variant: "destructive",
+          title: "Error fetching kata data",
+          description: <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4"><code className="text-white">{error.message}</code></pre>
         });
-      })
-      .finally(() => {
+      } finally {
         setLoading(false);
-      });
+      }
+    };
 
+    fetchKataData();
   }, [kataId, toast]);
   
   const handlePosizioneClick = async (standId: number) => {
@@ -192,8 +188,8 @@ export default function KataSelection() {
 
     try {
       const res = await fetch(`/api/info_stand/${standId}`);
-      const errorText = await res.text();
       if (!res.ok) {
+        const errorText = await res.text();
         try {
             const errorJson = JSON.parse(errorText);
             throw new Error(errorJson.error || `External API error: ${errorText}`);
@@ -201,7 +197,7 @@ export default function KataSelection() {
             throw new Error(errorText || `External API error with status: ${res.status}`);
         }
       }
-      const data = JSON.parse(errorText);
+      const data = await res.json();
       setSelectedPosizioneInfo(data.info_stand);
     } catch (error: any) {
       console.error("Error fetching stand info:", error);
@@ -752,7 +748,3 @@ export default function KataSelection() {
     </div>
   );
 }
-
-    
-
-    
