@@ -674,7 +674,7 @@ export default function KataSelection() {
                               )}
                             </div>
                           </TabsContent>
-                          <TabsContent value="bunkai">
+                           <TabsContent value="bunkai">
                                <div className="mt-6 flex flex-col items-center gap-4">
                                 {kataDetails && kataDetails.bunkai_ids && Object.keys(kataDetails.bunkai_ids).length > 0 && (
                                   <div className="w-full sm:w-[280px] self-start">
@@ -694,58 +694,112 @@ export default function KataSelection() {
                                 )}
                                 {loadingBunkai && <Loader2 className="h-6 w-6 animate-spin" />}
                                 {bunkaiDetails && bunkaiDetails.bunkai_steps ? (
-                                  sortedKataSteps.map((step) => {
-                                    const bunkaiStep = Object.values(bunkaiDetails.bunkai_steps).find(bs => bs.kata_sequence_id === step.id_sequence);
-                                    
-                                    return (
-                                        <Card key={step.id_sequence} className="w-full">
-                                          <CardHeader>
-                                              <CardTitle className="text-base flex justify-between">
-                                                <span>Step {step.seq_num}: {step.posizione}</span>
-                                                <span className="text-2xl font-bold" title={step.facing ?? undefined}>{getFacingArrow(step.facing)}</span>
-                                              </CardTitle>
-                                          </CardHeader>
-                                          <CardContent>
-                                            {bunkaiStep ? (
-                                              <div className="space-y-4">
-                                                  {bunkaiStep.description && (
-                                                      <div>
-                                                          <h4 className="font-semibold mb-1">Description</h4>
-                                                          <p className="text-sm text-muted-foreground">{bunkaiStep.description}</p>
-                                                      </div>
-                                                  )}
-                                                  {bunkaiStep.notes && (
-                                                      <div>
-                                                          <h4 className="font-semibold mb-1">Notes</h4>
-                                                          <p className="text-sm text-muted-foreground">{bunkaiStep.notes}</p>
-                                                      </div>
-                                                  )}
-                                                  {bunkaiStep.remarks && bunkaiStep.remarks.length > 0 && (
-                                                      <div>
-                                                          <h4 className="font-semibold mb-1">Remarks</h4>
-                                                           <div className="space-y-2">
-                                                              {bunkaiStep.remarks.map((remark, index) => (
-                                                                  <Card key={index} className="bg-secondary">
-                                                                      <CardContent className="p-3 text-sm">
-                                                                          {remark.arto && <p><span className="font-semibold">Arto:</span> {formatBodyPart(remark.arto)}</p>}
-                                                                          {remark.description && <p><span className="font-semibold">Description:</span> {remark.description}</p>}
-                                                                          {remark.explanation && <p><span className="font-semibold">Explanation:</span> {remark.explanation}</p>}
-                                                                          {remark.note && <p><span className="font-semibold">Note:</span> {remark.note}</p>}
-                                                                      </CardContent>
-                                                                  </Card>
-                                                              ))}
-                                                          </div>
-                                                      </div>
-                                                  )}
+                                    <div className="w-full space-y-4">
+                                    {sortedKataSteps.map((step, index) => {
+                                        const transactionId = kataDetails.transactions_mapping_from[step.id_sequence];
+                                        const transaction = transactionId ? kataDetails.transactions[transactionId] : null;
+                                        const bunkaiStep = Object.values(bunkaiDetails.bunkai_steps).find(bs => bs.kata_sequence_id === step.id_sequence);
 
-                                              </div>
-                                            ) : (
-                                              <p className="text-sm text-muted-foreground">No bunkai details for this step.</p>
+                                        return (
+                                        <React.Fragment key={step.id_sequence}>
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            {/* Left Column: Generale Content */}
+                                            <Card className={cn("flex flex-col", step.kiai && "border-primary")}>
+                                                <CardContent className="p-4 flex flex-col gap-2">
+                                                <div className="flex justify-between items-start">
+                                                    <div className="flex-grow">
+                                                    <p className="font-medium cursor-pointer hover:underline" onClick={() => handlePosizioneClick(step.stand_id)}>
+                                                        {step.posizione}
+                                                    </p>
+                                                    </div>
+                                                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                                                    {/* Icons */}
+                                                    {step.speed && <Popover><PopoverTrigger asChild><div className="cursor-pointer">{getStepTempoIcon(step.speed)}</div></PopoverTrigger><PopoverContent className="w-auto p-2"><p>{step.speed}</p></PopoverContent></Popover>}
+                                                    {step.kiai && <Popover><PopoverTrigger asChild><Volume2 className="h-5 w-5 text-destructive cursor-pointer" /></PopoverTrigger><PopoverContent className="w-auto p-2"><p>Kiai!</p></PopoverContent></Popover>}
+                                                    {step.notes && <Popover><PopoverTrigger><Notebook className="h-5 w-5 text-muted-foreground cursor-pointer" /></PopoverTrigger><PopoverContent><p>{typeof step.notes === 'string' ? step.notes : JSON.stringify(step.notes)}</p></PopoverContent></Popover>}
+                                                    <Popover><PopoverTrigger asChild><span className="text-2xl cursor-pointer">{getGuardiaSymbol(step.guardia)}</span></PopoverTrigger><PopoverContent className="w-auto p-2"><p>{step.guardia}</p></PopoverContent></Popover>
+                                                    <span className="text-2xl font-bold" title={step.facing ?? undefined}>{getFacingArrow(step.facing)}</span>
+                                                    </div>
+                                                </div>
+                                                <div>
+                                                    {step.Tecniche && step.Tecniche.length > 0 && (
+                                                    <>
+                                                        <p className="text-sm text-muted-foreground">Techniques:</p>
+                                                        <ul className="list-disc pl-5 font-medium">
+                                                        {step.Tecniche.map((tech) => (
+                                                            <li key={tech.technic_id} className="truncate text-sm cursor-pointer hover:underline" onClick={(e) => { e.stopPropagation(); handleTechnicClick(tech.technic_id); }}>
+                                                            {tech.tecnica}
+                                                            </li>
+                                                        ))}
+                                                        </ul>
+                                                    </>
+                                                    )}
+                                                </div>
+                                                </CardContent>
+                                            </Card>
+
+                                            {/* Right Column: Bunkai Details */}
+                                            <Card>
+                                                <CardHeader>
+                                                    <CardTitle className="text-base">Bunkai Application</CardTitle>
+                                                </CardHeader>
+                                                <CardContent>
+                                                {bunkaiStep ? (
+                                                    <div className="space-y-4">
+                                                    {bunkaiStep.description && (<div><h4 className="font-semibold mb-1">Description</h4><p className="text-sm text-muted-foreground">{bunkaiStep.description}</p></div>)}
+                                                    {bunkaiStep.notes && (<div><h4 className="font-semibold mb-1">Notes</h4><p className="text-sm text-muted-foreground">{bunkaiStep.notes}</p></div>)}
+                                                    {bunkaiStep.remarks && bunkaiStep.remarks.length > 0 && (
+                                                        <div>
+                                                        <h4 className="font-semibold mb-1">Remarks</h4>
+                                                        <div className="space-y-2">
+                                                            {bunkaiStep.remarks.map((remark, index) => (
+                                                            <Card key={index} className="bg-secondary"><CardContent className="p-3 text-sm">
+                                                                {remark.arto && <p><span className="font-semibold">Arto:</span> {formatBodyPart(remark.arto)}</p>}
+                                                                {remark.description && <p><span className="font-semibold">Description:</span> {remark.description}</p>}
+                                                                {remark.explanation && <p><span className="font-semibold">Explanation:</span> {remark.explanation}</p>}
+                                                                {remark.note && <p><span className="font-semibold">Note:</span> {remark.note}</p>}
+                                                            </CardContent></Card>
+                                                            ))}
+                                                        </div>
+                                                        </div>
+                                                    )}
+                                                     {bunkaiStep.resources && (
+                                                        <div>
+                                                            <h4 className="font-semibold text-foreground mt-2 mb-1">Resources</h4>
+                                                            {(Array.isArray(bunkaiStep.resources) ? bunkaiStep.resources : [bunkaiStep.resources]).map((res, i) => (
+                                                                <Card key={i} className="mt-1 bg-secondary"><CardContent className="p-2 space-y-1 text-xs">
+                                                                    {Object.entries(res).map(([key, value]) => (
+                                                                        <div key={key}>
+                                                                            <span className="font-semibold capitalize text-foreground">{key}:</span>
+                                                                            <span> {typeof value === 'object' ? JSON.stringify(value, null, 2) : String(value)}</span>
+                                                                        </div>
+                                                                    ))}
+                                                                </CardContent></Card>
+                                                            ))}
+                                                        </div>
+                                                    )}
+                                                    </div>
+                                                ) : (
+                                                    <p className="text-sm text-muted-foreground">No bunkai details for this step.</p>
+                                                )}
+                                                </CardContent>
+                                            </Card>
+                                            </div>
+                                            {index < sortedKataSteps.length - 1 && (
+                                            <div className="flex items-center justify-center my-2 text-muted-foreground">
+                                                {transaction && (
+                                                <div className="flex items-center gap-2">
+                                                    <Popover><PopoverTrigger asChild><div className="cursor-pointer">{getTempoIcon(transaction.tempo)}</div></PopoverTrigger><PopoverContent className="w-auto p-2"><p>{transaction.tempo}</p></PopoverContent></Popover>
+                                                    {transaction.looking_direction && (<Popover><PopoverTrigger asChild><Eye className="h-4 w-4 cursor-pointer" /></PopoverTrigger><PopoverContent className="w-auto p-2"><p className="flex items-center gap-2">Sguardo: <span className="text-2xl font-bold">{getFacingArrow(transaction.looking_direction)}</span></p></PopoverContent></Popover>)}
+                                                    <p className="text-2xl font-bold" title={transaction.direction ?? undefined}>{getDirectionSymbol(transaction.direction)}</p>
+                                                </div>
+                                                )}
+                                            </div>
                                             )}
-                                          </CardContent>
-                                        </Card>
-                                    );
-                                  })
+                                        </React.Fragment>
+                                        );
+                                    })}
+                                    </div>
                                 ) : (
                                   !loadingBunkai && <p className="text-muted-foreground">Select a bunkai to see details.</p>
                                 )}
