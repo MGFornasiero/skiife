@@ -125,6 +125,7 @@ export interface KataTechnique {
     strikingpart_id: number | null;
     strikingpart_name: string | null;
     technic_target_id: number | null;
+    target_direction: AbsoluteDirections | null;  // Add new field
     obiettivo: string | null;            // model attribute name is 'obiettivo' (alias "Obiettivo")
     waza_note: string | null;
     waza_resources: Record<string, any>[] | Record<string, any> | null; // allow single or multiple records
@@ -140,6 +141,7 @@ export interface KataSequenceStep {
   guardia: Sides | null;
   hips: Hips | null;
   facing: AbsoluteDirections | null;
+  looking_direction: AbsoluteDirections | null;  // Add new field before Tecniche
   Tecniche: KataTechnique[];           // model field name is 'Tecniche' (capital T)
   embusen: EmbusenPoints | null;
   kiai: boolean | null;                // can be null according to models
@@ -171,6 +173,7 @@ export interface KataTransaction {
   tempo: Tempo | null;
   direction: Sides | null;
   intermediate_stand_id: number | null;
+  looking_direction: AbsoluteDirections | null;  // Add new field
   notes: string | null;
   remarks: DetailedNotes[] | null;
   resources: Record<string, any> | Record<string, any>[] | null;
@@ -198,12 +201,6 @@ export interface BunkaiInfo {
 }
 
 
-export interface BunkaiInventoryResponse {
-  kata_id: number;
-  bunkai_inventory: Record<string, BunkaiInfo>;
-}
-
-// For /bunkai_dtls/{bunkai_id}
 export interface BunkaiStep {
   id_bunkaisequence: number;
   bunkai_id: number;
@@ -211,14 +208,10 @@ export interface BunkaiStep {
   description: string | null;
   notes: string | null;
   remarks: DetailedNotes[] | null;
-  resources: Record<string, any> | null;
+  resources: Record<string, any> | Record<string, any>[] | null;
   resource_url: string | null;
 }
 
-export interface BunkaiDetails {
-  bunkai_id: number;
-  bunkai_steps: Record<string, BunkaiStep>;
-}
 
 // For /finder
 export interface Relevance {

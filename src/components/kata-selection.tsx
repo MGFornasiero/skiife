@@ -14,7 +14,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight, Loader2, Link as LinkIcon, Rabbit, Wind, Hourglass, PersonStanding, Turtle, Volume2, MapPin, Notebook } from "lucide-react";
+import { ChevronLeft, ChevronRight, Loader2, Link as LinkIcon, Rabbit, Wind, Hourglass, PersonStanding, Turtle, Volume2, MapPin, Notebook, Eye } from "lucide-react";
 import { cn } from "@/lib/utils";
 import React from "react";
 import {
@@ -424,6 +424,16 @@ export default function KataSelection() {
                                                                       <p>{transaction.tempo}</p>
                                                                   </PopoverContent>
                                                               </Popover>
+                                                              {transaction.looking_direction && (
+                                                                  <Popover>
+                                                                      <PopoverTrigger asChild>
+                                                                          <Eye className="h-4 w-4 cursor-pointer" />
+                                                                      </PopoverTrigger>
+                                                                      <PopoverContent className="w-auto p-2">
+                                                                          <p className="text-2xl font-bold">{getFacingArrow(transaction.looking_direction)}</p>
+                                                                      </PopoverContent>
+                                                                  </Popover>
+                                                              )}
                                                               <p className="text-2xl font-bold" title={transaction.direction ?? undefined}>{getDirectionSymbol(transaction.direction)}</p>
                                                           </div>
                                                       )}
@@ -463,6 +473,14 @@ export default function KataSelection() {
                                                 <PopoverContent className="w-auto p-2"><p>Kiai!</p></PopoverContent>
                                             </Popover>
                                         )}
+                                        {currentStep.looking_direction && (
+                                          <Popover>
+                                            <PopoverTrigger className="cursor-pointer"><Eye className="h-5 w-5" /></PopoverTrigger>
+                                            <PopoverContent className="w-auto p-2">
+                                              <p className="flex items-center gap-2">Sguardo: <span className="text-2xl font-bold">{getFacingArrow(currentStep.looking_direction)}</span></p>
+                                            </PopoverContent>
+                                          </Popover>
+                                        )}
                                         <Popover>
                                             <PopoverTrigger className="cursor-pointer text-2xl">{getGuardiaSymbol(currentStep.guardia)}</PopoverTrigger>
                                             <PopoverContent className="w-auto p-2"><p>Guardia: {currentStep.guardia}</p></PopoverContent>
@@ -494,6 +512,7 @@ export default function KataSelection() {
                                                                 {tech.arto && <p><span className="font-semibold text-foreground">Arto:</span> {formatBodyPartDisplay(tech.arto)}</p>}
                                                                 {tech.strikingpart_name && <p><span className="font-semibold text-foreground">Striking Part:</span> {tech.strikingpart_name}</p>}
                                                                 {tech.obiettivo && <p><span className="font-semibold text-foreground">Obiettivo:</span> {tech.obiettivo}</p>}
+                                                                {tech.target_direction && <p><span className="font-semibold text-foreground">Direzione Obiettivo:</span> <span className="font-bold">{getFacingArrow(tech.target_direction)}</span></p>}
                                                                 {tech.waza_note && <p><span className="font-semibold text-foreground">Waza Note:</span> {tech.waza_note}</p>}
                                                                 {tech.waza_resources && (
                                                                     <div>
@@ -527,7 +546,7 @@ export default function KataSelection() {
                                                 {currentStep.remarks.map((remark, index) => (
                                                     <Card key={index}>
                                                         <CardContent className="p-4 space-y-2 text-sm">
-                                                            <p><span className="font-semibold">Arto:</span> {formatBodyPartDisplay(remark.arto)}</p>
+                                                          <p><span className="font-semibold">Arto:</span> {formatBodyPartDisplay(remark.arto)}</p>
                                                             {remark.description && <p><span className="font-semibold">Description:</span> {remark.description}</p>}
                                                             {remark.explanation && <p><span className="font-semibold">Explanation:</span> {remark.explanation}</p>}
                                                             {remark.note && <p><span className="font-semibold">Note:</span> {remark.note}</p>}
