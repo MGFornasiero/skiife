@@ -3,9 +3,9 @@
 
 import React, { useState, useEffect } from "react";
 import { KataSequenceStep } from "@/lib/data";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
+import { DirectionIndicator } from "./direction-indicator";
 
 const facingToDegree: Record<string, number> = {
   N: 0,
@@ -92,54 +92,64 @@ export const KataPlayer: React.FC<KataPlayerProps> = ({
       <CardHeader>
         <CardTitle>Embusen</CardTitle>
       </CardHeader>
-      <CardContent className="flex flex-col items-center">
-        <svg viewBox="0 0 400 400" className="border rounded-md bg-secondary/30 h-80 w-80">
-          {/* Mark origin (0,0) */}
-          <circle cx={200} cy={200} r={3} className="fill-muted-foreground/50" />
-          
-          {/* Draw faint previous steps */}
-          {steps.slice(0, currentStepIndex).map((s, idx) => (
-            s.embusen ? (
-              <circle
-                key={`past-${idx}`}
-                cx={200 + s.embusen.x * scale}
-                cy={200 - s.embusen.y * scale}
-                r={5}
-                className="fill-muted-foreground/30"
-              />
-            ) : null
-          ))}
-          
-           {/* Draw future steps */}
-           {steps.slice(currentStepIndex + 1).map((s, idx) => (
-            s.embusen ? (
-              <circle
-                key={`future-${idx}`}
-                cx={200 + s.embusen.x * scale}
-                cy={200 - s.embusen.y * scale}
-                r={3}
-                className="fill-muted-foreground/20"
-              />
-            ) : null
-          ))}
+      <CardContent className="grid grid-cols-2 items-center gap-4">
+        <div className="flex flex-col items-center">
+            <svg viewBox="0 0 400 400" className="border rounded-md bg-secondary/30 h-64 w-64">
+              {/* Mark origin (0,0) */}
+              <circle cx={200} cy={200} r={3} className="fill-muted-foreground/50" />
+              
+              {/* Draw faint previous steps */}
+              {steps.slice(0, currentStepIndex).map((s, idx) => (
+                s.embusen ? (
+                  <circle
+                    key={`past-${idx}`}
+                    cx={200 + s.embusen.x * scale}
+                    cy={200 - s.embusen.y * scale}
+                    r={5}
+                    className="fill-muted-foreground/30"
+                  />
+                ) : null
+              ))}
+              
+              {/* Draw future steps */}
+              {steps.slice(currentStepIndex + 1).map((s, idx) => (
+                s.embusen ? (
+                  <circle
+                    key={`future-${idx}`}
+                    cx={200 + s.embusen.x * scale}
+                    cy={200 - s.embusen.y * scale}
+                    r={3}
+                    className="fill-muted-foreground/20"
+                  />
+                ) : null
+              ))}
 
-          {/* Draw current arrow */}
-          {currentStep && currentStep.embusen && (
-            <polygon
-              points="0,-12 6,12 -6,12"
-              className={cn(
-                "transition-transform duration-100",
-                currentStep.kiai ? "fill-destructive" : "fill-primary"
+              {/* Draw current arrow */}
+              {currentStep && currentStep.embusen && (
+                <polygon
+                  points="0,-12 6,12 -6,12"
+                  className={cn(
+                    "transition-transform duration-100",
+                    currentStep.kiai ? "fill-destructive" : "fill-primary"
+                  )}
+                  transform={`translate(${200 + position.x * scale}, ${
+                    200 - position.y * scale
+                  }) rotate(${position.facing})`}
+                />
               )}
-              transform={`translate(${200 + position.x * scale}, ${
-                200 - position.y * scale
-              }) rotate(${position.facing})`}
-            />
+            </svg>
+            <div className="mt-4 w-full text-center">
+                {currentStep.kiai && <p className="text-sm font-bold text-destructive">Kiai!</p>}
+            </div>
+        </div>
+        <div className="flex items-center justify-center">
+          {currentStep && (
+              <DirectionIndicator
+                  size={120}
+                  direction={currentStep.facing}
+                  guardia={currentStep.guardia}
+              />
           )}
-        </svg>
-
-        <div className="mt-4 w-full text-center">
-            {currentStep.kiai && <p className="text-sm font-bold text-destructive">Kiai!</p>}
         </div>
       </CardContent>
     </Card>

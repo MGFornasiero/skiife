@@ -53,11 +53,11 @@ const gambaSymbolMap: { [key in string]: string } = {
 };
 
 const tempoIconMap: { [key in Tempo]: React.ElementType } = {
-    'Legato': InfinityIcon,
-    'Fast': Rabbit,
-    'Normal': PersonStanding,
-    'Slow': Turtle,
     'Breath': Wind,
+    'Slow': Turtle,
+    'Normal': PersonStanding,
+    'Fast': Rabbit,
+    'Legato': InfinityIcon,
 };
 
 const tempoColorMap: { [key in Tempo]: string } = {
@@ -413,20 +413,11 @@ export default function KataSelection() {
                                               <Card className={cn("w-full", step.kiai && "border-primary")}>
                                                   <CardContent className="p-4 grid grid-cols-[80px,1fr] gap-4 items-start">
                                                       <div className="w-full h-full flex items-center justify-center">
-                                                          <Popover>
-                                                              <PopoverTrigger asChild>
-                                                                  <div className="cursor-pointer">
-                                                                      <DirectionIndicator
-                                                                          size={60}
-                                                                          direction={step.facing}
-                                                                          guardia={step.guardia}
-                                                                      />
-                                                                  </div>
-                                                              </PopoverTrigger>
-                                                              <PopoverContent className="w-auto p-2">
-                                                                  <p>Facing: {step.facing}, Guardia: {step.guardia}</p>
-                                                              </PopoverContent>
-                                                          </Popover>
+                                                        <DirectionIndicator
+                                                            size={60}
+                                                            direction={step.facing}
+                                                            guardia={step.guardia}
+                                                        />
                                                       </div>
                                                       <div className="flex flex-col gap-2">
                                                           <div className="flex justify-between items-start">
@@ -546,14 +537,6 @@ export default function KataSelection() {
                                                 </PopoverContent>
                                             </Popover>
                                         )}
-                                        <Popover>
-                                            <PopoverTrigger asChild>
-                                              <div className="cursor-pointer">
-                                                <DirectionIndicator size={60} direction={currentStep.facing} guardia={currentStep.guardia} />
-                                              </div>
-                                            </PopoverTrigger>
-                                            <PopoverContent className="w-auto p-2"><p>Facing: {currentStep.facing}, Guardia: {currentStep.guardia}</p></PopoverContent>
-                                        </Popover>
                                     </div>
                                     
                                     <div className="w-full text-center space-y-2">
@@ -755,20 +738,11 @@ export default function KataSelection() {
                                                 <Card className={cn("flex flex-col", step.kiai && "border-primary")}>
                                                     <CardContent className="p-4 grid grid-cols-[80px,1fr] gap-4 items-start">
                                                         <div className="w-full h-full flex items-center justify-center">
-                                                            <Popover>
-                                                                <PopoverTrigger asChild>
-                                                                    <div className="cursor-pointer">
-                                                                        <DirectionIndicator
-                                                                            size={60}
-                                                                            direction={step.facing}
-                                                                            guardia={step.guardia}
-                                                                        />
-                                                                    </div>
-                                                                </PopoverTrigger>
-                                                                <PopoverContent className="w-auto p-2">
-                                                                    <p>Facing: {step.facing}, Guardia: {step.guardia}</p>
-                                                                </PopoverContent>
-                                                            </Popover>
+                                                            <DirectionIndicator
+                                                                size={60}
+                                                                direction={step.facing}
+                                                                guardia={step.guardia}
+                                                            />
                                                         </div>
                                                         <div className="flex flex-col gap-2">
                                                             <div className="flex justify-between items-start">
