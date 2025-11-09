@@ -68,7 +68,7 @@ export const DirectionIndicator: React.FC<BaseDirectionIndicatorProps> = ({
             position: "absolute",
             top: "50%",
             left: "50%",
-            transform: `translate(-50%, -50%) rotate(${directionRotation[direction]}deg)`,
+            transform: `translate(-50%, -80%) rotate(${directionRotation[direction]}deg)`,
             transformOrigin: "50% 50%",
             transition: "transform 0.3s ease-out",
           }}
