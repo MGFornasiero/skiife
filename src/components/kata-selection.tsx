@@ -503,18 +503,6 @@ export default function KataSelection() {
                                                       {transaction && (
                                                           <div className="flex items-center gap-2">
                                                               <TempoIndicator tempo={transaction.tempo} />
-                                                              {transaction.looking_direction && (
-                                                                  <Popover>
-                                                                    <PopoverTrigger asChild>
-                                                                      <div className="cursor-pointer">
-                                                                        <DirectionIndicator size={24} direction={transaction.looking_direction} centerIcon={Eye} />
-                                                                      </div>
-                                                                    </PopoverTrigger>
-                                                                    <PopoverContent className="w-auto p-2">
-                                                                        <p>Sguardo: {transaction.looking_direction}</p>
-                                                                    </PopoverContent>
-                                                                  </Popover>
-                                                              )}
                                                               <p className="text-2xl font-bold" title={transaction.direction ?? undefined}>{getDirectionSymbol(transaction.direction)}</p>
                                                           </div>
                                                       )}
@@ -873,7 +861,6 @@ export default function KataSelection() {
                                                 {transaction && (
                                                 <div className="flex items-center gap-2">
                                                     <TempoIndicator tempo={transaction.tempo} />
-                                                    {transaction.looking_direction && (<Popover><PopoverTrigger asChild><div className="cursor-pointer"><DirectionIndicator size={24} direction={transaction.looking_direction} centerIcon={Eye} /></div></PopoverTrigger><PopoverContent className="w-auto p-2"><p>Sguardo: {transaction.looking_direction}</p></PopoverContent></Popover>)}
                                                     <p className="text-2xl font-bold" title={transaction.direction ?? undefined}>{getDirectionSymbol(transaction.direction)}</p>
                                                 </div>
                                                 )}
@@ -987,3 +974,6 @@ export default function KataSelection() {
 
 
 
+
+
+    
