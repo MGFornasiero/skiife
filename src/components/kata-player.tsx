@@ -136,7 +136,7 @@ export const KataPlayer: React.FC<KataPlayerProps> = ({
               {currentStep && currentStep.embusen && (
                  <g transform={`translate(${position.x}, ${transformY(position.y)}) rotate(${position.facing})`}>
                     <polygon
-                        points="0,-1.2 0.6,1.2 -0.6,1.2"
+                        points="0,-0.8 0.4,0.8 -0.4,0.8"
                         className={cn(
                             "transition-transform duration-100",
                             currentStep.kiai ? "fill-destructive" : "fill-primary"
