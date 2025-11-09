@@ -1,7 +1,6 @@
 import React from "react";
 import { ArrowUp } from "lucide-react";
-import { AbsoluteDirections } from "@/lib/type_admin_fe";
-
+import { AbsoluteDirections, Sides } from "@/lib/type_admin_fe";
 
 const directionRotation: Record<AbsoluteDirections, number> = {
   N: 0,
@@ -14,22 +13,30 @@ const directionRotation: Record<AbsoluteDirections, number> = {
   NO: 315,
 };
 
-interface BaseDirectionIndicatorProps {
+const guardiaSymbolMap: { [key in Sides]: string } = {
+  'sx': '◐',
+  'dx': '◑',
+  'frontal': '◒',
+};
+
+interface DirectionIndicatorProps {
   size?: number;
-  centerIcon?: React.ElementType;
   direction?: AbsoluteDirections;
+  guardia?: Sides | null;
   arrowColor?: string;
   tickColor?: string;
+  guardiaColor?: string;
 }
 
 const directions: AbsoluteDirections[] = ["N", "NE", "E", "SE", "S", "SO", "O", "NO"];
 
-export const DirectionIndicator: React.FC<BaseDirectionIndicatorProps> = ({
+export const DirectionIndicator: React.FC<DirectionIndicatorProps> = ({
   size = 60,
-  centerIcon: CenterIcon,
   direction,
+  guardia,
   arrowColor = "hsl(var(--primary))",
   tickColor = "hsl(var(--muted-foreground))",
+  guardiaColor = "hsl(var(--primary))",
 }) => {
   const center = size / 2;
   const radius = size * 0.45;
@@ -75,18 +82,21 @@ export const DirectionIndicator: React.FC<BaseDirectionIndicatorProps> = ({
         />
       )}
 
-      {/* Center Icon */}
-      {CenterIcon && (
-        <CenterIcon
-          size={size * 0.3}
-          color={arrowColor}
-          style={{
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-          }}
-        />
+      {/* Guardia Symbol */}
+      {guardia && (
+        <div
+            style={{
+                position: "absolute",
+                top: "50%",
+                left: "50%",
+                transform: "translate(-50%, -50%)",
+                color: guardiaColor,
+                fontSize: `${size * 0.4}px`,
+                lineHeight: 1,
+            }}
+        >
+            {guardiaSymbolMap[guardia]}
+        </div>
       )}
     </div>
   );

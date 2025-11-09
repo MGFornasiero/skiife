@@ -419,12 +419,12 @@ export default function KataSelection() {
                                                                       <DirectionIndicator
                                                                           size={60}
                                                                           direction={step.facing}
-                                                                          centerIcon={PersonStanding}
+                                                                          guardia={step.guardia}
                                                                       />
                                                                   </div>
                                                               </PopoverTrigger>
                                                               <PopoverContent className="w-auto p-2">
-                                                                  <p>Facing: {step.facing}</p>
+                                                                  <p>Facing: {step.facing}, Guardia: {step.guardia}</p>
                                                               </PopoverContent>
                                                           </Popover>
                                                       </div>
@@ -471,14 +471,6 @@ export default function KataSelection() {
                                                                         </PopoverContent>
                                                                     </Popover>
                                                                   )}
-                                                                  <Popover>
-                                                                      <PopoverTrigger asChild>
-                                                                          <span className="text-2xl cursor-pointer">{getGuardiaSymbol(step.guardia)}</span>
-                                                                      </PopoverTrigger>
-                                                                      <PopoverContent className="w-auto p-2">
-                                                                          <p>{step.guardia}</p>
-                                                                      </PopoverContent>
-                                                                  </Popover>
                                                               </div>
                                                           </div>
                                                           <div>
@@ -546,7 +538,7 @@ export default function KataSelection() {
                                             <Popover>
                                                 <PopoverTrigger asChild>
                                                   <div className="cursor-pointer">
-                                                    <DirectionIndicator size={32} direction={currentStep.looking_direction} centerIcon={Eye} />
+                                                    <DirectionIndicator size={32} direction={currentStep.looking_direction} />
                                                   </div>
                                                 </PopoverTrigger>
                                                 <PopoverContent className="w-auto p-2">
@@ -555,16 +547,12 @@ export default function KataSelection() {
                                             </Popover>
                                         )}
                                         <Popover>
-                                            <PopoverTrigger className="cursor-pointer text-2xl">{getGuardiaSymbol(currentStep.guardia)}</PopoverTrigger>
-                                            <PopoverContent className="w-auto p-2"><p>Guardia: {currentStep.guardia}</p></PopoverContent>
-                                        </Popover>
-                                        <Popover>
                                             <PopoverTrigger asChild>
                                               <div className="cursor-pointer">
-                                                <DirectionIndicator size={60} direction={currentStep.facing} centerIcon={PersonStanding} />
+                                                <DirectionIndicator size={60} direction={currentStep.facing} guardia={currentStep.guardia} />
                                               </div>
                                             </PopoverTrigger>
-                                            <PopoverContent className="w-auto p-2"><p>Facing: {currentStep.facing}</p></PopoverContent>
+                                            <PopoverContent className="w-auto p-2"><p>Facing: {currentStep.facing}, Guardia: {currentStep.guardia}</p></PopoverContent>
                                         </Popover>
                                     </div>
                                     
@@ -592,7 +580,7 @@ export default function KataSelection() {
                                                               {tech.target_direction && 
                                                                 <div className="flex items-center gap-2">
                                                                   <span className="font-semibold text-foreground">Direzione Obiettivo:</span> 
-                                                                  <DirectionIndicator size={24} direction={tech.target_direction} centerIcon={Crosshair} />
+                                                                  <DirectionIndicator size={24} direction={tech.target_direction} />
                                                                 </div>
                                                               }
                                                               {tech.waza_note && <p><span className="font-semibold text-foreground">Waza Note:</span> {tech.waza_note}</p>}
@@ -773,12 +761,12 @@ export default function KataSelection() {
                                                                         <DirectionIndicator
                                                                             size={60}
                                                                             direction={step.facing}
-                                                                            centerIcon={PersonStanding}
+                                                                            guardia={step.guardia}
                                                                         />
                                                                     </div>
                                                                 </PopoverTrigger>
                                                                 <PopoverContent className="w-auto p-2">
-                                                                    <p>Facing: {step.facing}</p>
+                                                                    <p>Facing: {step.facing}, Guardia: {step.guardia}</p>
                                                                 </PopoverContent>
                                                             </Popover>
                                                         </div>
@@ -793,7 +781,6 @@ export default function KataSelection() {
                                                                     {step.speed && <Popover><PopoverTrigger asChild><div className="cursor-pointer">{getStepTempoIcon(step.speed)}</div></PopoverTrigger><PopoverContent className="w-auto p-2"><p>{step.speed}</p></PopoverContent></Popover>}
                                                                     {step.kiai && <Popover><PopoverTrigger asChild><Volume2 className="h-5 w-5 text-destructive cursor-pointer" /></PopoverTrigger><PopoverContent className="w-auto p-2"><p>Kiai!</p></PopoverContent></Popover>}
                                                                     {step.notes && <Popover><PopoverTrigger><Notebook className="h-5 w-5 text-muted-foreground cursor-pointer" /></PopoverTrigger><PopoverContent><p>{typeof step.notes === 'string' ? step.notes : JSON.stringify(step.notes)}</p></PopoverContent></Popover>}
-                                                                    <Popover><PopoverTrigger asChild><span className="text-2xl cursor-pointer">{getGuardiaSymbol(step.guardia)}</span></PopoverTrigger><PopoverContent className="w-auto p-2"><p>{step.guardia}</p></PopoverContent></Popover>
                                                                 </div>
                                                             </div>
                                                             <div>
