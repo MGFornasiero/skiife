@@ -136,7 +136,7 @@ export const KataPlayer: React.FC<KataPlayerProps> = ({
               {currentStep && currentStep.embusen && (
                  <g transform={`translate(${position.x}, ${transformY(position.y)}) rotate(${position.facing})`}>
                     <polygon
-                        points="0,-0.8 0.4,0.8 -0.4,0.8"
+                        points="0,-0.4 0.2,0.4 -0.2,0.4"
                         className={cn(
                             "transition-transform duration-100",
                             currentStep.kiai ? "fill-destructive" : "fill-primary"
@@ -154,6 +154,8 @@ export const KataPlayer: React.FC<KataPlayerProps> = ({
               <DirectionIndicator
                   size={120}
                   direction={currentStep.facing}
+                  secondaryDirection={currentStep.looking_direction}
+                  secondaryArrowColor="hsl(var(--chart-2))"
                   guardia={currentStep.guardia}
               />
           )}

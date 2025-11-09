@@ -23,9 +23,11 @@ const guardiaSymbolMap: { [key in Sides]: string } = {
 interface DirectionIndicatorProps {
   size?: number;
   direction?: AbsoluteDirections;
+  secondaryDirection?: AbsoluteDirections;
   guardia?: Sides | null;
   centerIcon?: React.ElementType;
   arrowColor?: string;
+  secondaryArrowColor?: string;
   tickColor?: string;
   guardiaColor?: string;
 }
@@ -35,19 +37,37 @@ const directions: AbsoluteDirections[] = ["N", "NE", "E", "SE", "S", "SO", "O", 
 export const DirectionIndicator: React.FC<DirectionIndicatorProps> = ({
   size = 60,
   direction,
+  secondaryDirection,
   guardia,
   centerIcon: CenterIcon,
   arrowColor = "hsl(var(--primary))",
+  secondaryArrowColor = "hsl(var(--chart-2))",
   tickColor = "hsl(var(--muted-foreground))",
   guardiaColor = "hsl(var(--foreground))",
 }) => {
   const center = size / 2;
   const radius = size * 0.4;
 
-  const rotation = direction ? directionRotation[direction] : 0;
-  const arrowAngle = (rotation * Math.PI) / 180;
-  const arrowX = center + radius * Math.sin(arrowAngle);
-  const arrowY = center - radius * Math.cos(arrowAngle);
+  const renderArrow = (dir: AbsoluteDirections, color: string) => {
+    const rotation = directionRotation[dir];
+    const arrowAngle = (rotation * Math.PI) / 180;
+    const arrowX = center + radius * Math.sin(arrowAngle);
+    const arrowY = center - radius * Math.cos(arrowAngle);
+    return (
+        <div
+            style={{
+                position: 'absolute',
+                left: arrowX,
+                top: arrowY,
+                transform: `translate(-50%, -50%) rotate(${rotation}deg)`,
+                transformOrigin: 'center center',
+            }}
+        >
+            <ArrowUp size={size * 0.25} color={color} />
+        </div>
+    );
+  };
+
 
   return (
     <div style={{ width: size, height: size, position: "relative" }}>
@@ -74,20 +94,12 @@ export const DirectionIndicator: React.FC<DirectionIndicatorProps> = ({
         );
       })}
 
-      {/* Arrow on the ticks ring */}
-      {direction && (
-        <div
-          style={{
-            position: 'absolute',
-            left: arrowX,
-            top: arrowY,
-            transform: `translate(-50%, -50%) rotate(${rotation}deg)`,
-            transformOrigin: 'center center',
-          }}
-        >
-          <ArrowUp size={size * 0.25} color={arrowColor} />
-        </div>
-      )}
+      {/* Primary Arrow */}
+      {direction && renderArrow(direction, arrowColor)}
+      
+      {/* Secondary Arrow */}
+      {secondaryDirection && renderArrow(secondaryDirection, secondaryArrowColor)}
+
 
       {/* Guardia or Center Icon */}
       {guardia ? (

@@ -623,7 +623,6 @@ export default function KataSelection() {
                                                                 <PopoverTrigger asChild>
                                                                   <div className="cursor-pointer flex items-center gap-1">
                                                                     <Eye className="h-4 w-4 text-muted-foreground"/>
-                                                                    <DirectionIndicator size={32} direction={currentStep.looking_direction} />
                                                                   </div>
                                                                 </PopoverTrigger>
                                                                 <PopoverContent className="w-auto p-2">
@@ -656,18 +655,13 @@ export default function KataSelection() {
                                                           <div className="space-y-2">
                                                               {currentStep.Tecniche.map((tech, index) => (
                                                                   <Card key={index}>
-                                                                      <CardContent className="p-4 space-y-2">
+                                                                    <CardContent className="p-4 grid grid-cols-[1fr,auto] items-start gap-4">
+                                                                      <div className="space-y-2">
                                                                           <p className="font-medium cursor-pointer hover:underline" onClick={() => handleTechnicClick(tech.technic_id)}>{tech.tecnica}</p>
                                                                           <div className="text-sm text-muted-foreground space-y-1">
                                                                               {tech.arto && <p><span className="font-semibold text-foreground">Arto:</span> {formatBodyPartDisplay(tech.arto)}</p>}
                                                                               {tech.strikingpart_name && <p><span className="font-semibold text-foreground">Striking Part:</span> {tech.strikingpart_name}</p>}
                                                                               {tech.obiettivo && <p><span className="font-semibold text-foreground">Obiettivo:</span> {tech.obiettivo}</p>}
-                                                                              {tech.target_direction && 
-                                                                                <div className="flex items-center gap-2">
-                                                                                  <span className="font-semibold text-foreground">Direzione Obiettivo:</span> 
-                                                                                   <DirectionIndicator size={24} direction={tech.target_direction} centerIcon={Crosshair}/>
-                                                                                </div>
-                                                                              }
                                                                               {tech.waza_note && <p><span className="font-semibold text-foreground">Waza Note:</span> {tech.waza_note}</p>}
                                                                               {tech.waza_resources && (
                                                                                   <div>
@@ -687,7 +681,17 @@ export default function KataSelection() {
                                                                                   </div>
                                                                               )}
                                                                           </div>
-                                                                      </CardContent>
+                                                                      </div>
+                                                                      {tech.target_direction && (
+                                                                          <div className="flex items-center justify-center">
+                                                                              <DirectionIndicator 
+                                                                                  size={40} 
+                                                                                  direction={tech.target_direction}
+                                                                                  arrowColor="hsl(var(--destructive))"
+                                                                              />
+                                                                          </div>
+                                                                      )}
+                                                                    </CardContent>
                                                                   </Card>
                                                               ))}
                                                           </div>
@@ -773,7 +777,7 @@ export default function KataSelection() {
                               {kataDetails.notes && (
                                 <Card>
                                   <CardHeader>
-                                    <CardTitle>Notes</CardTitle>
+                                    <h3>Notes</h3>
                                   </CardHeader>
                                   <CardContent>
                                     <p className="text-sm">{kataDetails.notes}</p>
@@ -784,7 +788,7 @@ export default function KataSelection() {
                                 (Array.isArray(kataDetails.resources) ? kataDetails.resources : [kataDetails.resources]).map((resource, index) => (
                                   <Card key={index}>
                                     <CardHeader>
-                                      <CardTitle>Resource</CardTitle>
+                                      <h3>Resource</h3>
                                     </CardHeader>
                                     <CardContent className="space-y-2">
                                       {Object.entries(resource).map(([key, value]) => (
