@@ -1,3 +1,4 @@
+
 import React from "react";
 import { ArrowUp } from "lucide-react";
 import { AbsoluteDirections, Sides } from "@/lib/type_admin_fe";
@@ -69,7 +70,7 @@ export const DirectionIndicator: React.FC<DirectionIndicatorProps> = ({
       {/* Arrow */}
       {direction && (
         <ArrowUp
-          size={size * 0.6}
+          size={size * 0.4}
           color={arrowColor}
           style={{
             position: "absolute",

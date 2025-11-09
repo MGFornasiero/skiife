@@ -82,7 +82,7 @@ export const KataPlayer: React.FC<KataPlayerProps> = ({
   }, [currentStepIndex, steps, stepDuration, position.x, position.y, position.facing]);
 
   // Calculate viewBox
-  const padding = 5;
+  const padding = 1;
   const embusenPoints = steps.map(s => s.embusen).filter(Boolean);
   
   let minX = 0, maxX = 0, minY = 0, maxY = 0;
