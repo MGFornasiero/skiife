@@ -39,7 +39,7 @@ export const DirectionIndicator: React.FC<DirectionIndicatorProps> = ({
   guardiaColor = "hsl(var(--primary))",
 }) => {
   const center = size / 2;
-  const radius = size * 0.45;
+  const radius = size * 0.4; // where ticks and arrow will be positioned
 
   return (
     <div style={{ width: size, height: size, position: "relative" }}>

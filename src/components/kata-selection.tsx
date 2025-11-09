@@ -411,8 +411,8 @@ export default function KataSelection() {
                                       return (
                                           <React.Fragment key={step.id_sequence}>
                                               <Card className={cn("w-full", step.kiai && "border-primary")}>
-                                                  <CardContent className="p-4 grid grid-cols-[auto,1fr] gap-4 items-start">
-                                                      <div className="w-16 h-16 flex items-center justify-center">
+                                                  <CardContent className="p-4 grid grid-cols-[80px,1fr] gap-4 items-start">
+                                                      <div className="w-full h-full flex items-center justify-center">
                                                           <Popover>
                                                               <PopoverTrigger asChild>
                                                                   <div className="cursor-pointer">
@@ -753,8 +753,8 @@ export default function KataSelection() {
                                         <React.Fragment key={step.id_sequence}>
                                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                                 <Card className={cn("flex flex-col", step.kiai && "border-primary")}>
-                                                    <CardContent className="p-4 grid grid-cols-[auto,1fr] gap-4 items-start">
-                                                        <div className="w-16 h-16 flex items-center justify-center">
+                                                    <CardContent className="p-4 grid grid-cols-[80px,1fr] gap-4 items-start">
+                                                        <div className="w-full h-full flex items-center justify-center">
                                                             <Popover>
                                                                 <PopoverTrigger asChild>
                                                                     <div className="cursor-pointer">
