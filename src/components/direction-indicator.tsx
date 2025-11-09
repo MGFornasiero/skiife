@@ -1,6 +1,6 @@
 
 import React from "react";
-import { ArrowUp } from "lucide-react";
+import { ArrowUp, Eye, Crosshair } from "lucide-react";
 import { AbsoluteDirections, Sides } from "@/lib/type_admin_fe";
 
 const directionRotation: Record<AbsoluteDirections, number> = {
@@ -24,6 +24,7 @@ interface DirectionIndicatorProps {
   size?: number;
   direction?: AbsoluteDirections;
   guardia?: Sides | null;
+  centerIcon?: React.ElementType;
   arrowColor?: string;
   tickColor?: string;
   guardiaColor?: string;
@@ -35,19 +36,18 @@ export const DirectionIndicator: React.FC<DirectionIndicatorProps> = ({
   size = 60,
   direction,
   guardia,
+  centerIcon: CenterIcon,
   arrowColor = "hsl(var(--primary))",
   tickColor = "hsl(var(--muted-foreground))",
-  guardiaColor = "hsl(var(--primary))",
+  guardiaColor = "hsl(var(--foreground))",
 }) => {
   const center = size / 2;
-  const radius = size * 0.4; // where ticks and arrow will be positioned
+  const radius = size * 0.4;
 
-  // Compute arrow position
   const rotation = direction ? directionRotation[direction] : 0;
   const arrowAngle = (rotation * Math.PI) / 180;
   const arrowX = center + radius * Math.sin(arrowAngle);
   const arrowY = center - radius * Math.cos(arrowAngle);
-
 
   return (
     <div style={{ width: size, height: size, position: "relative" }}>
@@ -89,9 +89,8 @@ export const DirectionIndicator: React.FC<DirectionIndicatorProps> = ({
         </div>
       )}
 
-
-      {/* Guardia Symbol */}
-      {guardia && (
+      {/* Guardia or Center Icon */}
+      {guardia ? (
         <div
             style={{
                 position: "absolute",
@@ -105,6 +104,17 @@ export const DirectionIndicator: React.FC<DirectionIndicatorProps> = ({
         >
             {guardiaSymbolMap[guardia]}
         </div>
+      ) : CenterIcon && (
+         <CenterIcon
+          size={size * 0.3}
+          color={arrowColor}
+          style={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+          }}
+        />
       )}
     </div>
   );
