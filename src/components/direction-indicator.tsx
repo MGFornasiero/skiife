@@ -42,6 +42,13 @@ export const DirectionIndicator: React.FC<DirectionIndicatorProps> = ({
   const center = size / 2;
   const radius = size * 0.4; // where ticks and arrow will be positioned
 
+  // Compute arrow position
+  const rotation = direction ? directionRotation[direction] : 0;
+  const arrowAngle = (rotation * Math.PI) / 180;
+  const arrowX = center + radius * Math.sin(arrowAngle);
+  const arrowY = center - radius * Math.cos(arrowAngle);
+
+
   return (
     <div style={{ width: size, height: size, position: "relative" }}>
       {/* Compass ticks */}
@@ -67,21 +74,21 @@ export const DirectionIndicator: React.FC<DirectionIndicatorProps> = ({
         );
       })}
 
-      {/* Arrow */}
+      {/* Arrow on the ticks ring */}
       {direction && (
-        <ArrowUp
-          size={size * 0.4}
-          color={arrowColor}
+        <div
           style={{
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: `translate(-50%, -80%) rotate(${directionRotation[direction]}deg)`,
-            transformOrigin: "50% 80%",
-            transition: "transform 0.3s ease-out",
+            position: 'absolute',
+            left: arrowX,
+            top: arrowY,
+            transform: `translate(-50%, -50%) rotate(${rotation}deg)`,
+            transformOrigin: 'center center',
           }}
-        />
+        >
+          <ArrowUp size={size * 0.25} color={arrowColor} />
+        </div>
       )}
+
 
       {/* Guardia Symbol */}
       {guardia && (
