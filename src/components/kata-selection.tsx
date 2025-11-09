@@ -55,8 +55,8 @@ const gambaSymbolMap: { [key in string]: string } = {
 const tempoIconMap: { [key in Tempo]: React.ElementType } = {
     'Legato': InfinityIcon,
     'Fast': Rabbit,
-    'Normal': Gauge,
-    'Slow': GaugeCircle,
+    'Normal': PersonStanding,
+    'Slow': Turtle,
     'Breath': Wind,
 };
 
@@ -86,7 +86,7 @@ const getGuardiaSymbol = (guardia: Sides | null) => {
 }
 
 const TempoIndicator: React.FC<{ tempo: Tempo | null }> = ({ tempo }) => {
-    if (!tempo) return <Hourglass className="h-4 w-4" />;
+    if (!tempo) return null;
     const Icon = tempoIconMap[tempo] || Hourglass;
     const color = tempoColorMap[tempo] || "";
     return (
@@ -123,7 +123,6 @@ export default function KataSelection() {
   const [kataId, setKataId] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
   const [kataDetails, setKataDetails] = useState<KataResponse | null>(null);
-
   const [selectedStepIndex, setSelectedStepIndex] = useState(0);
 
   const [isPosizioneInfoDialogOpen, setIsPosizioneInfoDialogOpen] = useState(false);
@@ -156,50 +155,50 @@ export default function KataSelection() {
 
   useEffect(() => {
     const fetchKataData = async () => {
-      if (kataId === null) {
+        if (kataId === null) {
+            setKataDetails(null);
+            setSelectedStepIndex(0);
+            setBunkaiIds([]);
+            setSelectedBunkaiIndex(0);
+            setBunkaiDetails(null);
+            return;
+        }
+
+        setLoading(true);
         setKataDetails(null);
         setSelectedStepIndex(0);
         setBunkaiIds([]);
         setSelectedBunkaiIndex(0);
         setBunkaiDetails(null);
-        return;
-      }
 
-      setLoading(true);
-      setKataDetails(null);
-      setSelectedStepIndex(0);
-      setBunkaiIds([]);
-      setSelectedBunkaiIndex(0);
-      setBunkaiDetails(null);
-
-      try {
-        const res = await fetch(`/api/kata/${kataId}`);
-        if (!res.ok) {
-          const errorPayload = await res.json();
-          throw new Error(errorPayload.error || `HTTP error! status: ${res.status}`);
-        }
-        const data: KataResponse = await res.json();
-        setKataDetails(data);
-        if (data.bunkai_ids) {
-            const sortedIds = Object.keys(data.bunkai_ids).sort((a, b) => 
-                data.bunkai_ids[a].version - data.bunkai_ids[b].version
-            );
-            setBunkaiIds(sortedIds);
-            if (sortedIds.length > 0) {
-              setSelectedBunkaiIndex(0);
+        try {
+            const res = await fetch(`/api/kata/${kataId}`);
+            if (!res.ok) {
+                const errorPayload = await res.json();
+                throw new Error(errorPayload.error || `HTTP error! status: ${res.status}`);
             }
-        }
+            const data: KataResponse = await res.json();
+            setKataDetails(data);
+            if (data.bunkai_ids) {
+                const sortedIds = Object.keys(data.bunkai_ids).sort((a, b) =>
+                    data.bunkai_ids[a].version - data.bunkai_ids[b].version
+                );
+                setBunkaiIds(sortedIds);
+                if (sortedIds.length > 0) {
+                    setSelectedBunkaiIndex(0);
+                }
+            }
 
-      } catch (error: any) {
-        console.error("Error fetching kata data:", error);
-        toast({
-          variant: "destructive",
-          title: "Error fetching kata data",
-          description: <pre className="mt-2 w-full rounded-md bg-slate-950 p-4"><code className="text-white">{error.message}</code></pre>
-        });
-      } finally {
-        setLoading(false);
-      }
+        } catch (error: any) {
+            console.error("Error fetching kata data:", error);
+            toast({
+                variant: "destructive",
+                title: "Error fetching kata data",
+                description: <pre className="mt-2 w-full rounded-md bg-slate-950 p-4"><code className="text-white">{error.message}</code></pre>
+            });
+        } finally {
+            setLoading(false);
+        }
     };
 
     fetchKataData();
@@ -411,88 +410,91 @@ export default function KataSelection() {
 
                                       return (
                                           <React.Fragment key={step.id_sequence}>
-                                              <Card className={cn("w-full flex flex-col", step.kiai && "border-primary")}>
-                                                  <CardContent className="p-4 flex flex-col gap-2">
-                                                      <div className="flex justify-between items-start">
-                                                          <div className="flex-grow">
-                                                              <p
-                                                                  className="font-medium cursor-pointer hover:underline"
-                                                                  onClick={() => handlePosizioneClick(step.stand_id)}
-                                                              >
-                                                                  {step.posizione}
-                                                              </p>
-                                                          </div>
-                                                          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                                                              {step.speed && (
-                                                                  <Popover>
-                                                                      <PopoverTrigger asChild>
-                                                                        <div className="cursor-pointer">
-                                                                          {getStepTempoIcon(step.speed)}
-                                                                          </div>
-                                                                      </PopoverTrigger>
-                                                                      <PopoverContent className="w-auto p-2">
-                                                                          <p>{step.speed}</p>
-                                                                      </PopoverContent>
-                                                                  </Popover>
-                                                              )}
-                                                              {step.kiai && (
-                                                                  <Popover>
-                                                                      <PopoverTrigger asChild>
-                                                                          <Volume2 className="h-5 w-5 text-destructive cursor-pointer" />
-                                                                      </PopoverTrigger>
-                                                                      <PopoverContent className="w-auto p-2">
-                                                                          <p>Kiai!</p>
-                                                                      </PopoverContent>
-                                                                  </Popover>
-                                                              )}
-                                                              {step.notes && (
-                                                                <Popover>
-                                                                    <PopoverTrigger>
-                                                                        <Notebook className="h-5 w-5 text-muted-foreground cursor-pointer" />
-                                                                    </PopoverTrigger>
-                                                                    <PopoverContent>
-                                                                        <p>{typeof step.notes === 'string' ? step.notes : JSON.stringify(step.notes)}</p>
-                                                                    </PopoverContent>
-                                                                </Popover>
-                                                              )}
-                                                              <Popover>
-                                                                  <PopoverTrigger asChild>
-                                                                      <span className="text-2xl cursor-pointer">{getGuardiaSymbol(step.guardia)}</span>
-                                                                  </PopoverTrigger>
-                                                                  <PopoverContent className="w-auto p-2">
-                                                                      <p>{step.guardia}</p>
-                                                                  </PopoverContent>
-                                                              </Popover>
-                                                                <Popover>
-                                                                  <PopoverTrigger asChild>
-                                                                    <div className="cursor-pointer w-12 h-12">
-                                                                        <DirectionIndicator
-                                                                            size={48}
-                                                                            direction={step.facing}
-                                                                            centerIcon={PersonStanding}
-                                                                        />
-                                                                    </div>
-                                                                  </PopoverTrigger>
-                                                                  <PopoverContent className="w-auto p-2">
-                                                                      <p>Facing: {step.facing}</p>
-                                                                  </PopoverContent>
-                                                              </Popover>
-                                                          </div>
+                                              <Card className={cn("w-full", step.kiai && "border-primary")}>
+                                                  <CardContent className="p-4 grid grid-cols-[auto,1fr] gap-4 items-start">
+                                                      <div className="w-16 h-16 flex items-center justify-center">
+                                                          <Popover>
+                                                              <PopoverTrigger asChild>
+                                                                  <div className="cursor-pointer">
+                                                                      <DirectionIndicator
+                                                                          size={60}
+                                                                          direction={step.facing}
+                                                                          centerIcon={PersonStanding}
+                                                                      />
+                                                                  </div>
+                                                              </PopoverTrigger>
+                                                              <PopoverContent className="w-auto p-2">
+                                                                  <p>Facing: {step.facing}</p>
+                                                              </PopoverContent>
+                                                          </Popover>
                                                       </div>
-
-                                                      <div>
-                                                          {techniques && techniques.length > 0 && (
-                                                            <>
-                                                              <p className="text-sm text-muted-foreground">Techniques:</p>
-                                                              <ul className="list-disc pl-5 font-medium">
-                                                                  {techniques.map((tech) => (
-                                                                      <li key={tech.technic_id} className="truncate text-sm cursor-pointer hover:underline" onClick={(e) => { e.stopPropagation(); handleTechnicClick(tech.technic_id); }}>
-                                                                          {tech.tecnica}
-                                                                      </li>
-                                                                  ))}
-                                                              </ul>
-                                                            </>
-                                                          )}
+                                                      <div className="flex flex-col gap-2">
+                                                          <div className="flex justify-between items-start">
+                                                              <div className="flex-grow">
+                                                                  <p
+                                                                      className="font-medium cursor-pointer hover:underline"
+                                                                      onClick={() => handlePosizioneClick(step.stand_id)}
+                                                                  >
+                                                                      {step.posizione}
+                                                                  </p>
+                                                              </div>
+                                                              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                                                                  {step.speed && (
+                                                                      <Popover>
+                                                                          <PopoverTrigger asChild>
+                                                                            <div className="cursor-pointer">
+                                                                              {getStepTempoIcon(step.speed)}
+                                                                              </div>
+                                                                          </PopoverTrigger>
+                                                                          <PopoverContent className="w-auto p-2">
+                                                                              <p>{step.speed}</p>
+                                                                          </PopoverContent>
+                                                                      </Popover>
+                                                                  )}
+                                                                  {step.kiai && (
+                                                                      <Popover>
+                                                                          <PopoverTrigger asChild>
+                                                                              <Volume2 className="h-5 w-5 text-destructive cursor-pointer" />
+                                                                          </PopoverTrigger>
+                                                                          <PopoverContent className="w-auto p-2">
+                                                                              <p>Kiai!</p>
+                                                                          </PopoverContent>
+                                                                      </Popover>
+                                                                  )}
+                                                                  {step.notes && (
+                                                                    <Popover>
+                                                                        <PopoverTrigger>
+                                                                            <Notebook className="h-5 w-5 text-muted-foreground cursor-pointer" />
+                                                                        </PopoverTrigger>
+                                                                        <PopoverContent>
+                                                                            <p>{typeof step.notes === 'string' ? step.notes : JSON.stringify(step.notes)}</p>
+                                                                        </PopoverContent>
+                                                                    </Popover>
+                                                                  )}
+                                                                  <Popover>
+                                                                      <PopoverTrigger asChild>
+                                                                          <span className="text-2xl cursor-pointer">{getGuardiaSymbol(step.guardia)}</span>
+                                                                      </PopoverTrigger>
+                                                                      <PopoverContent className="w-auto p-2">
+                                                                          <p>{step.guardia}</p>
+                                                                      </PopoverContent>
+                                                                  </Popover>
+                                                              </div>
+                                                          </div>
+                                                          <div>
+                                                              {techniques && techniques.length > 0 && (
+                                                                <>
+                                                                  <p className="text-sm text-muted-foreground">Techniques:</p>
+                                                                  <ul className="list-disc pl-5 font-medium">
+                                                                      {techniques.map((tech) => (
+                                                                          <li key={tech.technic_id} className="truncate text-sm cursor-pointer hover:underline" onClick={(e) => { e.stopPropagation(); handleTechnicClick(tech.technic_id); }}>
+                                                                              {tech.tecnica}
+                                                                          </li>
+                                                                      ))}
+                                                                  </ul>
+                                                                </>
+                                                              )}
+                                                          </div>
                                                       </div>
                                                   </CardContent>
                                               </Card>
@@ -774,97 +776,97 @@ export default function KataSelection() {
                                         return (
                                         <React.Fragment key={step.id_sequence}>
                                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                            {/* Left Column: Generale Content */}
-                                            <Card className={cn("flex flex-col", step.kiai && "border-primary")}>
-                                                <CardContent className="p-4 flex flex-col gap-2">
-                                                <div className="flex justify-between items-start">
-                                                    <div className="flex-grow">
-                                                    <p className="font-medium cursor-pointer hover:underline" onClick={() => handlePosizioneClick(step.stand_id)}>
-                                                        {step.posizione}
-                                                    </p>
-                                                    </div>
-                                                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                                                    {/* Icons */}
-                                                    {step.speed && <Popover><PopoverTrigger asChild><div className="cursor-pointer">{getStepTempoIcon(step.speed)}</div></PopoverTrigger><PopoverContent className="w-auto p-2"><p>{step.speed}</p></PopoverContent></Popover>}
-                                                    {step.kiai && <Popover><PopoverTrigger asChild><Volume2 className="h-5 w-5 text-destructive cursor-pointer" /></PopoverTrigger><PopoverContent className="w-auto p-2"><p>Kiai!</p></PopoverContent></Popover>}
-                                                    {step.notes && <Popover><PopoverTrigger><Notebook className="h-5 w-5 text-muted-foreground cursor-pointer" /></PopoverTrigger><PopoverContent><p>{typeof step.notes === 'string' ? step.notes : JSON.stringify(step.notes)}</p></PopoverContent></Popover>}
-                                                    <Popover><PopoverTrigger asChild><span className="text-2xl cursor-pointer">{getGuardiaSymbol(step.guardia)}</span></PopoverTrigger><PopoverContent className="w-auto p-2"><p>{step.guardia}</p></PopoverContent></Popover>
-                                                    <Popover>
-                                                        <PopoverTrigger asChild>
-                                                          <div className="cursor-pointer w-12 h-12">
-                                                              <DirectionIndicator
-                                                                  size={48}
-                                                                  direction={step.facing}
-                                                                  centerIcon={PersonStanding}
-                                                              />
-                                                          </div>
-                                                        </PopoverTrigger>
-                                                        <PopoverContent className="w-auto p-2">
-                                                            <p>Facing: {step.facing}</p>
-                                                        </PopoverContent>
-                                                    </Popover>
-                                                    </div>
-                                                </div>
-                                                <div>
-                                                    {step.Tecniche && step.Tecniche.length > 0 && (
-                                                    <>
-                                                        <p className="text-sm text-muted-foreground">Techniques:</p>
-                                                        <ul className="list-disc pl-5 font-medium">
-                                                        {step.Tecniche.map((tech) => (
-                                                            <li key={tech.technic_id} className="truncate text-sm cursor-pointer hover:underline" onClick={(e) => { e.stopPropagation(); handleTechnicClick(tech.technic_id); }}>
-                                                            {tech.tecnica}
-                                                            </li>
-                                                        ))}
-                                                        </ul>
-                                                    </>
-                                                    )}
-                                                </div>
-                                                </CardContent>
-                                            </Card>
-
-                                            {/* Right Column: Bunkai Details */}
-                                            <Card>
-                                                <CardContent className="p-4">
-                                                {bunkaiStep ? (
-                                                    <div className="space-y-4">
-                                                    {bunkaiStep.description && (<div><h4 className="font-semibold mb-1">Description</h4><p className="text-sm text-muted-foreground">{bunkaiStep.description}</p></div>)}
-                                                    {bunkaiStep.notes && (<div><h4 className="font-semibold mb-1">Notes</h4><p className="text-sm text-muted-foreground">{bunkaiStep.notes}</p></div>)}
-                                                    {bunkaiStep.remarks && bunkaiStep.remarks.length > 0 && (
-                                                        <div>
-                                                        <h4 className="font-semibold mb-1">Remarks</h4>
-                                                        <div className="space-y-2">
-                                                            {bunkaiStep.remarks.map((remark, index) => (
-                                                            <Card key={index} className="bg-secondary"><CardContent className="p-3 text-sm">
-                                                                {remark.arto && <p><span className="font-semibold">Arto:</span> {formatBodyPart(remark.arto)}</p>}
-                                                                {remark.description && <p><span className="font-semibold">Description:</span> {remark.description}</p>}
-                                                                {remark.explanation && <p><span className="font-semibold">Explanation:</span> {remark.explanation}</p>}
-                                                                {remark.note && <p><span className="font-semibold">Note:</span> {remark.note}</p>}
-                                                            </CardContent></Card>
-                                                            ))}
+                                                <Card className={cn("flex flex-col", step.kiai && "border-primary")}>
+                                                    <CardContent className="p-4 grid grid-cols-[auto,1fr] gap-4 items-start">
+                                                        <div className="w-16 h-16 flex items-center justify-center">
+                                                            <Popover>
+                                                                <PopoverTrigger asChild>
+                                                                    <div className="cursor-pointer">
+                                                                        <DirectionIndicator
+                                                                            size={60}
+                                                                            direction={step.facing}
+                                                                            centerIcon={PersonStanding}
+                                                                        />
+                                                                    </div>
+                                                                </PopoverTrigger>
+                                                                <PopoverContent className="w-auto p-2">
+                                                                    <p>Facing: {step.facing}</p>
+                                                                </PopoverContent>
+                                                            </Popover>
                                                         </div>
-                                                        </div>
-                                                    )}
-                                                     {bunkaiStep.resources && (
-                                                        <div>
-                                                            <h4 className="font-semibold text-foreground mt-2 mb-1">Resources</h4>
-                                                            {(Array.isArray(bunkaiStep.resources) ? bunkaiStep.resources : [bunkaiStep.resources]).map((res, i) => (
-                                                                <Card key={i} className="mt-1 bg-secondary"><CardContent className="p-2 space-y-1 text-xs">
-                                                                    {Object.entries(res).map(([key, value]) => (
-                                                                        <div key={key}>
-                                                                            <span className="font-semibold capitalize text-foreground">{key}:</span>
-                                                                            <span> {typeof value === 'object' ? JSON.stringify(value, null, 2) : String(value)}</span>
-                                                                        </div>
+                                                        <div className="flex flex-col gap-2">
+                                                            <div className="flex justify-between items-start">
+                                                                <div className="flex-grow">
+                                                                    <p className="font-medium cursor-pointer hover:underline" onClick={() => handlePosizioneClick(step.stand_id)}>
+                                                                        {step.posizione}
+                                                                    </p>
+                                                                </div>
+                                                                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                                                                    {step.speed && <Popover><PopoverTrigger asChild><div className="cursor-pointer">{getStepTempoIcon(step.speed)}</div></PopoverTrigger><PopoverContent className="w-auto p-2"><p>{step.speed}</p></PopoverContent></Popover>}
+                                                                    {step.kiai && <Popover><PopoverTrigger asChild><Volume2 className="h-5 w-5 text-destructive cursor-pointer" /></PopoverTrigger><PopoverContent className="w-auto p-2"><p>Kiai!</p></PopoverContent></Popover>}
+                                                                    {step.notes && <Popover><PopoverTrigger><Notebook className="h-5 w-5 text-muted-foreground cursor-pointer" /></PopoverTrigger><PopoverContent><p>{typeof step.notes === 'string' ? step.notes : JSON.stringify(step.notes)}</p></PopoverContent></Popover>}
+                                                                    <Popover><PopoverTrigger asChild><span className="text-2xl cursor-pointer">{getGuardiaSymbol(step.guardia)}</span></PopoverTrigger><PopoverContent className="w-auto p-2"><p>{step.guardia}</p></PopoverContent></Popover>
+                                                                </div>
+                                                            </div>
+                                                            <div>
+                                                                {step.Tecniche && step.Tecniche.length > 0 && (
+                                                                <>
+                                                                    <p className="text-sm text-muted-foreground">Techniques:</p>
+                                                                    <ul className="list-disc pl-5 font-medium">
+                                                                    {step.Tecniche.map((tech) => (
+                                                                        <li key={tech.technic_id} className="truncate text-sm cursor-pointer hover:underline" onClick={(e) => { e.stopPropagation(); handleTechnicClick(tech.technic_id); }}>
+                                                                        {tech.tecnica}
+                                                                        </li>
                                                                     ))}
-                                                                </CardContent></Card>
-                                                            ))}
+                                                                    </ul>
+                                                                </>
+                                                                )}
+                                                            </div>
                                                         </div>
+                                                    </CardContent>
+                                                </Card>
+                                                <Card>
+                                                    <CardContent className="p-4">
+                                                    {bunkaiStep ? (
+                                                        <div className="space-y-4">
+                                                        {bunkaiStep.description && (<div><h4 className="font-semibold mb-1">Description</h4><p className="text-sm text-muted-foreground">{bunkaiStep.description}</p></div>)}
+                                                        {bunkaiStep.notes && (<div><h4 className="font-semibold mb-1">Notes</h4><p className="text-sm text-muted-foreground">{bunkaiStep.notes}</p></div>)}
+                                                        {bunkaiStep.remarks && bunkaiStep.remarks.length > 0 && (
+                                                            <div>
+                                                            <h4 className="font-semibold mb-1">Remarks</h4>
+                                                            <div className="space-y-2">
+                                                                {bunkaiStep.remarks.map((remark, index) => (
+                                                                <Card key={index} className="bg-secondary"><CardContent className="p-3 text-sm">
+                                                                    {remark.arto && <p><span className="font-semibold">Arto:</span> {formatBodyPart(remark.arto)}</p>}
+                                                                    {remark.description && <p><span className="font-semibold">Description:</span> {remark.description}</p>}
+                                                                    {remark.explanation && <p><span className="font-semibold">Explanation:</span> {remark.explanation}</p>}
+                                                                    {remark.note && <p><span className="font-semibold">Note:</span> {remark.note}</p>}
+                                                                </CardContent></Card>
+                                                                ))}
+                                                            </div>
+                                                            </div>
+                                                        )}
+                                                         {bunkaiStep.resources && (
+                                                            <div>
+                                                                <h4 className="font-semibold text-foreground mt-2 mb-1">Resources</h4>
+                                                                {(Array.isArray(bunkaiStep.resources) ? bunkaiStep.resources : [bunkaiStep.resources]).map((res, i) => (
+                                                                    <Card key={i} className="mt-1 bg-secondary"><CardContent className="p-2 space-y-1 text-xs">
+                                                                        {Object.entries(res).map(([key, value]) => (
+                                                                            <div key={key}>
+                                                                                <span className="font-semibold capitalize text-foreground">{key}:</span>
+                                                                                <span> {typeof value === 'object' ? JSON.stringify(value, null, 2) : String(value)}</span>
+                                                                            </div>
+                                                                        ))}
+                                                                    </CardContent></Card>
+                                                                ))}
+                                                            </div>
+                                                        )}
+                                                        </div>
+                                                    ) : (
+                                                        <p className="text-sm text-muted-foreground">No bunkai details for this step.</p>
                                                     )}
-                                                    </div>
-                                                ) : (
-                                                    <p className="text-sm text-muted-foreground">No bunkai details for this step.</p>
-                                                )}
-                                                </CardContent>
-                                            </Card>
+                                                    </CardContent>
+                                                </Card>
                                             </div>
                                             {index < sortedKataSteps.length - 1 && (
                                             <div className="flex items-center justify-center my-2 text-muted-foreground">
@@ -982,5 +984,6 @@ export default function KataSelection() {
     </div>
   );
 }
+
 
 
