@@ -14,7 +14,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight, Loader2, Link as LinkIcon, Rabbit, Wind, Hourglass, PersonStanding, Turtle, Volume2, MapPin, Notebook, Eye } from "lucide-react";
+import { ChevronLeft, ChevronRight, Loader2, Rabbit, Wind, Hourglass, PersonStanding, Turtle, Volume2, MapPin, Notebook, Eye, Crosshair } from "lucide-react";
 import { cn } from "@/lib/utils";
 import React from "react";
 import {
@@ -30,18 +30,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AbsoluteDirections, EmbusenPoints, Tempo } from "@/lib/type_admin_fe";
 import { KataPlayer } from "./kata-player";
 import { Separator } from "./ui/separator";
+import { Gauge, GaugeCircle, Infinity as InfinityIcon } from "lucide-react";
+import { DirectionIndicator } from "./direction-indicator";
 
-
-const facingArrowMap: { [key in AbsoluteDirections]: string } = {
-  'N': '↑',  // Upwards Arrow
-  'NE': '↗', // North East Arrow
-  'E': '→',  // Rightwards Arrow
-  'SE': '↘', // South East Arrow
-  'S': '↓',  // Downwards Arrow
-  'SO': '↙', // South West Arrow
-  'O': '←',  // Leftwards Arrow
-  'NO': '↖'  // North West Arrow
-};
 
 const directionSymbolMap: { [key in Sides]: string } = {
   'sx': '↶',
@@ -62,22 +53,26 @@ const gambaSymbolMap: { [key in string]: string } = {
 };
 
 const tempoIconMap: { [key in Tempo]: React.ElementType } = {
-    'Legato': LinkIcon,
+    'Legato': InfinityIcon,
     'Fast': Rabbit,
-    'Normal': PersonStanding,
-    'Slow': Turtle,
+    'Normal': Gauge,
+    'Slow': GaugeCircle,
     'Breath': Wind,
 };
+
+const tempoColorMap: { [key in Tempo]: string } = {
+    'Legato': "text-purple-500",
+    'Fast': "text-red-500",
+    'Normal': "text-green-500",
+    'Slow': "text-blue-400",
+    'Breath': "text-sky-400",
+};
+
 
 const formatBodyPartDisplay = (arto: BodyPart | null) => {
     if (!arto) return null;
     const sideSymbol = guardiaSymbolMap[arto.side] || '';
     return <span>{arto.limb} {sideSymbol}</span>;
-};
-
-const getFacingArrow = (facing: AbsoluteDirections | null) => {
-  if (!facing) return '';
-  return facingArrowMap[facing] || facing;
 };
 
 const getDirectionSymbol = (direction: Sides | null) => {
@@ -90,17 +85,30 @@ const getGuardiaSymbol = (guardia: Sides | null) => {
   return guardiaSymbolMap[guardia] || guardia;
 }
 
-const getTempoIcon = (tempo: Tempo | null) => {
-    if (!tempo) return Hourglass;
+const TempoIndicator: React.FC<{ tempo: Tempo | null }> = ({ tempo }) => {
+    if (!tempo) return <Hourglass className="h-4 w-4" />;
     const Icon = tempoIconMap[tempo] || Hourglass;
-    return <Icon className="h-4 w-4" />;
+    const color = tempoColorMap[tempo] || "";
+    return (
+      <Popover>
+        <PopoverTrigger>
+          <div className="flex items-center gap-2 cursor-pointer">
+            <Icon className={`w-5 h-5 ${color}`} />
+          </div>
+        </PopoverTrigger>
+        <PopoverContent className="w-auto p-2">
+            <p className="capitalize">{tempo}</p>
+        </PopoverContent>
+      </Popover>
+    );
 };
 
 const getStepTempoIcon = (tempo: Tempo | null) => {
     if (!tempo) return null;
     const Icon = tempoIconMap[tempo];
     if (!Icon) return null;
-    return <Icon className="h-5 w-5" />;
+    const color = tempoColorMap[tempo] || "";
+    return <Icon className={`h-5 w-5 ${color}`} />;
 };
 
 const formatBodyPart = (arto: BodyPart) => {
@@ -167,13 +175,8 @@ export default function KataSelection() {
       try {
         const res = await fetch(`/api/kata/${kataId}`);
         if (!res.ok) {
-          let errorPayload = { error: `HTTP error! status: ${res.status}` };
-          try {
-            errorPayload = await res.json();
-          } catch (e) {
-            // Not a JSON error, use the raw text
-          }
-          throw new Error(errorPayload.error);
+          const errorPayload = await res.json();
+          throw new Error(errorPayload.error || `HTTP error! status: ${res.status}`);
         }
         const data: KataResponse = await res.json();
         setKataDetails(data);
@@ -460,7 +463,20 @@ export default function KataSelection() {
                                                                       <p>{step.guardia}</p>
                                                                   </PopoverContent>
                                                               </Popover>
-                                                              <span className="text-2xl font-bold" title={step.facing ?? undefined}>{getFacingArrow(step.facing)}</span>
+                                                                <Popover>
+                                                                  <PopoverTrigger asChild>
+                                                                    <div className="cursor-pointer w-12 h-12">
+                                                                        <DirectionIndicator
+                                                                            size={48}
+                                                                            direction={step.facing}
+                                                                            centerIcon={PersonStanding}
+                                                                        />
+                                                                    </div>
+                                                                  </PopoverTrigger>
+                                                                  <PopoverContent className="w-auto p-2">
+                                                                      <p>Facing: {step.facing}</p>
+                                                                  </PopoverContent>
+                                                              </Popover>
                                                           </div>
                                                       </div>
 
@@ -484,22 +500,17 @@ export default function KataSelection() {
                                                   <div className="flex items-center justify-center my-2 text-muted-foreground">
                                                       {transaction && (
                                                           <div className="flex items-center gap-2">
-                                                              <Popover>
-                                                                  <PopoverTrigger asChild>
-                                                                      <div className="cursor-pointer">{getTempoIcon(transaction.tempo)}</div>
-                                                                  </PopoverTrigger>
-                                                                  <PopoverContent className="w-auto p-2">
-                                                                      <p>{transaction.tempo}</p>
-                                                                  </PopoverContent>
-                                                              </Popover>
+                                                              <TempoIndicator tempo={transaction.tempo} />
                                                               {transaction.looking_direction && (
                                                                   <Popover>
-                                                                      <PopoverTrigger asChild>
-                                                                          <Eye className="h-4 w-4 cursor-pointer" />
-                                                                      </PopoverTrigger>
-                                                                      <PopoverContent className="w-auto p-2">
-                                                                          <p className="flex items-center gap-2">Sguardo: <span className="text-2xl font-bold">{getFacingArrow(transaction.looking_direction)}</span></p>
-                                                                      </PopoverContent>
+                                                                    <PopoverTrigger asChild>
+                                                                      <div className="cursor-pointer">
+                                                                        <DirectionIndicator size={24} direction={transaction.looking_direction} centerIcon={Eye} />
+                                                                      </div>
+                                                                    </PopoverTrigger>
+                                                                    <PopoverContent className="w-auto p-2">
+                                                                        <p>Sguardo: {transaction.looking_direction}</p>
+                                                                    </PopoverContent>
                                                                   </Popover>
                                                               )}
                                                               <p className="text-2xl font-bold" title={transaction.direction ?? undefined}>{getDirectionSymbol(transaction.direction)}</p>
@@ -543,9 +554,13 @@ export default function KataSelection() {
                                         )}
                                         {currentStep.looking_direction && (
                                             <Popover>
-                                                <PopoverTrigger asChild><button className="cursor-pointer"><Eye className="h-5 w-5" /></button></PopoverTrigger>
+                                                <PopoverTrigger asChild>
+                                                  <div className="cursor-pointer">
+                                                    <DirectionIndicator size={32} direction={currentStep.looking_direction} centerIcon={Eye} />
+                                                  </div>
+                                                </PopoverTrigger>
                                                 <PopoverContent className="w-auto p-2">
-                                                <p className="flex items-center gap-2">Sguardo: <span className="text-2xl font-bold">{getFacingArrow(currentStep.looking_direction)}</span></p>
+                                                <p>Sguardo: {currentStep.looking_direction}</p>
                                                 </PopoverContent>
                                             </Popover>
                                         )}
@@ -554,7 +569,11 @@ export default function KataSelection() {
                                             <PopoverContent className="w-auto p-2"><p>Guardia: {currentStep.guardia}</p></PopoverContent>
                                         </Popover>
                                         <Popover>
-                                            <PopoverTrigger className="cursor-pointer text-2xl font-bold">{getFacingArrow(currentStep.facing)}</PopoverTrigger>
+                                            <PopoverTrigger asChild>
+                                              <div className="cursor-pointer">
+                                                <DirectionIndicator size={60} direction={currentStep.facing} centerIcon={PersonStanding} />
+                                              </div>
+                                            </PopoverTrigger>
                                             <PopoverContent className="w-auto p-2"><p>Facing: {currentStep.facing}</p></PopoverContent>
                                         </Popover>
                                     </div>
@@ -580,7 +599,12 @@ export default function KataSelection() {
                                                               {tech.arto && <p><span className="font-semibold text-foreground">Arto:</span> {formatBodyPartDisplay(tech.arto)}</p>}
                                                               {tech.strikingpart_name && <p><span className="font-semibold text-foreground">Striking Part:</span> {tech.strikingpart_name}</p>}
                                                               {tech.obiettivo && <p><span className="font-semibold text-foreground">Obiettivo:</span> {tech.obiettivo}</p>}
-                                                              {tech.target_direction && <p><span className="font-semibold text-foreground">Direzione Obiettivo:</span> <span className="font-bold">{getFacingArrow(tech.target_direction)}</span></p>}
+                                                              {tech.target_direction && 
+                                                                <div className="flex items-center gap-2">
+                                                                  <span className="font-semibold text-foreground">Direzione Obiettivo:</span> 
+                                                                  <DirectionIndicator size={24} direction={tech.target_direction} centerIcon={Crosshair} />
+                                                                </div>
+                                                              }
                                                               {tech.waza_note && <p><span className="font-semibold text-foreground">Waza Note:</span> {tech.waza_note}</p>}
                                                               {tech.waza_resources && (
                                                                   <div>
@@ -765,7 +789,20 @@ export default function KataSelection() {
                                                     {step.kiai && <Popover><PopoverTrigger asChild><Volume2 className="h-5 w-5 text-destructive cursor-pointer" /></PopoverTrigger><PopoverContent className="w-auto p-2"><p>Kiai!</p></PopoverContent></Popover>}
                                                     {step.notes && <Popover><PopoverTrigger><Notebook className="h-5 w-5 text-muted-foreground cursor-pointer" /></PopoverTrigger><PopoverContent><p>{typeof step.notes === 'string' ? step.notes : JSON.stringify(step.notes)}</p></PopoverContent></Popover>}
                                                     <Popover><PopoverTrigger asChild><span className="text-2xl cursor-pointer">{getGuardiaSymbol(step.guardia)}</span></PopoverTrigger><PopoverContent className="w-auto p-2"><p>{step.guardia}</p></PopoverContent></Popover>
-                                                    <span className="text-2xl font-bold" title={step.facing ?? undefined}>{getFacingArrow(step.facing)}</span>
+                                                    <Popover>
+                                                        <PopoverTrigger asChild>
+                                                          <div className="cursor-pointer w-12 h-12">
+                                                              <DirectionIndicator
+                                                                  size={48}
+                                                                  direction={step.facing}
+                                                                  centerIcon={PersonStanding}
+                                                              />
+                                                          </div>
+                                                        </PopoverTrigger>
+                                                        <PopoverContent className="w-auto p-2">
+                                                            <p>Facing: {step.facing}</p>
+                                                        </PopoverContent>
+                                                    </Popover>
                                                     </div>
                                                 </div>
                                                 <div>
@@ -833,8 +870,8 @@ export default function KataSelection() {
                                             <div className="flex items-center justify-center my-2 text-muted-foreground">
                                                 {transaction && (
                                                 <div className="flex items-center gap-2">
-                                                    <Popover><PopoverTrigger asChild><div className="cursor-pointer">{getTempoIcon(transaction.tempo)}</div></PopoverTrigger><PopoverContent className="w-auto p-2"><p>{transaction.tempo}</p></PopoverContent></Popover>
-                                                    {transaction.looking_direction && (<Popover><PopoverTrigger asChild><Eye className="h-4 w-4 cursor-pointer" /></PopoverTrigger><PopoverContent className="w-auto p-2"><p className="flex items-center gap-2">Sguardo: <span className="text-2xl font-bold">{getFacingArrow(transaction.looking_direction)}</span></p></PopoverContent></Popover>)}
+                                                    <TempoIndicator tempo={transaction.tempo} />
+                                                    {transaction.looking_direction && (<Popover><PopoverTrigger asChild><div className="cursor-pointer"><DirectionIndicator size={24} direction={transaction.looking_direction} centerIcon={Eye} /></div></PopoverTrigger><PopoverContent className="w-auto p-2"><p>Sguardo: {transaction.looking_direction}</p></PopoverContent></Popover>)}
                                                     <p className="text-2xl font-bold" title={transaction.direction ?? undefined}>{getDirectionSymbol(transaction.direction)}</p>
                                                 </div>
                                                 )}
@@ -945,4 +982,5 @@ export default function KataSelection() {
     </div>
   );
 }
+
 
