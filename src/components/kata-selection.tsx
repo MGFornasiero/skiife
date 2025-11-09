@@ -32,14 +32,6 @@ import { KataPlayer } from "./kata-player";
 import { Separator } from "./ui/separator";
 import { Gauge, GaugeCircle, Infinity as InfinityIcon } from "lucide-react";
 import { DirectionIndicator } from "./direction-indicator";
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet";
 
 
 const directionSymbolMap: { [key in Sides]: string } = {
@@ -125,6 +117,80 @@ const formatBodyPart = (arto: BodyPart) => {
 };
 
 
+const TransactionDetails: React.FC<{ transaction: KataTransaction | null, title: string }> = ({ transaction, title }) => {
+  if (!transaction) {
+    return (
+      <div className="p-4 text-sm text-muted-foreground h-full flex items-center justify-center">
+        <p>No transaction data.</p>
+      </div>
+    );
+  }
+  return (
+    <div className="p-4 space-y-4 h-full overflow-y-auto">
+        <h3 className="font-semibold text-lg">{title}</h3>
+        {transaction.tempo && (
+          <div>
+            <h4 className="font-semibold mb-1 text-sm">Tempo</h4>
+            <p className="text-sm text-muted-foreground">{transaction.tempo}</p>
+          </div>
+        )}
+        {transaction.direction && (
+          <div>
+            <h4 className="font-semibold mb-1 text-sm">Direction</h4>
+            <p className="text-sm text-muted-foreground">{transaction.direction}</p>
+          </div>
+        )}
+        {transaction.looking_direction && (
+          <div>
+            <h4 className="font-semibold mb-1 text-sm">Looking Direction</h4>
+            <div className="flex justify-center mt-2">
+                <DirectionIndicator direction={transaction.looking_direction} size={60} centerIcon={Eye}/>
+            </div>
+          </div>
+        )}
+        {transaction.notes && (
+          <div>
+            <h4 className="font-semibold mb-1 text-sm">Notes</h4>
+            <p className="text-sm text-muted-foreground break-words">{transaction.notes}</p>
+          </div>
+        )}
+        {transaction.remarks && transaction.remarks.length > 0 && (
+          <div>
+            <h4 className="font-semibold mb-1 text-sm">Remarks</h4>
+            <div className="space-y-2">
+              {transaction.remarks.map((remark, index) => (
+                <Card key={index} className="bg-secondary/50">
+                  <CardContent className="p-3 text-sm">
+                    {remark.arto && <p><span className="font-semibold text-foreground">Arto:</span> {formatBodyPart(remark.arto)}</p>}
+                    {remark.description && <p><span className="font-semibold text-foreground">Description:</span> {remark.description}</p>}
+                    {remark.explanation && <p><span className="font-semibold text-foreground">Explanation:</span> {remark.explanation}</p>}
+                    {remark.note && <p><span className="font-semibold text-foreground">Note:</span> {remark.note}</p>}
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+        )}
+        {transaction.resources && (
+            <div>
+                <h4 className="font-semibold text-foreground mt-2 mb-1 text-sm">Resources</h4>
+                {(Array.isArray(transaction.resources) ? transaction.resources : [transaction.resources]).map((res, i) => (
+                    <Card key={i} className="mt-1 bg-secondary"><CardContent className="p-2 space-y-1 text-xs">
+                        {Object.entries(res).map(([key, value]) => (
+                            <div key={key} className="break-all">
+                                <span className="font-semibold capitalize text-foreground">{key}:</span>
+                                <span> {typeof value === 'object' ? JSON.stringify(value, null, 2) : String(value)}</span>
+                            </div>
+                        ))}
+                    </CardContent></Card>
+                ))}
+            </div>
+        )}
+      </div>
+  );
+};
+
+
 export default function KataSelection() {
   const [kataInventory, setKataInventory] = useState<KataInventory | null>(null);
   const [selectedKataName, setSelectedKataName] = useState<string | null>(null);
@@ -147,6 +213,9 @@ export default function KataSelection() {
   const [selectedBunkaiIndex, setSelectedBunkaiIndex] = useState<number>(0);
   const [bunkaiDetails, setBunkaiDetails] = useState<BunkaiDetailsResponse | null>(null);
   const [loadingBunkai, setLoadingBunkai] = useState(false);
+  
+  const [leftPanelOpen, setLeftPanelOpen] = useState(false);
+  const [rightPanelOpen, setRightPanelOpen] = useState(false);
 
   const { toast } = useToast();
 
@@ -178,6 +247,8 @@ export default function KataSelection() {
         setBunkaiIds([]);
         setSelectedBunkaiIndex(0);
         setBunkaiDetails(null);
+        setLeftPanelOpen(false);
+        setRightPanelOpen(false);
 
         try {
             const res = await fetch(`/api/kata/${kataId}`);
@@ -355,84 +426,7 @@ export default function KataSelection() {
   const selectedBunkaiId = bunkaiIds[selectedBunkaiIndex];
   const selectedBunkaiSummary = kataDetails && selectedBunkaiId ? kataDetails.bunkai_ids[selectedBunkaiId] : null;
 
-    const TransactionDetails: React.FC<{ transaction: KataTransaction | null, title: string }> = ({ transaction, title }) => {
-      if (!transaction) {
-        return (
-          <div className="p-4 text-sm text-muted-foreground">
-            No transaction data available.
-          </div>
-        );
-      }
-      return (
-        <>
-          <SheetHeader>
-            <SheetTitle>{title}</SheetTitle>
-            <SheetDescription>Details for the transaction.</SheetDescription>
-          </SheetHeader>
-          <div className="space-y-4 py-4">
-            {transaction.tempo && (
-              <div>
-                <h4 className="font-semibold mb-1">Tempo</h4>
-                <p className="text-sm text-muted-foreground">{transaction.tempo}</p>
-              </div>
-            )}
-            {transaction.direction && (
-              <div>
-                <h4 className="font-semibold mb-1">Direction</h4>
-                <p className="text-sm text-muted-foreground">{transaction.direction}</p>
-              </div>
-            )}
-            {transaction.looking_direction && (
-              <div>
-                <h4 className="font-semibold mb-1">Looking Direction</h4>
-                <div className="flex justify-center mt-2">
-                    <DirectionIndicator direction={transaction.looking_direction} size={60}/>
-                </div>
-              </div>
-            )}
-            {transaction.notes && (
-              <div>
-                <h4 className="font-semibold mb-1">Notes</h4>
-                <p className="text-sm text-muted-foreground break-words">{transaction.notes}</p>
-              </div>
-            )}
-            {transaction.remarks && transaction.remarks.length > 0 && (
-              <div>
-                <h4 className="font-semibold mb-1">Remarks</h4>
-                <div className="space-y-2">
-                  {transaction.remarks.map((remark, index) => (
-                    <Card key={index} className="bg-secondary/50">
-                      <CardContent className="p-3 text-sm">
-                        {remark.arto && <p><span className="font-semibold text-foreground">Arto:</span> {formatBodyPart(remark.arto)}</p>}
-                        {remark.description && <p><span className="font-semibold text-foreground">Description:</span> {remark.description}</p>}
-                        {remark.explanation && <p><span className="font-semibold text-foreground">Explanation:</span> {remark.explanation}</p>}
-                        {remark.note && <p><span className="font-semibold text-foreground">Note:</span> {remark.note}</p>}
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
-              </div>
-            )}
-            {transaction.resources && (
-                <div>
-                    <h4 className="font-semibold text-foreground mt-2 mb-1">Resources</h4>
-                    {(Array.isArray(transaction.resources) ? transaction.resources : [transaction.resources]).map((res, i) => (
-                        <Card key={i} className="mt-1 bg-secondary"><CardContent className="p-2 space-y-1 text-xs">
-                            {Object.entries(res).map(([key, value]) => (
-                                <div key={key} className="break-all">
-                                    <span className="font-semibold capitalize text-foreground">{key}:</span>
-                                    <span> {typeof value === 'object' ? JSON.stringify(value, null, 2) : String(value)}</span>
-                                </div>
-                            ))}
-                        </CardContent></Card>
-                    ))}
-                </div>
-            )}
-          </div>
-        </>
-      );
-    };
-
+  
   return (
     <div className="w-full space-y-4">
       <div className="w-full sm:w-[280px]">
@@ -582,168 +576,182 @@ export default function KataSelection() {
                                   })}
                               </div>
                           </TabsContent>
-                           <TabsContent value="dettagli">
-                            <div className="w-full flex flex-col items-center">
-                              {currentStep ? (
-                                  <div className="mt-4 flex flex-col items-center gap-4 w-full">
-                                    <div className="flex items-center gap-4 w-full justify-center">
-                                      <Sheet>
-                                        <SheetTrigger asChild>
-                                            <Button variant="outline" size="icon" disabled={!transactionToCurrent}>
-                                                <ChevronLeft className="h-4 w-4" />
-                                            </Button>
-                                        </SheetTrigger>
-                                        <SheetContent side="left" className="w-[350px] sm:w-[540px] overflow-y-auto">
-                                            <TransactionDetails transaction={transactionToCurrent} title="Previous Transition" />
-                                        </SheetContent>
-                                      </Sheet>
-
-                                        <p className="text-sm font-medium tabular-nums text-center">
-                                            Step {selectedStepIndex + 1} / {sortedKataSteps.length}
-                                        </p>
-                                      <Sheet>
-                                        <SheetTrigger asChild>
-                                            <Button variant="outline" size="icon" disabled={!transactionToNext}>
-                                                <ChevronRight className="h-4 w-4" />
-                                            </Button>
-                                        </SheetTrigger>
-                                        <SheetContent side="right" className="w-[350px] sm:w-[540px] overflow-y-auto">
-                                            <TransactionDetails transaction={transactionToNext} title="Next Transition" />
-                                        </SheetContent>
-                                      </Sheet>
+                           <TabsContent value="dettagli" className="relative overflow-hidden">
+                                <div className="flex justify-between items-start">
+                                    {/* Left Panel */}
+                                    <div className={cn(
+                                        "absolute top-0 left-0 h-full w-64 bg-background border-r transition-transform duration-300 ease-in-out z-10",
+                                        leftPanelOpen ? "translate-x-0" : "-translate-x-full"
+                                    )}>
+                                        <TransactionDetails transaction={transactionToCurrent} title="Previous Transition" />
                                     </div>
                                     
-                                    <div className="flex items-center justify-center gap-3 text-sm p-4">
-                                        {currentStep.speed && (
-                                            <Popover>
-                                                <PopoverTrigger className="cursor-pointer">{getStepTempoIcon(currentStep.speed)}</PopoverTrigger>
-                                                <PopoverContent className="w-auto p-2"><p>{currentStep.speed}</p></PopoverContent>
-                                            </Popover>
-                                        )}
-                                        {currentStep.kiai && (
-                                            <Popover>
-                                                <PopoverTrigger className="cursor-pointer"><Volume2 className="h-5 w-5 text-destructive" /></PopoverTrigger>
-                                                <PopoverContent className="w-auto p-2"><p>Kiai!</p></PopoverContent>
-                                            </Popover>
-                                        )}
-                                        {currentStep.looking_direction && (
-                                            <Popover>
-                                                <PopoverTrigger asChild>
-                                                  <div className="cursor-pointer flex items-center gap-1">
-                                                    <Eye className="h-4 w-4 text-muted-foreground"/>
-                                                    <DirectionIndicator size={32} direction={currentStep.looking_direction} />
-                                                  </div>
-                                                </PopoverTrigger>
-                                                <PopoverContent className="w-auto p-2">
-                                                <p>Sguardo: {currentStep.looking_direction}</p>
-                                                </PopoverContent>
-                                            </Popover>
-                                        )}
-                                    </div>
-                                    
-                                    <div className="w-full text-center space-y-2">
-                                        <p 
-                                        className="font-medium text-base cursor-pointer hover:underline"
-                                        onClick={() => handlePosizioneClick(currentStep.stand_id)}
-                                        >
-                                        {currentStep.posizione} {currentStep.hips && `(${currentStep.hips})`}
-                                        </p>
-                                    </div>
+                                    {/* Main Content */}
+                                    <div className="flex-grow transition-all duration-300 ease-in-out w-full">
+                                        <div className="w-full flex flex-col items-center">
+                                            {currentStep ? (
+                                                <div className="mt-4 flex flex-col items-center gap-4 w-full max-w-2xl mx-auto">
+                                                    <div className="flex items-center gap-4 w-full justify-center">
+                                                        <Button variant="outline" size="icon" onClick={() => setLeftPanelOpen(!leftPanelOpen)} disabled={!transactionToCurrent}>
+                                                            <ChevronLeft className="h-4 w-4" />
+                                                        </Button>
 
-                                    <div className="w-full space-y-4">
-                                      <h3>Tecniche</h3>
-                                      {currentStep.Tecniche && currentStep.Tecniche.length > 0 ? (
-                                          <div className="space-y-2">
-                                              {currentStep.Tecniche.map((tech, index) => (
-                                                  <Card key={index}>
-                                                      <CardContent className="p-4 space-y-2">
-                                                          <p className="font-medium cursor-pointer hover:underline" onClick={() => handleTechnicClick(tech.technic_id)}>{tech.tecnica}</p>
-                                                          <div className="text-sm text-muted-foreground space-y-1">
-                                                              {tech.arto && <p><span className="font-semibold text-foreground">Arto:</span> {formatBodyPartDisplay(tech.arto)}</p>}
-                                                              {tech.strikingpart_name && <p><span className="font-semibold text-foreground">Striking Part:</span> {tech.strikingpart_name}</p>}
-                                                              {tech.obiettivo && <p><span className="font-semibold text-foreground">Obiettivo:</span> {tech.obiettivo}</p>}
-                                                              {tech.target_direction && 
-                                                                <div className="flex items-center gap-2">
-                                                                  <span className="font-semibold text-foreground">Direzione Obiettivo:</span> 
-                                                                   <DirectionIndicator size={24} direction={tech.target_direction} centerIcon={Crosshair}/>
-                                                                </div>
-                                                              }
-                                                              {tech.waza_note && <p><span className="font-semibold text-foreground">Waza Note:</span> {tech.waza_note}</p>}
-                                                              {tech.waza_resources && (
-                                                                  <div>
-                                                                      <h4 className="font-semibold text-foreground mt-2 mb-1">Waza Resources</h4>
-                                                                      {(Array.isArray(tech.waza_resources) ? tech.waza_resources : [tech.waza_resources]).map((res, i) => (
-                                                                          <Card key={i} className="mt-1">
-                                                                              <CardContent className="p-2 space-y-1 text-xs">
-                                                                                  {Object.entries(res).map(([key, value]) => (
-                                                                                      <div key={key}>
-                                                                                          <span className="font-semibold capitalize text-foreground">{key}:</span>
-                                                                                          <span> {typeof value === 'object' ? JSON.stringify(value, null, 2) : String(value)}</span>
-                                                                                      </div>
-                                                                                  ))}
-                                                                              </CardContent>
-                                                                          </Card>
-                                                                      ))}
+                                                        <div className="flex-grow text-center">
+                                                            <p className="text-sm font-medium tabular-nums">
+                                                                Step {selectedStepIndex + 1} / {sortedKataSteps.length}
+                                                            </p>
+                                                            <div className="flex items-center justify-center gap-4 mt-2">
+                                                                <Button variant="ghost" size="sm" onClick={() => handleStepChange('prev')}>Prev</Button>
+                                                                <Button variant="ghost" size="sm" onClick={() => handleStepChange('next')}>Next</Button>
+                                                            </div>
+                                                        </div>
+
+                                                        <Button variant="outline" size="icon" onClick={() => setRightPanelOpen(!rightPanelOpen)} disabled={!transactionToNext}>
+                                                            <ChevronRight className="h-4 w-4" />
+                                                        </Button>
+                                                    </div>
+                                    
+                                                    <div className="flex items-center justify-center gap-3 text-sm p-4">
+                                                        {currentStep.speed && (
+                                                            <Popover>
+                                                                <PopoverTrigger className="cursor-pointer">{getStepTempoIcon(currentStep.speed)}</PopoverTrigger>
+                                                                <PopoverContent className="w-auto p-2"><p>{currentStep.speed}</p></PopoverContent>
+                                                            </Popover>
+                                                        )}
+                                                        {currentStep.kiai && (
+                                                            <Popover>
+                                                                <PopoverTrigger className="cursor-pointer"><Volume2 className="h-5 w-5 text-destructive" /></PopoverTrigger>
+                                                                <PopoverContent className="w-auto p-2"><p>Kiai!</p></PopoverContent>
+                                                            </Popover>
+                                                        )}
+                                                        {currentStep.looking_direction && (
+                                                            <Popover>
+                                                                <PopoverTrigger asChild>
+                                                                  <div className="cursor-pointer flex items-center gap-1">
+                                                                    <Eye className="h-4 w-4 text-muted-foreground"/>
+                                                                    <DirectionIndicator size={32} direction={currentStep.looking_direction} />
                                                                   </div>
-                                                              )}
-                                                          </div>
-                                                      </CardContent>
-                                                  </Card>
-                                              ))}
-                                          </div>
-                                      ) : <p className="text-sm text-muted-foreground">No techniques for this step.</p>}
-                                    </div>
+                                                                </PopoverTrigger>
+                                                                <PopoverContent className="w-auto p-2">
+                                                                <p>Sguardo: {currentStep.looking_direction}</p>
+                                                                </PopoverContent>
+                                                            </Popover>
+                                                        )}
+                                                    </div>
                                     
-                                    <div className="w-full space-y-4">
-                                        <h3>Remarks</h3>
-                                        {currentStep.remarks && currentStep.remarks.length > 0 ? (
-                                            <div className="space-y-2">
-                                                {currentStep.remarks.map((remark, index) => (
-                                                    <Card key={index}>
-                                                        <CardContent className="p-4 space-y-2 text-sm">
-                                                            {remark.arto && <p><span className="font-semibold">Arto:</span> {formatBodyPart(remark.arto)}</p>}
-                                                            {remark.description && <p><span className="font-semibold">Description:</span> {remark.description}</p>}
-                                                            {remark.explanation && <p><span className="font-semibold">Explanation:</span> {remark.explanation}</p>}
-                                                            {remark.note && <p><span className="font-semibold">Note:</span> {remark.note}</p>}
-                                                        </CardContent>
-                                                    </Card>
-                                                ))}
-                                            </div>
-                                        ) : <p className="text-sm text-muted-foreground">No remarks for this step.</p>}
-                                    </div>
+                                                    <div className="w-full text-center space-y-2">
+                                                        <p 
+                                                        className="font-medium text-base cursor-pointer hover:underline"
+                                                        onClick={() => handlePosizioneClick(currentStep.stand_id)}
+                                                        >
+                                                        {currentStep.posizione} {currentStep.hips && `(${currentStep.hips})`}
+                                                        </p>
+                                                    </div>
 
-                                    <div className="w-full space-y-4">
-                                      <h3>Resources</h3>
-                                      {currentStep.resources ? (
-                                        <div className="space-y-2">
-                                          {(Array.isArray(currentStep.resources) ? currentStep.resources : [currentStep.resources]).map((res, index) => (
-                                            <Card key={index}>
-                                              <CardContent className="p-4 space-y-1 text-sm">
-                                                {Object.entries(res).map(([key, value]) => (
-                                                  <div key={key}>
-                                                    <span className="font-semibold capitalize text-foreground">{key}:</span>
-                                                    <span> {typeof value === 'object' ? JSON.stringify(value) : String(value)}</span>
-                                                  </div>
-                                                ))}
-                                              </CardContent>
-                                            </Card>
-                                          ))}
+                                                    <div className="w-full space-y-4">
+                                                      <h3>Tecniche</h3>
+                                                      {currentStep.Tecniche && currentStep.Tecniche.length > 0 ? (
+                                                          <div className="space-y-2">
+                                                              {currentStep.Tecniche.map((tech, index) => (
+                                                                  <Card key={index}>
+                                                                      <CardContent className="p-4 space-y-2">
+                                                                          <p className="font-medium cursor-pointer hover:underline" onClick={() => handleTechnicClick(tech.technic_id)}>{tech.tecnica}</p>
+                                                                          <div className="text-sm text-muted-foreground space-y-1">
+                                                                              {tech.arto && <p><span className="font-semibold text-foreground">Arto:</span> {formatBodyPartDisplay(tech.arto)}</p>}
+                                                                              {tech.strikingpart_name && <p><span className="font-semibold text-foreground">Striking Part:</span> {tech.strikingpart_name}</p>}
+                                                                              {tech.obiettivo && <p><span className="font-semibold text-foreground">Obiettivo:</span> {tech.obiettivo}</p>}
+                                                                              {tech.target_direction && 
+                                                                                <div className="flex items-center gap-2">
+                                                                                  <span className="font-semibold text-foreground">Direzione Obiettivo:</span> 
+                                                                                   <DirectionIndicator size={24} direction={tech.target_direction} centerIcon={Crosshair}/>
+                                                                                </div>
+                                                                              }
+                                                                              {tech.waza_note && <p><span className="font-semibold text-foreground">Waza Note:</span> {tech.waza_note}</p>}
+                                                                              {tech.waza_resources && (
+                                                                                  <div>
+                                                                                      <h4 className="font-semibold text-foreground mt-2 mb-1">Waza Resources</h4>
+                                                                                      {(Array.isArray(tech.waza_resources) ? tech.waza_resources : [tech.waza_resources]).map((res, i) => (
+                                                                                          <Card key={i} className="mt-1">
+                                                                                              <CardContent className="p-2 space-y-1 text-xs">
+                                                                                                  {Object.entries(res).map(([key, value]) => (
+                                                                                                      <div key={key}>
+                                                                                                          <span className="font-semibold capitalize text-foreground">{key}:</span>
+                                                                                                          <span> {typeof value === 'object' ? JSON.stringify(value, null, 2) : String(value)}</span>
+                                                                                                      </div>
+                                                                                                  ))}
+                                                                                              </CardContent>
+                                                                                          </Card>
+                                                                                      ))}
+                                                                                  </div>
+                                                                              )}
+                                                                          </div>
+                                                                      </CardContent>
+                                                                  </Card>
+                                                              ))}
+                                                          </div>
+                                                      ) : <p className="text-sm text-muted-foreground">No techniques for this step.</p>}
+                                                    </div>
+                                                    
+                                                    <div className="w-full space-y-4">
+                                                        <h3>Remarks</h3>
+                                                        {currentStep.remarks && currentStep.remarks.length > 0 ? (
+                                                            <div className="space-y-2">
+                                                                {currentStep.remarks.map((remark, index) => (
+                                                                    <Card key={index}>
+                                                                        <CardContent className="p-4 space-y-2 text-sm">
+                                                                            {remark.arto && <p><span className="font-semibold">Arto:</span> {formatBodyPart(remark.arto)}</p>}
+                                                                            {remark.description && <p><span className="font-semibold">Description:</span> {remark.description}</p>}
+                                                                            {remark.explanation && <p><span className="font-semibold">Explanation:</span> {remark.explanation}</p>}
+                                                                            {remark.note && <p><span className="font-semibold">Note:</span> {remark.note}</p>}
+                                                                        </CardContent>
+                                                                    </Card>
+                                                                ))}
+                                                            </div>
+                                                        ) : <p className="text-sm text-muted-foreground">No remarks for this step.</p>}
+                                                    </div>
+
+                                                    <div className="w-full space-y-4">
+                                                      <h3>Resources</h3>
+                                                      {currentStep.resources ? (
+                                                        <div className="space-y-2">
+                                                          {(Array.isArray(currentStep.resources) ? currentStep.resources : [currentStep.resources]).map((res, index) => (
+                                                            <Card key={index}>
+                                                              <CardContent className="p-4 space-y-1 text-sm">
+                                                                {Object.entries(res).map(([key, value]) => (
+                                                                  <div key={key}>
+                                                                    <span className="font-semibold capitalize text-foreground">{key}:</span>
+                                                                    <span> {typeof value === 'object' ? JSON.stringify(value) : String(value)}</span>
+                                                                  </div>
+                                                                ))}
+                                                              </CardContent>
+                                                            </Card>
+                                                          ))}
+                                                        </div>
+                                                      ) : <p className="text-sm text-muted-foreground">No resources for this step.</p>}
+                                                    </div>
+                                                    
+                                                    <div className="w-full space-y-2 flex flex-col items-center">
+                                                      <KataPlayer 
+                                                        steps={sortedKataSteps} 
+                                                        currentStepIndex={selectedStepIndex}
+                                                        onStepChange={setSelectedStepIndex}
+                                                      />
+                                                    </div>
+                                                </div>
+                                            ) : (
+                                              <p className="text-muted-foreground text-center">No step details available.</p>
+                                            )}
                                         </div>
-                                      ) : <p className="text-sm text-muted-foreground">No resources for this step.</p>}
                                     </div>
                                     
-                                    <div className="w-full space-y-2 flex flex-col items-center">
-                                      <KataPlayer 
-                                        steps={sortedKataSteps} 
-                                        currentStepIndex={selectedStepIndex}
-                                        onStepChange={setSelectedStepIndex}
-                                      />
+                                    {/* Right Panel */}
+                                    <div className={cn(
+                                        "absolute top-0 right-0 h-full w-64 bg-background border-l transition-transform duration-300 ease-in-out z-10",
+                                        rightPanelOpen ? "translate-x-0" : "translate-x-full"
+                                    )}>
+                                        <TransactionDetails transaction={transactionToNext} title="Next Transition" />
                                     </div>
-                                  </div>
-                                ) : (
-                                  <p className="text-muted-foreground text-center">No step details available.</p>
-                                )}
-                              </div>
+                                </div>
                           </TabsContent>
                           <TabsContent value="info">
                             <div className="mt-6 space-y-4">
@@ -1034,9 +1042,3 @@ export default function KataSelection() {
     </div>
   );
 }
-
-
-
-
-
-    
