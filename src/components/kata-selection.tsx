@@ -491,8 +491,8 @@ export default function KataSelection() {
                                       return (
                                           <React.Fragment key={step.id_sequence}>
                                               <Card className={cn("w-full", step.kiai && "border-primary")}>
-                                                  <CardContent className="p-4 grid grid-cols-[80px,1fr] gap-4 items-start">
-                                                      <div className="w-full h-full flex items-center justify-center">
+                                                  <CardContent className="p-4 grid grid-cols-[auto,1fr] gap-4 items-start">
+                                                      <div className="w-20 h-full flex items-center justify-center">
                                                         <DirectionIndicator
                                                             size={60}
                                                             direction={step.facing}
@@ -612,12 +612,6 @@ export default function KataSelection() {
                                                     </div>
                                     
                                                     <div className="flex items-center justify-center gap-3 text-sm p-4">
-                                                        {currentStep.speed && (
-                                                            <Popover>
-                                                                <PopoverTrigger className="cursor-pointer">{getStepTempoIcon(currentStep.speed)}</PopoverTrigger>
-                                                                <PopoverContent className="w-auto p-2"><p>{currentStep.speed}</p></PopoverContent>
-                                                            </Popover>
-                                                        )}
                                                         {currentStep.kiai && (
                                                             <Popover>
                                                                 <PopoverTrigger className="cursor-pointer"><Volume2 className="h-5 w-5 text-destructive" /></PopoverTrigger>
@@ -649,7 +643,15 @@ export default function KataSelection() {
                                                     </div>
 
                                                     <div className="w-full space-y-4">
-                                                      <h3>Tecniche</h3>
+                                                      <div className="flex items-center gap-2">
+                                                        <h3>Tecniche</h3>
+                                                        {currentStep.speed && (
+                                                            <Popover>
+                                                                <PopoverTrigger className="cursor-pointer">{getStepTempoIcon(currentStep.speed)}</PopoverTrigger>
+                                                                <PopoverContent className="w-auto p-2"><p>{currentStep.speed}</p></PopoverContent>
+                                                            </Popover>
+                                                        )}
+                                                      </div>
                                                       {currentStep.Tecniche && currentStep.Tecniche.length > 0 ? (
                                                           <div className="space-y-2">
                                                               {currentStep.Tecniche.map((tech, index) => (
