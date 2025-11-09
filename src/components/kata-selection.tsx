@@ -491,8 +491,8 @@ export default function KataSelection() {
                                       return (
                                           <React.Fragment key={step.id_sequence}>
                                               <Card className={cn("w-full", step.kiai && "border-primary")}>
-                                                  <CardContent className="p-4 grid grid-cols-[auto,1fr] gap-4 items-start">
-                                                      <div className="w-20 h-full flex items-center justify-center">
+                                                  <CardContent className="p-4 grid grid-cols-[80px,1fr] gap-4 items-start">
+                                                      <div className="w-full h-full flex items-center justify-center">
                                                         <DirectionIndicator
                                                             size={60}
                                                             direction={step.facing}
@@ -731,6 +731,19 @@ export default function KataSelection() {
                                                         </div>
                                                       ) : <p className="text-sm text-muted-foreground">No resources for this step.</p>}
                                                     </div>
+
+                                                    {currentStep.notes && (
+                                                      <div className="w-full space-y-2">
+                                                        <Card>
+                                                          <CardHeader>
+                                                            <CardTitle className="text-lg">Notes</CardTitle>
+                                                          </CardHeader>
+                                                          <CardContent>
+                                                            <p className="text-sm text-muted-foreground">{currentStep.notes}</p>
+                                                          </CardContent>
+                                                        </Card>
+                                                      </div>
+                                                    )}
                                                     
                                                     <div className="w-full space-y-2 flex flex-col items-center">
                                                       <KataPlayer 
