@@ -3,7 +3,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { type KataInventory, type KataResponse, type KataSequenceStep, type StandInfo, type TechnicInfo, type BunkaiSummary, type KataTechnique, BodyPart, DetailedNotes, Limbs, Sides, BunkaiDetailsResponse } from "@/lib/data";
+import { type KataInventory, type KataResponse, type KataSequenceStep, type StandInfo, type TechnicInfo, type BunkaiSummary, type KataTechnique, BodyPart, DetailedNotes, Limbs, Sides, BunkaiDetailsResponse, KataTransaction } from "@/lib/data";
 import {
   Select,
   SelectContent,
@@ -32,6 +32,14 @@ import { KataPlayer } from "./kata-player";
 import { Separator } from "./ui/separator";
 import { Gauge, GaugeCircle, Infinity as InfinityIcon } from "lucide-react";
 import { DirectionIndicator } from "./direction-indicator";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 
 
 const directionSymbolMap: { [key in Sides]: string } = {
@@ -347,6 +355,84 @@ export default function KataSelection() {
   const selectedBunkaiId = bunkaiIds[selectedBunkaiIndex];
   const selectedBunkaiSummary = kataDetails && selectedBunkaiId ? kataDetails.bunkai_ids[selectedBunkaiId] : null;
 
+    const TransactionDetails: React.FC<{ transaction: KataTransaction | null, title: string }> = ({ transaction, title }) => {
+      if (!transaction) {
+        return (
+          <div className="p-4 text-sm text-muted-foreground">
+            No transaction data available.
+          </div>
+        );
+      }
+      return (
+        <>
+          <SheetHeader>
+            <SheetTitle>{title}</SheetTitle>
+            <SheetDescription>Details for the transaction.</SheetDescription>
+          </SheetHeader>
+          <div className="space-y-4 py-4">
+            {transaction.tempo && (
+              <div>
+                <h4 className="font-semibold mb-1">Tempo</h4>
+                <p className="text-sm text-muted-foreground">{transaction.tempo}</p>
+              </div>
+            )}
+            {transaction.direction && (
+              <div>
+                <h4 className="font-semibold mb-1">Direction</h4>
+                <p className="text-sm text-muted-foreground">{transaction.direction}</p>
+              </div>
+            )}
+            {transaction.looking_direction && (
+              <div>
+                <h4 className="font-semibold mb-1">Looking Direction</h4>
+                <div className="flex justify-center mt-2">
+                    <DirectionIndicator direction={transaction.looking_direction} size={60}/>
+                </div>
+              </div>
+            )}
+            {transaction.notes && (
+              <div>
+                <h4 className="font-semibold mb-1">Notes</h4>
+                <p className="text-sm text-muted-foreground break-words">{transaction.notes}</p>
+              </div>
+            )}
+            {transaction.remarks && transaction.remarks.length > 0 && (
+              <div>
+                <h4 className="font-semibold mb-1">Remarks</h4>
+                <div className="space-y-2">
+                  {transaction.remarks.map((remark, index) => (
+                    <Card key={index} className="bg-secondary/50">
+                      <CardContent className="p-3 text-sm">
+                        {remark.arto && <p><span className="font-semibold text-foreground">Arto:</span> {formatBodyPart(remark.arto)}</p>}
+                        {remark.description && <p><span className="font-semibold text-foreground">Description:</span> {remark.description}</p>}
+                        {remark.explanation && <p><span className="font-semibold text-foreground">Explanation:</span> {remark.explanation}</p>}
+                        {remark.note && <p><span className="font-semibold text-foreground">Note:</span> {remark.note}</p>}
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </div>
+            )}
+            {transaction.resources && (
+                <div>
+                    <h4 className="font-semibold text-foreground mt-2 mb-1">Resources</h4>
+                    {(Array.isArray(transaction.resources) ? transaction.resources : [transaction.resources]).map((res, i) => (
+                        <Card key={i} className="mt-1 bg-secondary"><CardContent className="p-2 space-y-1 text-xs">
+                            {Object.entries(res).map(([key, value]) => (
+                                <div key={key} className="break-all">
+                                    <span className="font-semibold capitalize text-foreground">{key}:</span>
+                                    <span> {typeof value === 'object' ? JSON.stringify(value, null, 2) : String(value)}</span>
+                                </div>
+                            ))}
+                        </CardContent></Card>
+                    ))}
+                </div>
+            )}
+          </div>
+        </>
+      );
+    };
+
   return (
     <div className="w-full space-y-4">
       <div className="w-full sm:w-[280px]">
@@ -501,15 +587,30 @@ export default function KataSelection() {
                               {currentStep ? (
                                   <div className="mt-4 flex flex-col items-center gap-4 w-full">
                                     <div className="flex items-center gap-4 w-full justify-center">
-                                        <Button variant="outline" size="icon" onClick={() => handleStepChange('prev')}>
-                                            <ChevronLeft className="h-4 w-4" />
-                                        </Button>
+                                      <Sheet>
+                                        <SheetTrigger asChild>
+                                            <Button variant="outline" size="icon" disabled={!transactionToCurrent}>
+                                                <ChevronLeft className="h-4 w-4" />
+                                            </Button>
+                                        </SheetTrigger>
+                                        <SheetContent side="left" className="w-[350px] sm:w-[540px] overflow-y-auto">
+                                            <TransactionDetails transaction={transactionToCurrent} title="Previous Transition" />
+                                        </SheetContent>
+                                      </Sheet>
+
                                         <p className="text-sm font-medium tabular-nums text-center">
                                             Step {selectedStepIndex + 1} / {sortedKataSteps.length}
                                         </p>
-                                        <Button variant="outline" size="icon" onClick={() => handleStepChange('next')}>
-                                            <ChevronRight className="h-4 w-4" />
-                                        </Button>
+                                      <Sheet>
+                                        <SheetTrigger asChild>
+                                            <Button variant="outline" size="icon" disabled={!transactionToNext}>
+                                                <ChevronRight className="h-4 w-4" />
+                                            </Button>
+                                        </SheetTrigger>
+                                        <SheetContent side="right" className="w-[350px] sm:w-[540px] overflow-y-auto">
+                                            <TransactionDetails transaction={transactionToNext} title="Next Transition" />
+                                        </SheetContent>
+                                      </Sheet>
                                     </div>
                                     
                                     <div className="flex items-center justify-center gap-3 text-sm p-4">
@@ -528,7 +629,8 @@ export default function KataSelection() {
                                         {currentStep.looking_direction && (
                                             <Popover>
                                                 <PopoverTrigger asChild>
-                                                  <div className="cursor-pointer">
+                                                  <div className="cursor-pointer flex items-center gap-1">
+                                                    <Eye className="h-4 w-4 text-muted-foreground"/>
                                                     <DirectionIndicator size={32} direction={currentStep.looking_direction} />
                                                   </div>
                                                 </PopoverTrigger>
@@ -563,7 +665,7 @@ export default function KataSelection() {
                                                               {tech.target_direction && 
                                                                 <div className="flex items-center gap-2">
                                                                   <span className="font-semibold text-foreground">Direzione Obiettivo:</span> 
-                                                                  <DirectionIndicator size={24} direction={tech.target_direction} />
+                                                                   <DirectionIndicator size={24} direction={tech.target_direction} centerIcon={Crosshair}/>
                                                                 </div>
                                                               }
                                                               {tech.waza_note && <p><span className="font-semibold text-foreground">Waza Note:</span> {tech.waza_note}</p>}
@@ -938,3 +1040,4 @@ export default function KataSelection() {
 
 
     
+
