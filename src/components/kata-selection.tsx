@@ -140,13 +140,13 @@ const TransactionDetails: React.FC<{
             )}
             {transaction.direction && (
               <div className="flex items-center gap-2">
-                <h4 className="font-semibold text-sm">Direction</h4>
+                <h4 className="font-semibold text-sm">Direzione</h4>
                 <p className="text-xl font-bold" title={transaction.direction}>{getDirectionSymbol(transaction.direction)}</p>
               </div>
             )}
             {transaction.looking_direction && (
               <div>
-                <h4 className="font-semibold mb-1 text-sm">Looking Direction</h4>
+                <h4 className="font-semibold mb-1 text-sm">Direzione Sguardo</h4>
                 <div className="flex justify-center mt-2">
                     <DirectionIndicator direction={transaction.looking_direction} size={60} centerIcon={Eye}/>
                 </div>
@@ -154,13 +154,13 @@ const TransactionDetails: React.FC<{
             )}
             {transaction.notes && (
               <div>
-                <h4 className="font-semibold mb-1 text-sm">Notes</h4>
+                <h4 className="font-semibold mb-1 text-sm">Note</h4>
                 <p className="text-sm text-muted-foreground break-words">{transaction.notes}</p>
               </div>
             )}
             {transaction.remarks && transaction.remarks.length > 0 && (
               <div>
-                <h4 className="font-semibold mb-1 text-sm">Remarks</h4>
+                <h4 className="font-semibold mb-1 text-sm">Osservazioni</h4>
                 <div className="space-y-2">
                   {transaction.remarks.map((remark, index) => (
                     <Card key={index} className="bg-secondary/50">
@@ -177,7 +177,7 @@ const TransactionDetails: React.FC<{
             )}
             {transaction.resources && (
                 <div>
-                    <h4 className="font-semibold text-foreground mt-2 mb-1 text-sm">Resources</h4>
+                    <h4 className="font-semibold text-foreground mt-2 mb-1 text-sm">Risorse</h4>
                     {(Array.isArray(transaction.resources) ? transaction.resources : [transaction.resources]).map((res, i) => (
                         <Card key={i} className="mt-1 bg-secondary"><CardContent className="p-2 space-y-1 text-xs">
                             {Object.entries(res).map(([key, value]) => (
@@ -1081,5 +1081,7 @@ export default function KataSelection() {
 }
 
 
+
+    
 
     
