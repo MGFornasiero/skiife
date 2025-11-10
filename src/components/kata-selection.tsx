@@ -637,7 +637,7 @@ export default function KataSelection() {
                                                         </div>
                                                     </div>
                                     
-                                                    <div className="flex items-center justify-center gap-3 text-sm p-4">
+                                                    <div className="flex items-center justify-center gap-3 text-sm">
                                                         {currentStep.kiai && (
                                                             <Popover>
                                                                 <PopoverTrigger className="cursor-pointer"><Volume2 className="h-5 w-5 text-destructive" /></PopoverTrigger>
@@ -699,7 +699,7 @@ export default function KataSelection() {
                                                                       {tech.target_direction && (
                                                                           <div className="flex items-center justify-center">
                                                                               <DirectionIndicator 
-                                                                                  size={40} 
+                                                                                  size={60} 
                                                                                   direction={tech.target_direction}
                                                                                   arrowColor="hsl(var(--destructive))"
                                                                               />
@@ -729,32 +729,32 @@ export default function KataSelection() {
                                                           </div>
                                                       </div>
                                                     )}
-
+                                                    
                                                     {currentStep.resources && (
-                                                      <div className="w-full space-y-4">
-                                                        <h3>Risorse</h3>
-                                                        <div className="space-y-2">
-                                                          {(Array.isArray(currentStep.resources) ? currentStep.resources : [currentStep.resources]).map((res, index) => (
-                                                            <Card key={index}>
-                                                              <CardContent className="p-4 space-y-1 text-sm">
-                                                                {Object.entries(res).map(([key, value]) => (
-                                                                  <div key={key}>
-                                                                    <span className="font-semibold capitalize text-foreground">{key}:</span>
-                                                                    <span> {typeof value === 'object' ? JSON.stringify(value) : String(value)}</span>
-                                                                  </div>
+                                                        <div className="w-full space-y-4">
+                                                            <h3>Risorse</h3>
+                                                            <div className="space-y-2">
+                                                                {(Array.isArray(currentStep.resources) ? currentStep.resources : [currentStep.resources]).map((res, index) => (
+                                                                    <Card key={index}>
+                                                                        <CardContent className="p-4 space-y-1 text-sm">
+                                                                            {Object.entries(res).map(([key, value]) => (
+                                                                                <div key={key}>
+                                                                                    <span className="font-semibold capitalize text-foreground">{key}:</span>
+                                                                                    <span> {typeof value === 'object' ? JSON.stringify(value) : String(value)}</span>
+                                                                                </div>
+                                                                            ))}
+                                                                        </CardContent>
+                                                                    </Card>
                                                                 ))}
-                                                              </CardContent>
-                                                            </Card>
-                                                          ))}
+                                                            </div>
                                                         </div>
-                                                      </div>
                                                     )}
 
                                                     {currentStep.notes && (
                                                       <div className="w-full space-y-2">
                                                         <Card>
                                                           <CardHeader>
-                                                            <h3 className="font-semibold">Note</h3>
+                                                            <h3>Note</h3>
                                                           </CardHeader>
                                                           <CardContent>
                                                             <p className="text-sm text-muted-foreground">{currentStep.notes}</p>
