@@ -881,7 +881,7 @@ export default function KataSelection() {
 
                                         return (
                                         <React.Fragment key={step.id_sequence}>
-                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            <div className="grid grid-cols-1 md:grid-cols-[1fr,2fr] gap-4">
                                                 <Card className={cn("flex flex-col", step.kiai && "border-primary")}>
                                                     <CardContent className="p-4 flex flex-col gap-4 items-start">
                                                         <div className="flex flex-col gap-2 w-full">
@@ -892,9 +892,7 @@ export default function KataSelection() {
                                                                     </p>
                                                                 </div>
                                                                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                                                                    {step.speed && <Popover><PopoverTrigger asChild><div className="cursor-pointer">{getStepTempoIcon(step.speed)}</div></PopoverTrigger><PopoverContent className="w-auto p-2"><p>{step.speed}</p></PopoverContent></Popover>}
                                                                     {step.kiai && <Popover><PopoverTrigger asChild><Volume2 className="h-5 w-5 text-destructive cursor-pointer" /></PopoverTrigger><PopoverContent className="w-auto p-2"><p>Kiai!</p></PopoverContent></Popover>}
-                                                                    {step.notes && <Popover><PopoverTrigger><Notebook className="h-5 w-5 text-muted-foreground cursor-pointer" /></PopoverTrigger><PopoverContent><p>{typeof step.notes === 'string' ? step.notes : JSON.stringify(step.notes)}</p></PopoverContent></Popover>}
                                                                 </div>
                                                             </div>
                                                             <div>
@@ -1078,3 +1076,4 @@ export default function KataSelection() {
     
 
     
+
