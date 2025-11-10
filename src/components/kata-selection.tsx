@@ -644,18 +644,6 @@ export default function KataSelection() {
                                                                 <PopoverContent className="w-auto p-2"><p>Kiai!</p></PopoverContent>
                                                             </Popover>
                                                         )}
-                                                        {currentStep.looking_direction && (
-                                                            <Popover>
-                                                                <PopoverTrigger asChild>
-                                                                  <div className="cursor-pointer flex items-center gap-1">
-                                                                    <Eye className="h-4 w-4 text-muted-foreground"/>
-                                                                  </div>
-                                                                </PopoverTrigger>
-                                                                <PopoverContent className="w-auto p-2">
-                                                                <p>Sguardo: {currentStep.looking_direction}</p>
-                                                                </PopoverContent>
-                                                            </Popover>
-                                                        )}
                                                     </div>
                                     
                                                     <div className="w-full text-center space-y-2">
@@ -1091,3 +1079,4 @@ export default function KataSelection() {
     </div>
   );
 }
+
