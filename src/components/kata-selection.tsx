@@ -117,7 +117,11 @@ const formatBodyPart = (arto: BodyPart) => {
 };
 
 
-const TransactionDetails: React.FC<{ transaction: KataTransaction | null, title: string }> = ({ transaction, title }) => {
+const TransactionDetails: React.FC<{ 
+  transaction: KataTransaction | null,
+  onNavigate?: () => void,
+  navigationDirection?: 'prev' | 'next' 
+}> = ({ transaction, onNavigate, navigationDirection }) => {
   if (!transaction) {
     return (
       <div className="p-4 text-sm text-muted-foreground h-full flex items-center justify-center">
@@ -126,65 +130,77 @@ const TransactionDetails: React.FC<{ transaction: KataTransaction | null, title:
     );
   }
   return (
-    <div className="p-4 space-y-4 h-full overflow-y-auto">
-        <h3 className="font-semibold text-lg">{title}</h3>
-        {transaction.tempo && (
-          <div>
-            <h4 className="font-semibold mb-1 text-sm">Tempo</h4>
-            <p className="text-sm text-muted-foreground">{transaction.tempo}</p>
+    <div className="p-4 space-y-4 h-full overflow-y-auto flex flex-col">
+        <div className="flex-grow space-y-4">
+            {transaction.tempo && (
+              <div className="flex items-center gap-2">
+                <h4 className="font-semibold text-sm">Tempo</h4>
+                <TempoIndicator tempo={transaction.tempo} />
+              </div>
+            )}
+            {transaction.direction && (
+              <div className="flex items-center gap-2">
+                <h4 className="font-semibold text-sm">Direction</h4>
+                <p className="text-xl font-bold" title={transaction.direction}>{getDirectionSymbol(transaction.direction)}</p>
+              </div>
+            )}
+            {transaction.looking_direction && (
+              <div>
+                <h4 className="font-semibold mb-1 text-sm">Looking Direction</h4>
+                <div className="flex justify-center mt-2">
+                    <DirectionIndicator direction={transaction.looking_direction} size={60} centerIcon={Eye}/>
+                </div>
+              </div>
+            )}
+            {transaction.notes && (
+              <div>
+                <h4 className="font-semibold mb-1 text-sm">Notes</h4>
+                <p className="text-sm text-muted-foreground break-words">{transaction.notes}</p>
+              </div>
+            )}
+            {transaction.remarks && transaction.remarks.length > 0 && (
+              <div>
+                <h4 className="font-semibold mb-1 text-sm">Remarks</h4>
+                <div className="space-y-2">
+                  {transaction.remarks.map((remark, index) => (
+                    <Card key={index} className="bg-secondary/50">
+                      <CardContent className="p-3 text-sm">
+                        {remark.arto && <p><span className="font-semibold text-foreground">Arto:</span> {formatBodyPart(remark.arto)}</p>}
+                        {remark.description && <p><span className="font-semibold text-foreground">Description:</span> {remark.description}</p>}
+                        {remark.explanation && <p><span className="font-semibold text-foreground">Explanation:</span> {remark.explanation}</p>}
+                        {remark.note && <p><span className="font-semibold text-foreground">Note:</span> {remark.note}</p>}
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </div>
+            )}
+            {transaction.resources && (
+                <div>
+                    <h4 className="font-semibold text-foreground mt-2 mb-1 text-sm">Resources</h4>
+                    {(Array.isArray(transaction.resources) ? transaction.resources : [transaction.resources]).map((res, i) => (
+                        <Card key={i} className="mt-1 bg-secondary"><CardContent className="p-2 space-y-1 text-xs">
+                            {Object.entries(res).map(([key, value]) => (
+                                <div key={key} className="break-all">
+                                    <span className="font-semibold capitalize text-foreground">{key}:</span>
+                                    <span> {typeof value === 'object' ? JSON.stringify(value, null, 2) : String(value)}</span>
+                                </div>
+                            ))}
+                        </CardContent></Card>
+                    ))}
+                </div>
+            )}
+        </div>
+        {onNavigate && navigationDirection && (
+          <div className="pt-4 border-t">
+              <Button onClick={onNavigate} className="w-full">
+                  {navigationDirection === 'next' ? (
+                      <>Next Step <ArrowRight className="ml-2 h-4 w-4" /></>
+                  ) : (
+                      <><ArrowLeft className="mr-2 h-4 w-4" /> Previous Step</>
+                  )}
+              </Button>
           </div>
-        )}
-        {transaction.direction && (
-          <div>
-            <h4 className="font-semibold mb-1 text-sm">Direction</h4>
-            <p className="text-sm text-muted-foreground">{transaction.direction}</p>
-          </div>
-        )}
-        {transaction.looking_direction && (
-          <div>
-            <h4 className="font-semibold mb-1 text-sm">Looking Direction</h4>
-            <div className="flex justify-center mt-2">
-                <DirectionIndicator direction={transaction.looking_direction} size={60} centerIcon={Eye}/>
-            </div>
-          </div>
-        )}
-        {transaction.notes && (
-          <div>
-            <h4 className="font-semibold mb-1 text-sm">Notes</h4>
-            <p className="text-sm text-muted-foreground break-words">{transaction.notes}</p>
-          </div>
-        )}
-        {transaction.remarks && transaction.remarks.length > 0 && (
-          <div>
-            <h4 className="font-semibold mb-1 text-sm">Remarks</h4>
-            <div className="space-y-2">
-              {transaction.remarks.map((remark, index) => (
-                <Card key={index} className="bg-secondary/50">
-                  <CardContent className="p-3 text-sm">
-                    {remark.arto && <p><span className="font-semibold text-foreground">Arto:</span> {formatBodyPart(remark.arto)}</p>}
-                    {remark.description && <p><span className="font-semibold text-foreground">Description:</span> {remark.description}</p>}
-                    {remark.explanation && <p><span className="font-semibold text-foreground">Explanation:</span> {remark.explanation}</p>}
-                    {remark.note && <p><span className="font-semibold text-foreground">Note:</span> {remark.note}</p>}
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </div>
-        )}
-        {transaction.resources && (
-            <div>
-                <h4 className="font-semibold text-foreground mt-2 mb-1 text-sm">Resources</h4>
-                {(Array.isArray(transaction.resources) ? transaction.resources : [transaction.resources]).map((res, i) => (
-                    <Card key={i} className="mt-1 bg-secondary"><CardContent className="p-2 space-y-1 text-xs">
-                        {Object.entries(res).map(([key, value]) => (
-                            <div key={key} className="break-all">
-                                <span className="font-semibold capitalize text-foreground">{key}:</span>
-                                <span> {typeof value === 'object' ? JSON.stringify(value, null, 2) : String(value)}</span>
-                            </div>
-                        ))}
-                    </CardContent></Card>
-                ))}
-            </div>
         )}
       </div>
   );
@@ -583,7 +599,11 @@ export default function KataSelection() {
                                         "absolute top-0 left-0 h-full w-64 bg-background border-r transition-transform duration-300 ease-in-out z-10",
                                         leftPanelOpen ? "translate-x-0" : "-translate-x-full"
                                     )}>
-                                        <TransactionDetails transaction={transactionToCurrent} title="Previous Transition" />
+                                        <TransactionDetails 
+                                            transaction={transactionToCurrent} 
+                                            onNavigate={() => handleStepChange('prev')}
+                                            navigationDirection="prev"
+                                        />
                                     </div>
                                     
                                     {/* Main Content */}
@@ -746,7 +766,7 @@ export default function KataSelection() {
                                                       <div className="w-full space-y-2">
                                                         <Card>
                                                           <CardHeader>
-                                                            <h3 className="text-lg font-semibold">Notes</h3>
+                                                            <h3>Notes</h3>
                                                           </CardHeader>
                                                           <CardContent>
                                                             <p className="text-sm text-muted-foreground">{currentStep.notes}</p>
@@ -774,7 +794,11 @@ export default function KataSelection() {
                                         "absolute top-0 right-0 h-full w-64 bg-background border-l transition-transform duration-300 ease-in-out z-10",
                                         rightPanelOpen ? "translate-x-0" : "translate-x-full"
                                     )}>
-                                        <TransactionDetails transaction={transactionToNext} title="Next Transition" />
+                                        <TransactionDetails 
+                                          transaction={transactionToNext} 
+                                          onNavigate={() => handleStepChange('next')}
+                                          navigationDirection="next"
+                                        />
                                     </div>
                                 </div>
                           </TabsContent>
