@@ -795,7 +795,7 @@ export default function KataSelection() {
                               {kataDetails.notes && (
                                 <Card>
                                   <CardHeader>
-                                    <h3>Notes</h3>
+                                    <h3>Note</h3>
                                   </CardHeader>
                                   <CardContent>
                                     <p className="text-sm">{kataDetails.notes}</p>
@@ -806,7 +806,7 @@ export default function KataSelection() {
                                 (Array.isArray(kataDetails.resources) ? kataDetails.resources : [kataDetails.resources]).map((resource, index) => (
                                   <Card key={index}>
                                     <CardHeader>
-                                      <h3>Resource</h3>
+                                      <h3>Risorse</h3>
                                     </CardHeader>
                                     <CardContent className="space-y-2">
                                       {Object.entries(resource).map(([key, value]) => (
@@ -883,15 +883,8 @@ export default function KataSelection() {
                                         <React.Fragment key={step.id_sequence}>
                                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                                 <Card className={cn("flex flex-col", step.kiai && "border-primary")}>
-                                                    <CardContent className="p-4 grid grid-cols-[80px,1fr] gap-4 items-start">
-                                                        <div className="w-full h-full flex items-center justify-center">
-                                                            <DirectionIndicator
-                                                                size={60}
-                                                                direction={step.facing}
-                                                                guardia={step.guardia}
-                                                            />
-                                                        </div>
-                                                        <div className="flex flex-col gap-2">
+                                                    <CardContent className="p-4 flex flex-col gap-4 items-start">
+                                                        <div className="flex flex-col gap-2 w-full">
                                                             <div className="flex justify-between items-start">
                                                                 <div className="flex-grow">
                                                                     <p className="font-medium cursor-pointer hover:underline" onClick={() => handlePosizioneClick(step.stand_id)}>
