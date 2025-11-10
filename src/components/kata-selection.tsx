@@ -14,7 +14,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight, Loader2, Rabbit, Wind, Hourglass, PersonStanding, Turtle, Volume2, MapPin, Notebook, Eye, Crosshair } from "lucide-react";
+import { ChevronLeft, ChevronRight, Loader2, Rabbit, Wind, Hourglass, PersonStanding, Turtle, Volume2, MapPin, Notebook, Eye, Crosshair, Lightbulb, ArrowLeft, ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import React from "react";
 import {
@@ -591,24 +591,30 @@ export default function KataSelection() {
                                         <div className="w-full flex flex-col items-center">
                                             {currentStep ? (
                                                 <div className="mt-4 flex flex-col items-center gap-4 w-full max-w-2xl mx-auto">
-                                                    <div className="flex items-center gap-4 w-full justify-center">
-                                                        <Button variant="outline" size="icon" onClick={() => setLeftPanelOpen(!leftPanelOpen)} disabled={!transactionToCurrent}>
-                                                            <ChevronLeft className="h-4 w-4" />
-                                                        </Button>
+                                                    <div className="flex items-center w-full justify-between">
+                                                        <div className="flex flex-col space-y-2">
+                                                            <Button variant="outline" size="icon" onClick={() => setLeftPanelOpen(!leftPanelOpen)} disabled={!transactionToCurrent}>
+                                                                <Lightbulb className="h-4 w-4" />
+                                                            </Button>
+                                                            <Button variant="outline" size="icon" onClick={() => handleStepChange('prev')}>
+                                                                <ArrowLeft className="h-4 w-4" />
+                                                            </Button>
+                                                        </div>
 
                                                         <div className="flex-grow text-center">
                                                             <p className="text-sm font-medium tabular-nums">
                                                                 Step {selectedStepIndex + 1} / {sortedKataSteps.length}
                                                             </p>
-                                                            <div className="flex items-center justify-center gap-4 mt-2">
-                                                                <Button variant="ghost" size="sm" onClick={() => handleStepChange('prev')}>Prev</Button>
-                                                                <Button variant="ghost" size="sm" onClick={() => handleStepChange('next')}>Next</Button>
-                                                            </div>
                                                         </div>
 
-                                                        <Button variant="outline" size="icon" onClick={() => setRightPanelOpen(!rightPanelOpen)} disabled={!transactionToNext}>
-                                                            <ChevronRight className="h-4 w-4" />
-                                                        </Button>
+                                                        <div className="flex flex-col space-y-2">
+                                                            <Button variant="outline" size="icon" onClick={() => setRightPanelOpen(!rightPanelOpen)} disabled={!transactionToNext}>
+                                                                <Lightbulb className="h-4 w-4" />
+                                                            </Button>
+                                                            <Button variant="outline" size="icon" onClick={() => handleStepChange('next')}>
+                                                                <ArrowRight className="h-4 w-4" />
+                                                            </Button>
+                                                        </div>
                                                     </div>
                                     
                                                     <div className="flex items-center justify-center gap-3 text-sm p-4">
@@ -740,7 +746,7 @@ export default function KataSelection() {
                                                       <div className="w-full space-y-2">
                                                         <Card>
                                                           <CardHeader>
-                                                            <CardTitle className="text-lg">Notes</CardTitle>
+                                                            <h3 className="text-lg font-semibold">Notes</h3>
                                                           </CardHeader>
                                                           <CardContent>
                                                             <p className="text-sm text-muted-foreground">{currentStep.notes}</p>
