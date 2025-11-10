@@ -48,11 +48,11 @@ export const DirectionIndicator: React.FC<DirectionIndicatorProps> = ({
   const center = size / 2;
   const radius = size * 0.4;
 
-  const renderArrow = (dir: AbsoluteDirections, color: string) => {
+  const renderArrow = (dir: AbsoluteDirections, color: string, arrowRadius: number) => {
     const rotation = directionRotation[dir];
     const arrowAngle = (rotation * Math.PI) / 180;
-    const arrowX = center + radius * Math.sin(arrowAngle);
-    const arrowY = center - radius * Math.cos(arrowAngle);
+    const arrowX = center + arrowRadius * Math.sin(arrowAngle);
+    const arrowY = center - arrowRadius * Math.cos(arrowAngle);
     return (
         <div
             style={{
@@ -95,10 +95,10 @@ export const DirectionIndicator: React.FC<DirectionIndicatorProps> = ({
       })}
 
       {/* Primary Arrow */}
-      {direction && renderArrow(direction, arrowColor)}
+      {direction && renderArrow(direction, arrowColor, radius)}
       
-      {/* Secondary Arrow */}
-      {secondaryDirection && renderArrow(secondaryDirection, secondaryArrowColor)}
+      {/* Secondary Arrow (closer to center) */}
+      {secondaryDirection && renderArrow(secondaryDirection, secondaryArrowColor, radius * 0.6)}
 
 
       {/* Guardia or Center Icon */}
