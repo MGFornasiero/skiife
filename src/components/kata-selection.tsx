@@ -391,7 +391,7 @@ export default function KataSelection() {
       setSelectedTechnicInfo(data.info_technic);
     } catch (error: any) {
       console.error("Error fetching technic info:", error);
-      setIsTechnicInfoDialogOpen(false);
+      setIsPosizioneInfoDialogOpen(false);
       toast({
         variant: "destructive",
         title: "Error",
@@ -449,7 +449,7 @@ export default function KataSelection() {
         {kataInventory ? (
             <Select onValueChange={handleKataChange}>
               <SelectTrigger id="kata-select">
-                <SelectValue placeholder="Select a kata..." />
+                <SelectValue placeholder="Selezionare il kata" />
               </SelectTrigger>
               <SelectContent>
                 {sortedKataNames.map((kataName) => (
@@ -563,7 +563,7 @@ export default function KataSelection() {
                                                           <div>
                                                               {techniques && techniques.length > 0 && (
                                                                 <>
-                                                                  <p className="text-sm text-muted-foreground">Techniques:</p>
+                                                                  <p className="text-sm text-muted-foreground">Tecniche:</p>
                                                                   <ul className="list-disc pl-5 font-medium">
                                                                       {techniques.map((tech) => (
                                                                           <li key={tech.technic_id} className="truncate text-sm cursor-pointer hover:underline" onClick={(e) => { e.stopPropagation(); handleTechnicClick(tech.technic_id); }}>
@@ -712,27 +712,27 @@ export default function KataSelection() {
                                                       ) : <p className="text-sm text-muted-foreground">No techniques for this step.</p>}
                                                     </div>
                                                     
-                                                    <div className="w-full space-y-4">
-                                                        <h3>Remarks</h3>
-                                                        {currentStep.remarks && currentStep.remarks.length > 0 ? (
-                                                            <div className="space-y-2">
-                                                                {currentStep.remarks.map((remark, index) => (
-                                                                    <Card key={index}>
-                                                                        <CardContent className="p-4 space-y-2 text-sm">
-                                                                            {remark.arto && <p><span className="font-semibold">Arto:</span> {formatBodyPart(remark.arto)}</p>}
-                                                                            {remark.description && <p><span className="font-semibold">Description:</span> {remark.description}</p>}
-                                                                            {remark.explanation && <p><span className="font-semibold">Explanation:</span> {remark.explanation}</p>}
-                                                                            {remark.note && <p><span className="font-semibold">Note:</span> {remark.note}</p>}
-                                                                        </CardContent>
-                                                                    </Card>
-                                                                ))}
-                                                            </div>
-                                                        ) : <p className="text-sm text-muted-foreground">No remarks for this step.</p>}
-                                                    </div>
+                                                    {currentStep.remarks && currentStep.remarks.length > 0 && (
+                                                      <div className="w-full space-y-4">
+                                                          <h3>Osservazioni</h3>
+                                                          <div className="space-y-2">
+                                                              {currentStep.remarks.map((remark, index) => (
+                                                                  <Card key={index}>
+                                                                      <CardContent className="p-4 space-y-2 text-sm">
+                                                                          {remark.arto && <p><span className="font-semibold">Arto:</span> {formatBodyPart(remark.arto)}</p>}
+                                                                          {remark.description && <p><span className="font-semibold">Description:</span> {remark.description}</p>}
+                                                                          {remark.explanation && <p><span className="font-semibold">Explanation:</span> {remark.explanation}</p>}
+                                                                          {remark.note && <p><span className="font-semibold">Note:</span> {remark.note}</p>}
+                                                                      </CardContent>
+                                                                  </Card>
+                                                              ))}
+                                                          </div>
+                                                      </div>
+                                                    )}
 
-                                                    <div className="w-full space-y-4">
-                                                      <h3>Resources</h3>
-                                                      {currentStep.resources ? (
+                                                    {currentStep.resources && (
+                                                      <div className="w-full space-y-4">
+                                                        <h3>Risorse</h3>
                                                         <div className="space-y-2">
                                                           {(Array.isArray(currentStep.resources) ? currentStep.resources : [currentStep.resources]).map((res, index) => (
                                                             <Card key={index}>
@@ -747,14 +747,14 @@ export default function KataSelection() {
                                                             </Card>
                                                           ))}
                                                         </div>
-                                                      ) : <p className="text-sm text-muted-foreground">No resources for this step.</p>}
-                                                    </div>
+                                                      </div>
+                                                    )}
 
                                                     {currentStep.notes && (
                                                       <div className="w-full space-y-2">
                                                         <Card>
                                                           <CardHeader>
-                                                            <h3>Notes</h3>
+                                                            <h3 className="font-semibold">Note</h3>
                                                           </CardHeader>
                                                           <CardContent>
                                                             <p className="text-sm text-muted-foreground">{currentStep.notes}</p>
@@ -1080,3 +1080,6 @@ export default function KataSelection() {
   );
 }
 
+
+
+    
