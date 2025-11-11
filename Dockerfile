@@ -16,7 +16,7 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
 # Environment variables for build
-ENV NEXT_TELEMETRY_DISABLED 1
+ENV NEXT_TELEMETRY_DISABLED = 1
 
 # Build the Next.js application
 RUN npm run build
@@ -26,7 +26,7 @@ FROM node:20-alpine AS runner
 WORKDIR /app
 
 ENV NODE_ENV=production
-ENV NEXT_TELEMETRY_DISABLED 1
+ENV NEXT_TELEMETRY_DISABLED = 1
 
 # Create a non-root user for security
 RUN addgroup --system --gid 1001 nodejs
@@ -51,6 +51,6 @@ USER nextjs
 
 EXPOSE 3000
 
-ENV PORT 3000
+ENV PORT = 3000
 
 CMD ["npm", "start"]
