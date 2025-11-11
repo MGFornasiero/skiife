@@ -292,6 +292,7 @@ export default function KataDisplay() {
                   <Card className="w-full">
                     <CardContent className="p-4 grid grid-cols-[80px,1fr] gap-4 items-start">
                       <div className="w-full h-full flex flex-col items-center justify-center gap-2">
+                          <p className="font-bold text-lg">{passaggioNum}</p>
                           <Popover>
                             <PopoverTrigger>
                                 <span className="text-3xl cursor-pointer">{getMovementIcon(passaggio.movement || null)}</span>
@@ -300,7 +301,6 @@ export default function KataDisplay() {
                               <p>{passaggio.movement}</p>
                             </PopoverContent>
                           </Popover>
-                          <p className="font-bold text-lg">{passaggioNum}</p>
                       </div>
                       <div className="flex flex-col gap-2">
                           <div className="flex justify-between items-start">
