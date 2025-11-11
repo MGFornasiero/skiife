@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { type StandInfo, type TechnicInfo, type KihonsResponse, type KihonSequences, type KihonFormattedDetails } from "@/lib/data";
 import {
   Select,
@@ -10,14 +10,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -274,7 +266,8 @@ export default function KataDisplay() {
       
       {loading ? (
         <div className="flex flex-col items-center justify-center text-center p-10 border-2 border-dashed rounded-lg">
-          <p className="text-muted-foreground">Loading data...</p>
+          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+          <p className="text-muted-foreground mt-2">Loading data...</p>
         </div>
       ) : gradeId && kihonData ? (
         <>
@@ -293,63 +286,61 @@ export default function KataDisplay() {
           </div>
 
           {selectedPassaggi.length > 0 ? (
-            <div className="overflow-hidden rounded-lg border">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead className="w-[50px]">#</TableHead>
-                      <TableHead>Mov</TableHead>
-                      <TableHead>Tecnica</TableHead>
-                      <TableHead>Posizione</TableHead>
-                      <TableHead>Altezza</TableHead>
-                      <TableHead>Note</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {selectedPassaggi.map(([passaggioNum, passaggio]) => {
-                      return (
-                        <TableRow key={passaggioNum}>
-                          <TableCell className="font-medium">{passaggioNum}</TableCell>
-                          <TableCell>
-                            <Popover>
-                              <PopoverTrigger>
-                                  <span className="text-xl cursor-pointer">{getMovementIcon(passaggio.movement || null)}</span>
-                              </PopoverTrigger>
-                              <PopoverContent className="w-auto p-2">
-                                <p>{passaggio.movement}</p>
-                              </PopoverContent>
-                            </Popover>
-                          </TableCell>
-                          <TableCell 
-                            className="cursor-pointer hover:underline"
-                            onClick={() => handleTechnicClick(passaggio.technic_id)}
-                          >
-                            {passaggio.tecnica}
-                          </TableCell>
-                          <TableCell 
-                            className="cursor-pointer hover:underline"
-                            onClick={() => handleStandClick(passaggio.stand_id)}
-                          >
-                            {passaggio.Stand}
-                          </TableCell>
-                          <TableCell>{passaggio.Target}</TableCell>
-                          <TableCell>
-                            {passaggio.Note && passaggio.Note.trim() !== '' && (
-                                <Popover>
-                                    <PopoverTrigger>
-                                        <Notebook className="h-5 w-5 text-muted-foreground cursor-pointer" />
-                                    </PopoverTrigger>
-                                    <PopoverContent>
-                                        <p>{passaggio.Note}</p>
-                                    </PopoverContent>
-                                </Popover>
+            <div className="mt-6 flex flex-col items-center gap-2">
+              {selectedPassaggi.map(([passaggioNum, passaggio]) => (
+                <React.Fragment key={passaggioNum}>
+                  <Card className="w-full">
+                    <CardContent className="p-4 grid grid-cols-[80px,1fr] gap-4 items-start">
+                      <div className="w-full h-full flex flex-col items-center justify-center gap-2">
+                          <Popover>
+                            <PopoverTrigger>
+                                <span className="text-3xl cursor-pointer">{getMovementIcon(passaggio.movement || null)}</span>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-auto p-2">
+                              <p>{passaggio.movement}</p>
+                            </PopoverContent>
+                          </Popover>
+                          <p className="font-bold text-lg">{passaggioNum}</p>
+                      </div>
+                      <div className="flex flex-col gap-2">
+                          <div className="flex justify-between items-start">
+                              <div className="flex-grow">
+                                <p
+                                    className="font-medium cursor-pointer hover:underline"
+                                    onClick={() => handleStandClick(passaggio.stand_id)}
+                                >
+                                    {passaggio.Stand}
+                                </p>
+                                <p
+                                    className="text-sm cursor-pointer hover:underline"
+                                    onClick={() => handleTechnicClick(passaggio.technic_id)}
+                                >
+                                    {passaggio.tecnica}
+                                </p>
+                              </div>
+                              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                                {passaggio.Note && passaggio.Note.trim() !== '' && (
+                                    <Popover>
+                                        <PopoverTrigger>
+                                            <Notebook className="h-5 w-5 text-muted-foreground cursor-pointer" />
+                                        </PopoverTrigger>
+                                        <PopoverContent>
+                                            <p>{passaggio.Note}</p>
+                                        </PopoverContent>
+                                    </Popover>
+                                )}
+                              </div>
+                          </div>
+                          <div>
+                            {passaggio.Target && (
+                              <p className="text-sm"><span className="text-muted-foreground">Altezza:</span> {passaggio.Target}</p>
                             )}
-                          </TableCell>
-                        </TableRow>
-                      );
-                    })}
-                  </TableBody>
-                </Table>
+                          </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </React.Fragment>
+              ))}
             </div>
           ) : (
             <div className="flex flex-col items-center justify-center text-center p-10 border-2 border-dashed rounded-lg">
