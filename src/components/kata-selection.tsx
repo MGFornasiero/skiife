@@ -120,8 +120,9 @@ const formatBodyPart = (arto: BodyPart) => {
 const TransactionDetails: React.FC<{ 
   transaction: KataTransaction | null,
   onNavigate?: () => void,
+  onClose?: () => void,
   navigationDirection?: 'prev' | 'next' 
-}> = ({ transaction, onNavigate, navigationDirection }) => {
+}> = ({ transaction, onNavigate, onClose, navigationDirection }) => {
   if (!transaction) {
     return (
       <div className="p-4 text-sm text-muted-foreground h-full flex items-center justify-center">
@@ -131,6 +132,22 @@ const TransactionDetails: React.FC<{
   }
   return (
     <div className="p-4 space-y-4 h-full overflow-y-auto flex flex-col">
+        {onNavigate && navigationDirection && (
+          <div className="pb-4 border-b flex items-center gap-2">
+              <Button onClick={onNavigate} className="flex-grow">
+                  {navigationDirection === 'next' ? (
+                      <>Next Step <ArrowRight className="ml-2 h-4 w-4" /></>
+                  ) : (
+                      <><ArrowLeft className="mr-2 h-4 w-4" /> Previous Step</>
+                  )}
+              </Button>
+              {onClose && (
+                <Button onClick={onClose} variant="outline" size="icon">
+                  <Lightbulb className="h-4 w-4" />
+                </Button>
+              )}
+          </div>
+        )}
         <div className="flex-grow space-y-4">
             {transaction.tempo && (
               <div className="flex items-center gap-2">
@@ -191,17 +208,6 @@ const TransactionDetails: React.FC<{
                 </div>
             )}
         </div>
-        {onNavigate && navigationDirection && (
-          <div className="pt-4 border-t">
-              <Button onClick={onNavigate} className="w-full">
-                  {navigationDirection === 'next' ? (
-                      <>Next Step <ArrowRight className="ml-2 h-4 w-4" /></>
-                  ) : (
-                      <><ArrowLeft className="mr-2 h-4 w-4" /> Previous Step</>
-                  )}
-              </Button>
-          </div>
-        )}
       </div>
   );
 };
@@ -439,6 +445,13 @@ export default function KataSelection() {
     }
   };
 
+  const handleStepChangeAndClosePanels = (direction: 'next' | 'prev') => {
+    handleStepChange(direction);
+    setLeftPanelOpen(false);
+    setRightPanelOpen(false);
+  };
+
+
   const selectedBunkaiId = bunkaiIds[selectedBunkaiIndex];
   const selectedBunkaiSummary = kataDetails && selectedBunkaiId ? kataDetails.bunkai_ids[selectedBunkaiId] : null;
 
@@ -601,7 +614,8 @@ export default function KataSelection() {
                                     )}>
                                         <TransactionDetails 
                                             transaction={transactionToCurrent} 
-                                            onNavigate={() => handleStepChange('prev')}
+                                            onNavigate={() => handleStepChangeAndClosePanels('prev')}
+                                            onClose={() => setLeftPanelOpen(false)}
                                             navigationDirection="prev"
                                         />
                                     </div>
@@ -784,7 +798,8 @@ export default function KataSelection() {
                                     )}>
                                         <TransactionDetails 
                                           transaction={transactionToNext} 
-                                          onNavigate={() => handleStepChange('next')}
+                                          onNavigate={() => handleStepChangeAndClosePanels('next')}
+                                          onClose={() => setRightPanelOpen(false)}
                                           navigationDirection="next"
                                         />
                                     </div>
@@ -881,7 +896,7 @@ export default function KataSelection() {
 
                                         return (
                                         <React.Fragment key={step.id_sequence}>
-                                            <div className="grid grid-cols-1 md:grid-cols-[1fr,2fr] gap-4">
+                                            <div className="grid grid-cols-1 md:grid-cols-[1fr,3fr] gap-4">
                                                 <Card className={cn("flex flex-col", step.kiai && "border-primary")}>
                                                     <CardContent className="p-4 flex flex-col gap-4 items-start">
                                                         <div className="flex flex-col gap-2 w-full">
@@ -1076,4 +1091,5 @@ export default function KataSelection() {
     
 
     
+
 
