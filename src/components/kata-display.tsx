@@ -213,6 +213,10 @@ export default function KataDisplay() {
     setSelectedSequenzaKey(sequenzaKeys[nextIndex]);
   };
   
+  const handleSequenzaSelect = (value: string) => {
+    setSelectedSequenzaKey(value);
+  };
+
   const gradeNumbers = Array.from({ length: 9 }, (_, i) => i + 1);
 
   return (
@@ -276,9 +280,18 @@ export default function KataDisplay() {
                 <Button variant="outline" size="icon" onClick={() => handleSequenzaChange('prev')} disabled={sequenzaKeys.length < 2}>
                     <span className="text-xl">⧏</span>
                 </Button>
-                <div className="w-48 h-10 flex items-center justify-center rounded-md border border-input bg-background px-3 py-2 text-sm">
-                    {selectedSequenzaKey ? `Sequenza ${selectedSequenzaKey}` : "Select a sequenza"}
-                </div>
+                <Select onValueChange={handleSequenzaSelect} value={selectedSequenzaKey || ""}>
+                    <SelectTrigger className="w-[180px]">
+                        <SelectValue placeholder="Select a sequenza..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                        {sequenzaKeys.map((key) => (
+                            <SelectItem key={key} value={key}>
+                                Sequenza {key}
+                            </SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
                  <Button variant="outline" size="icon" onClick={() => handleSequenzaChange('next')} disabled={sequenzaKeys.length < 2}>
                     <span className="text-xl">⧐</span>
                 </Button>
