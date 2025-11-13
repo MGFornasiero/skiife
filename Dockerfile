@@ -32,10 +32,10 @@ ENV NEXT_TELEMETRY_DISABLED=1
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
 
-# Copy built assets
-COPY --from=builder /app/.next ./.next
-COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/package.json ./package.json
+# Copy built assets (set ownership at copy-time to avoid heavy chown)
+COPY --from=builder --chown=nextjs:nodejs /app/.next ./.next
+COPY --from=builder --chown=nextjs:nodejs /app/node_modules ./node_modules
+COPY --from=builder --chown=nextjs:nodejs /app/package.json ./package.json
 
 # The standalone output does not require the full node_modules,
 # but we keep it for simplicity. For a more optimized image,
@@ -43,9 +43,7 @@ COPY --from=builder /app/package.json ./package.json
 # COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 # COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
-# Change ownership of the files to the non-root user
-RUN chown -R nextjs:nodejs .
-
+# Files are owned correctly via the above `--chown` flags.
 # Switch to the non-root user
 USER nextjs
 
