@@ -104,7 +104,7 @@ export const KataPlayer: React.FC<KataPlayerProps> = ({
       <CardHeader>
         <CardTitle>Embusen</CardTitle>
       </CardHeader>
-      <CardContent className="grid grid-cols-2 items-center gap-4">
+      <CardContent className="grid grid-cols-1 md:grid-cols-2 items-center gap-4">
         <div className="flex flex-col items-center">
             <svg viewBox={viewBox} className="border rounded-md bg-secondary/30 h-64 w-64">
               <circle cx={0} cy={0} r={0.3} className="fill-muted-foreground/50" />

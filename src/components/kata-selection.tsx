@@ -777,7 +777,7 @@ export default function KataSelection() {
                                                       </div>
                                                     )}
                                                     
-                                                    <div className="w-full space-y-2 flex flex-col items-center">
+                                                    <div className="w-full">
                                                       <KataPlayer 
                                                         steps={sortedKataSteps} 
                                                         currentStepIndex={selectedStepIndex}
@@ -1091,5 +1091,6 @@ export default function KataSelection() {
     
 
     
+
 
 

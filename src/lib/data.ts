@@ -1,4 +1,5 @@
 
+
 import { 
     AbsoluteDirections, BodyPart, DetailedNotes, EmbusenPoints, Hips, KataSeries, Limbs, 
     Movements, Sides, TargetHgt, Tempo, WazaType 
@@ -108,6 +109,7 @@ export interface KihonTransaction {
 export interface KihonListResponse {
   grade: string;
   grade_id: number;
+  resources: Record<string, any>;
   note: string | null;
   sequenza_n: number;
   tecniche: Record<string, KihonStepInfo>;
